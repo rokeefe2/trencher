@@ -224,6 +224,7 @@ async function loadTrencher() {
   const s = d.summary || {}, o = s.outcomes || {}, picks = d.picks || [];
   $("#stake").textContent = (d.config || {}).paper_stake || 50;
   $("#source").textContent = d.source ? ` Data: ${d.source}.` : "";
+  $("#source").style.color = d.stale ? "var(--crit)" : "";
   $("#updated").textContent = d.updated_at ? "Last scan " + ago(d.updated_at) : "";
   $("#tiles").innerHTML =
     tile("Paper P&amp;L", money(s.pnl || 0, true), `$${(s.value || 0).toFixed(2)} value on $${(s.staked || 0).toFixed(0)} staked`, dir(s.pnl)) +

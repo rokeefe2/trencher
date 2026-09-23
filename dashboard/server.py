@@ -27,17 +27,17 @@ def fetch(url, ttl=60, raw=False):
     return val
 
 def trencher():
-    source = "local file"
+    source, stale = "local file", False
     if REPO:
-        try:  # GitHub API (not raw CDN) so data is never stale
-            meta = fetch(f"https://api.github.com/repos/{REPO}/contents/dashboard.json?ref=data", ttl=60)
-            data = json.loads(fetch(meta["download_url"] + f"?t={meta['sha']}", ttl=3600, raw=True))
+        try:  # raw file server: no API rate limit (the API allows only 60 requests/hour)
+            data = fetch(f"https://raw.githubusercontent.com/{REPO}/data/dashboard.json", ttl=60)
             source = f"github.com/{REPO}"
         except Exception as e:
-            data = None; source = f"GitHub unavailable ({e}); showing local file"
+            data = None; source = f"couldn't reach GitHub ({e}) - showing an OLD local copy"; stale = True
     if not REPO or data is None:
         p = os.path.join(HERE, "..", "dashboard.json")
         data = json.load(open(p)) if os.path.exists(p) else {"summary": {}, "picks": [], "recent": []}
+    data = json.loads(json.dumps(data))  # copy so live-price edits don't touch the cache
     # live prices for open picks
     open_picks = [p for p in data.get("picks", []) if p.get("status") == "open"]
     for chain in {p["chain"] for p in open_picks}:
@@ -59,15 +59,7 @@ def trencher():
     if open_picks:
         s = data["summary"]; s["value"] = round(sum(p["value_now"] for p in data["picks"]), 2)
         s["pnl"] = round(s["value"] - s.get("staked", 0), 2)
-    weekly = None
-    if REPO:
-        try:
-            files = fetch(f"https://api.github.com/repos/{REPO}/contents/weekly?ref=data", ttl=600)
-            latest = sorted(files, key=lambda f: f["name"])[-1]
-            weekly = {"name": latest["name"], "markdown": fetch(latest["download_url"], ttl=3600, raw=True)}
-        except Exception:
-            pass
-    data["weekly"] = weekly; data["source"] = source
+    data["source"] = source; data["stale"] = stale
     return data
 
 def ceo():

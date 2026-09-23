@@ -492,6 +492,8 @@ def cmd_export():
            "analysis": json.load(open(os.path.join(HERE, "analysis.json"))) if os.path.exists(os.path.join(HERE, "analysis.json")) else None,
            "tuning": {**TUNING, "effective": {k: _get(k) for k in TUNABLE}},
            "learnings": open(os.path.join(HERE, "learnings.md")).read() if os.path.exists(os.path.join(HERE, "learnings.md")) else "",
+           "weekly": (lambda fs: {"name": fs[-1], "markdown": open(os.path.join(HERE, "weekly", fs[-1])).read()} if fs else None)(
+               sorted(os.listdir(os.path.join(HERE, "weekly"))) if os.path.isdir(os.path.join(HERE, "weekly")) else []),
            "last_log": open(os.path.join(HERE, "logs", datetime.now().strftime("%Y-%m-%d") + ".log")).read()[-4000:]
                        if os.path.exists(os.path.join(HERE, "logs", datetime.now().strftime("%Y-%m-%d") + ".log")) else ""}
     json.dump(out, open(os.path.join(HERE, "dashboard.json"), "w"), default=str)
