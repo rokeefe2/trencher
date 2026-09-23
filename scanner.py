@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS seen (chain TEXT, token TEXT, first_seen REAL, last_r
 CREATE TABLE IF NOT EXISTS shadow (chain TEXT, token TEXT, t0 REAL, stage TEXT, reason TEXT, score REAL,
   parts TEXT, metrics TEXT, entry REAL, liq0 REAL, p1h REAL, p6h REAL, p24h REAL, p72h REAL, liq24 REAL,
   PRIMARY KEY(chain, token));
+CREATE TABLE IF NOT EXISTS equity (t REAL PRIMARY KEY, value REAL, staked REAL, open_n INTEGER);
 CREATE TABLE IF NOT EXISTS incubator (chain TEXT, token TEXT, created_at REAL, PRIMARY KEY(chain, token));
 CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT, symbol TEXT, name TEXT,
   picked_at REAL, entry_price REAL, stake REAL, score REAL, reason TEXT,
@@ -480,7 +481,18 @@ def cmd_export():
             key = re.sub(r"only \d+ holders.*", "too few holders", key).replace("rugcheck danger: ", "")[:60]
             reasons[key] = reasons.get(key, 0) + 1
     closed = [p for p in picks if p["status"] == "closed"]
-    out = {"updated_at": NOW, "config": {k: v for k, v in CFG.items() if k not in ("ntfy_topic", "email")},
+    # equity curve: one point per scan (the dashboard's main chart)
+    if not DB.execute("SELECT 1 FROM equity LIMIT 1").fetchone():   # first run: backfill a start point per pick
+        for p in sorted(picks, key=lambda x: x["picked_at"]):
+            st = sum(q["stake"] for q in picks if q["picked_at"] <= p["picked_at"])
+            DB.execute("INSERT OR IGNORE INTO equity VALUES (?,?,?,?)", (p["picked_at"], st, st, 0))
+    DB.execute("INSERT OR REPLACE INTO equity VALUES (?,?,?,?)", (NOW, sum(p["value_now"] for p in picks),
+               sum(p["stake"] for p in picks), sum(p["status"] == "open" for p in picks)))
+    eq = DB.execute("SELECT t, value, staked FROM equity WHERE t>? ORDER BY t", (NOW - 400 * 86400,)).fetchall()
+    stride = max(1, len(eq) // 1500)
+    eq = eq[::stride] + ([eq[-1]] if eq and (len(eq) - 1) % stride else [])
+    out = {"updated_at": NOW,
+           "equity": [[round(a), round(b, 2), round(c, 2)] for a, b, c in eq], "config": {k: v for k, v in CFG.items() if k not in ("ntfy_topic", "email")},
            "summary": {"picks": len(picks), "open": sum(p["status"] == "open" for p in picks),
                        "staked": sum(p["stake"] for p in picks), "value": round(sum(p["value_now"] for p in picks), 2),
                        "pnl": round(sum(p["pnl"] for p in picks), 2),

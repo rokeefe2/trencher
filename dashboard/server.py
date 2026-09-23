@@ -62,6 +62,16 @@ def trencher():
     data["source"] = source; data["stale"] = stale
     return data
 
+def spark(chain, token, since):
+    """Price history for a pick's mini chart: DexScreener finds the main pool, GeckoTerminal gives candles."""
+    pairs = fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{token}", ttl=600)
+    pair = max(pairs, key=lambda p: float((p.get("liquidity") or {}).get("usd") or 0))["pairAddress"]
+    hrs = (time.time() - since) / 3600
+    tf, agg = ("minute", 15) if hrs <= 24 else ("hour", 1)
+    d = fetch(f"https://api.geckoterminal.com/api/v2/networks/{chain}/pools/{pair}/ohlcv/{tf}?aggregate={agg}&limit=300", ttl=300)
+    pts = sorted([c[0], c[4]] for c in d["data"]["attributes"]["ohlcv_list"] if c[0] >= since - 3600)
+    return {"points": pts}
+
 def ceo():
     out = {"state": None, "briefings": []}
     sp = os.path.join(CEO_DIR, "state.json")
@@ -83,6 +93,12 @@ class H(BaseHTTPRequestHandler):
                 self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
             elif self.path.startswith("/api/trencher"):
                 self.send(200, json.dumps(trencher(), default=str), "application/json")
+            elif self.path.startswith("/api/spark"):
+                from urllib.parse import urlparse, parse_qs
+                q = {k: v[0] for k, v in parse_qs(urlparse(self.path).query).items()}
+                if q.get("chain") not in ("solana", "base") or not q.get("token", "").isalnum():
+                    self.send(400, "bad request", "text/plain"); return
+                self.send(200, json.dumps(spark(q["chain"], q["token"], float(q.get("since", 0)))), "application/json")
             elif self.path.startswith("/api/ceo"):
                 self.send(200, json.dumps(ceo(), default=str), "application/json")
             else:

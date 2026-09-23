@@ -7,319 +7,443 @@
 <style>
 :root {
   color-scheme: light;
-  --bg: #f6f5f2; --surface: #fcfcfb; --surface-2: #f0efec; --border: #e4e2dc;
-  --text: #0b0b0b; --text-2: #52514e; --text-3: #8a8883;
-  --accent: #2a78d6; --gain: #2a78d6; --loss: #e34948; --neutral: #c9c7c0;
-  --good: #0ca30c; --warn: #fab219; --crit: #d03b3b;
-  --seq-1: #86b6ef; --seq-2: #5598e7; --seq-3: #2a78d6; --seq-4: #1c5cab;
+  --bg: #ffffff; --surface: #ffffff; --raised: #f5f6f7; --border: #e3e5e8;
+  --text: #000000; --text-2: #6b6e73; --text-3: #9a9da3;
+  --up: #00a805; --up-line: #00c805; --down: #e04a00; --down-line: #ff5000;
+  --pill-text: #ffffff; --cross: #b8bbc0;
+  --good: #00a805; --crit: #d03b3b;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #2e2e2b;
-    --text: #ffffff; --text-2: #c3c2b7; --text-3: #8d8c84;
-    --accent: #3987e5; --gain: #3987e5; --loss: #e66767; --neutral: #4a4a46;
-    --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #5598e7;
+    --bg: #000000; --surface: #000000; --raised: #1b1d1f; --border: #26282b;
+    --text: #ffffff; --text-2: #9b9ea3; --text-3: #6b6e73;
+    --up: #00c805; --up-line: #00c805; --down: #ff5000; --down-line: #ff5000;
+    --pill-text: #000000; --cross: #4a4d51;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #2e2e2b;
-  --text: #ffffff; --text-2: #c3c2b7; --text-3: #8d8c84;
-  --accent: #3987e5; --gain: #3987e5; --loss: #e66767; --neutral: #4a4a46;
-  --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #5598e7;
+  --bg: #000000; --surface: #000000; --raised: #1b1d1f; --border: #26282b;
+  --text: #ffffff; --text-2: #9b9ea3; --text-3: #6b6e73;
+  --up: #00c805; --up-line: #00c805; --down: #ff5000; --down-line: #ff5000;
+  --pill-text: #000000; --cross: #4a4d51;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text);
-  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
-.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 20px 60px; }
-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
-h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
-h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2); margin: 0 0 12px; font-weight: 600; }
-.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: 9px; }
-.tabs button { border: 0; background: transparent; color: var(--text-2); padding: 6px 14px; border-radius: 7px;
-  font: inherit; font-weight: 500; cursor: pointer; }
-.tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
-.meta { margin-left: auto; color: var(--text-3); font-size: 12px; display: flex; gap: 10px; align-items: center; }
-.meta button { font: inherit; border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
-  border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-.banner { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
-  color: var(--text-2); margin-bottom: 16px; font-size: 13px; }
-.grid { display: grid; gap: 14px; }
-.tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 14px; }
-.two { grid-template-columns: 1.4fr 1fr; }
-@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
-.tile .label { color: var(--text-2); font-size: 12px; }
-.tile .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
-.tile .sub { color: var(--text-3); font-size: 12px; margin-top: 2px; }
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 80px; }
+a { color: inherit; text-decoration: none; }
+[hidden] { display: none !important; }
+
+/* nav */
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border); }
+nav .in { max-width: 1120px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 28px; }
+.brand { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--up-line); }
+.tabs { display: flex; gap: 24px; height: 100%; }
+.tabs button { all: unset; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text-2); display: flex; align-items: center;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); }
+.navright { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--text-2); font-size: 13px; }
+.iconbtn { all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--text-2); }
+.iconbtn:hover { background: var(--raised); color: var(--text); }
+.stale { color: var(--crit); font-weight: 600; }
+@media (max-width: 600px) { nav .in { gap: 14px; } .tabs { gap: 14px; } .navright #updated { display: none; } }
+
+/* layout */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; padding-top: 32px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 28px; } }
+.side { position: sticky; top: 84px; align-self: start; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+@media (max-width: 900px) { .side { position: static; } }
+.side h3 { margin: 0; padding: 18px 20px 12px; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; }
+.side h3 small { font-weight: 500; color: var(--text-3); font-size: 12px; }
+section.block { border-top: 1px solid var(--border); padding: 24px 0; }
+section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.01em; }
+.muted { color: var(--text-2); } .small { font-size: 13px; }
+
+/* hero */
+.eyebrow { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 14px; font-weight: 500; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--raised); color: var(--text-2); }
+.hero { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.delta { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 20px; }
+.delta .when { color: var(--text-2); font-weight: 500; margin-left: 6px; }
+.up { color: var(--up); } .down { color: var(--down); }
+
+/* chart */
+.chart { position: relative; margin: 26px 0 8px; height: 280px; user-select: none; touch-action: pan-y; }
+.chart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.chart .timelabel { position: absolute; top: -20px; font-size: 12px; color: var(--text-2); transform: translateX(-50%); white-space: nowrap; pointer-events: none; }
+.chart .empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-3); font-size: 14px; text-align: center; }
+.ranges { display: flex; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.ranges button { all: unset; cursor: pointer; font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 4px; color: var(--text); }
+.ranges button:hover { background: var(--raised); }
+.ranges button[aria-pressed="true"] { color: var(--accent-now, var(--up)); box-shadow: inset 0 -2px 0 var(--accent-now, var(--up)); border-radius: 0; }
+
+/* stats grid */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px 24px; }
+.stat .k { font-size: 13px; color: var(--text-2); font-weight: 500; border-bottom: 1px dotted var(--border); padding-bottom: 6px; margin-bottom: 6px; }
+.stat .v { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* list rows (watchlist style) */
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 84px 82px; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.row:hover { background: var(--raised); }
+.row:last-child { border-bottom: 0; }
+.row .sym { font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .sub { font-size: 12px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row svg { width: 84px; height: 34px; display: block; }
+.pill { justify-self: end; min-width: 76px; text-align: center; font-size: 13px; font-weight: 700; padding: 6px 8px; border-radius: 4px; color: var(--pill-text); font-variant-numeric: tabular-nums; }
+.pill.up { background: var(--up-line); } .pill.down { background: var(--down-line); } .pill.flat { background: var(--raised); color: var(--text); }
+.side .emptyrow { padding: 22px 20px; color: var(--text-3); font-size: 14px; }
+.side-section { padding: 18px 20px; border-top: 1px solid var(--border); }
+.side-section h2 { font-size: 15px; margin-bottom: 12px; }
+
+/* bars */
+.bars { display: grid; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 1fr) 40px; gap: 4px 10px; font-size: 13px; }
+.bar-row .lbl { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-row .v { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.bar-track { grid-column: 1 / -1; height: 4px; background: var(--raised); border-radius: 2px; }
+.bar-fill { height: 4px; border-radius: 2px; background: var(--text); }
+
+/* tables etc */
 .tbl { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-th { text-align: left; font-weight: 500; color: var(--text-3); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+th { text-align: left; font-weight: 500; color: var(--text-2); font-size: 13px; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 12px 10px 12px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
 tr:last-child td { border-bottom: 0; }
 td.num, th.num { text-align: right; white-space: nowrap; }
-a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
-.chip { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--surface-2);
-  color: var(--text-2); border: 1px solid var(--border); white-space: nowrap; }
-
-.reason { color: var(--text-2); font-size: 12.5px; margin-top: 3px; max-width: 520px; }
-.empty { color: var(--text-3); padding: 18px 0; text-align: center; }
-.bars { display: grid; gap: 7px; }
-.bar-row { display: grid; grid-template-columns: minmax(120px, 42%) 1fr auto; gap: 10px; align-items: center; font-size: 12.5px; }
-.bar-row .lbl { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar-track { height: 12px; }
-.bar-fill { height: 12px; border-radius: 0 4px 4px 0; min-width: 2px; }
-.bar-row .v { color: var(--text); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
-svg text { fill: var(--text-2); font-size: 11px; }
-.tip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--border); color: var(--text);
-  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgb(0 0 0 / .18); z-index: 9; max-width: 280px; }
-.md { color: var(--text); font-size: 13.5px; overflow-x: auto; }
-.md h1, .md h2, .md h3 { text-transform: none; letter-spacing: 0; color: var(--text); font-size: 15px; margin: 14px 0 6px; }
-.md table { margin: 8px 0; } .md code { background: var(--surface-2); padding: 1px 4px; border-radius: 4px; font-size: 12px; }
-pre.log { background: var(--surface-2); border-radius: 8px; padding: 10px; font-size: 11.5px; overflow: auto; max-height: 260px;
-  color: var(--text-2); margin: 0; white-space: pre-wrap; }
-details summary { cursor: pointer; color: var(--text-2); }
-[hidden] { display: none !important; }
+.chip { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--raised); color: var(--text-2); white-space: nowrap; }
+.reason { color: var(--text-2); font-size: 13px; margin-top: 4px; }
+.empty { color: var(--text-3); padding: 16px 0; font-size: 14px; }
+.link { color: var(--up); font-weight: 600; }
+.md { font-size: 14px; overflow-x: auto; } .md h3 { font-size: 16px; margin: 18px 0 6px; }
+.md code { background: var(--raised); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+pre.log { background: var(--raised); border-radius: 8px; padding: 12px; font-size: 12px; overflow: auto; max-height: 280px; color: var(--text-2); margin: 0; white-space: pre-wrap; }
+details > summary { cursor: pointer; font-weight: 600; list-style: none; padding: 10px 0; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "›"; display: inline-block; margin-right: 8px; transition: transform .15s; color: var(--text-2); }
+details[open] > summary::before { transform: rotate(90deg); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+.check { display: flex; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.check .st { font-weight: 700; min-width: 70px; font-size: 13px; }
 </style>
 </head>
 <body>
+<nav><div class="in">
+  <div class="brand"><span class="dot" id="branddot"></span>Trencher</div>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="trencher" aria-selected="true">Meme coins</button>
+    <button role="tab" data-tab="learning" aria-selected="false">Learning</button>
+    <button role="tab" data-tab="ceo" aria-selected="false">CEO Watcher</button>
+  </div>
+  <div class="navright"><span id="updated"></span>
+    <button class="iconbtn" id="refresh" title="Refresh" aria-label="Refresh">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+  </div>
+</div></nav>
+
 <div class="wrap">
-  <header>
-    <h1>Trencher</h1>
-    <div class="tabs" role="tablist">
-      <button role="tab" data-tab="trencher" aria-selected="true">Meme coins</button>
-      <button role="tab" data-tab="learning" aria-selected="false">Learning</button>
-      <button role="tab" data-tab="ceo" aria-selected="false">CEO Watcher</button>
-    </div>
-    <div class="meta"><span id="updated"></span><button id="refresh">Refresh</button></div>
-  </header>
+<!-- ================= MEME COINS ================= -->
+<section id="tab-trencher">
+  <div class="layout">
+    <main>
+      <div class="eyebrow">Paper P&amp;L <span class="tag">Paper trading</span></div>
+      <div class="hero" id="hero">$0.00</div>
+      <div class="delta" id="delta"></div>
+      <div class="chart" id="chart"></div>
+      <div class="ranges" id="ranges">
+        <button data-r="1D">1D</button><button data-r="1W">1W</button><button data-r="1M">1M</button>
+        <button data-r="3M">3M</button><button data-r="ALL" aria-pressed="true">ALL</button>
+      </div>
 
-  <section id="tab-trencher">
-    <div class="banner">📝 <b>Paper trading</b> — every pick is a pretend $<span id="stake">50</span> bet. No real money moves.
-      <span id="source"></span></div>
-    <div class="grid tiles" id="tiles"></div>
-    <div class="grid two" style="margin-bottom:14px">
-      <div class="card"><h2>Open picks</h2><div class="tbl" id="open"></div></div>
-      <div class="card"><h2>P&amp;L by pick</h2><div id="pnlchart"></div></div>
-    </div>
-    <div class="grid two" style="margin-bottom:14px">
-      <div class="card"><h2>Closed picks</h2><div class="tbl" id="closed"></div></div>
-      <div class="card"><h2>Scan funnel</h2><div id="funnel" class="bars"></div>
-        <h2 style="margin-top:20px">Top reasons coins were rejected</h2><div id="reasons" class="bars"></div></div>
-    </div>
-    <div class="card" style="margin-bottom:14px"><h2>Weekly report</h2><div id="weekly" class="md"></div></div>
-    <div class="grid two">
-      <div class="card"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></div>
-      <div class="card"><h2>Latest scan log</h2><pre class="log" id="log"></pre></div>
-    </div>
-  </section>
+      <section class="block" style="border-top:0">
+        <h2>Key statistics</h2>
+        <div class="stats" id="stats"></div>
+      </section>
+      <section class="block"><h2>Closed picks</h2><div class="tbl" id="closed"></div></section>
+      <section class="block"><h2>Weekly report</h2><div id="weekly" class="md"></div></section>
+      <section class="block"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></section>
+      <section class="block"><details><summary>Latest scan log</summary><pre class="log" id="log"></pre></details>
+        <div class="small muted" id="source" style="margin-top:10px"></div></section>
+    </main>
 
-  <section id="tab-learning" hidden>
-    <div class="banner">🧪 The agent follows every coin it scans, including the ones it rejected, and checks whether each rule
-      was right. Every Monday it reviews the evidence, tunes itself within guardrails, and updates its notebook.
-      <span id="learn-meta"></span></div>
-    <div class="grid two" style="margin-bottom:14px">
-      <div class="card"><h2>Ready for real money?</h2><div id="golive"></div></div>
-      <div class="card"><h2>Waiting for your approval</h2><div id="pending"></div>
-        <h2 style="margin-top:20px">Changes the agent made</h2><div class="tbl" id="changelog"></div></div>
-    </div>
-    <div class="card" style="margin-bottom:14px"><h2>Safety rule report card</h2>
-      <div style="color:var(--text-3);font-size:12px;margin-bottom:8px">For coins each rule blocked: how many later rugged
-        (the rule protected you) vs. doubled (a missed winner). Judged 24h after the coin was seen.</div>
-      <div class="tbl" id="rules"></div></div>
-    <div class="grid two" style="margin-bottom:14px">
-      <div class="card"><h2>Outcome by stage</h2><div class="tbl" id="stages"></div>
-        <h2 style="margin-top:20px">Outcome by score</h2><div class="tbl" id="buckets"></div></div>
-      <div class="card"><h2>Which score factors predict winners?</h2><div class="tbl" id="comps"></div></div>
-    </div>
-    <div class="card"><h2>Agent's notebook</h2><div id="notebook" class="md"></div></div>
-  </section>
+    <aside class="side">
+      <h3>Open picks <small id="opencount"></small></h3>
+      <div id="open"></div>
+      <div class="side-section"><h2>Scan funnel</h2><div class="bars" id="funnel"></div></div>
+      <div class="side-section"><h2>Why coins were rejected</h2><div class="bars" id="reasons"></div></div>
+    </aside>
+  </div>
+</section>
 
-  <section id="tab-ceo" hidden>
-    <div class="grid tiles" id="ceo-tiles"></div>
-    <div class="grid two">
-      <div class="card"><h2>Positions the job manages</h2><div class="tbl" id="ceo-pos"></div>
-        <h2 style="margin-top:20px">Connor's current portfolio</h2><div id="ceo-connor" style="display:flex;flex-wrap:wrap;gap:6px"></div></div>
-      <div class="card"><h2>Daily briefings</h2><div id="ceo-brief"></div></div>
-    </div>
-  </section>
+<!-- ================= LEARNING ================= -->
+<section id="tab-learning" hidden>
+  <div style="padding-top:32px">
+    <div class="eyebrow">Self-study <span class="tag" id="learn-meta"></span></div>
+    <div class="hero" style="font-size:32px" id="golive-head">Ready for real money?</div>
+    <p class="muted small" style="max-width:720px">The agent follows every coin it scans, including the ones it rejected, and checks whether each rule
+      was right. Every Monday it reviews the evidence, tunes itself within guardrails, and updates its notebook.</p>
+    <section class="block" style="border-top:0;padding-top:8px"><div id="golive"></div></section>
+    <section class="block two">
+      <div><h2 style="font-size:20px;margin:0 0 12px">Waiting for your approval</h2><div id="pending"></div></div>
+      <div><h2 style="font-size:20px;margin:0 0 12px">Changes the agent made</h2><div class="tbl" id="changelog"></div></div>
+    </section>
+    <section class="block"><h2>Safety rule report card</h2>
+      <p class="muted small" style="margin-top:-8px">For coins each rule blocked: how many later rugged (the rule protected you) vs. doubled (a missed winner). Judged 24h after the coin was seen.</p>
+      <div class="tbl" id="rules"></div></section>
+    <section class="block two">
+      <div><h2 style="font-size:20px;margin:0 0 12px">Outcome by stage</h2><div class="tbl" id="stages"></div>
+        <h2 style="font-size:20px;margin:24px 0 12px">Outcome by score</h2><div class="tbl" id="buckets"></div></div>
+      <div><h2 style="font-size:20px;margin:0 0 12px">Which score factors predict winners?</h2><div class="tbl" id="comps"></div></div>
+    </section>
+    <section class="block"><h2>Agent's notebook</h2><div id="notebook" class="md"></div></section>
+  </div>
+</section>
+
+<!-- ================= CEO WATCHER ================= -->
+<section id="tab-ceo" hidden>
+  <div class="layout">
+    <main>
+      <div class="eyebrow">CEO Watcher <span class="tag">Agentic account</span></div>
+      <div class="hero" style="font-size:32px" id="ceo-head">—</div>
+      <div class="delta"><span class="when" style="margin:0" id="ceo-sub"></span></div>
+      <section class="block" style="margin-top:20px"><h2>Key statistics</h2><div class="stats" id="ceo-stats"></div></section>
+      <section class="block"><h2>Daily briefings</h2><div id="ceo-brief"></div></section>
+    </main>
+    <aside class="side">
+      <h3>Positions <small>sold when Connor exits</small></h3>
+      <div id="ceo-pos"></div>
+      <div class="side-section"><h2>Connor's portfolio</h2><div id="ceo-connor" style="display:flex;flex-wrap:wrap;gap:6px"></div></div>
+    </aside>
+  </div>
+</section>
 </div>
-<div class="tip" id="tip" hidden></div>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const money = (v, sign) => (sign && v > 0 ? "+" : v < 0 ? "−" : "") + "$" + Math.abs(v).toFixed(2);
+const fmt$ = v => "$" + Math.abs(v).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const signed$ = v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmt$(v);
+const pct = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2) + "%";
 const mult = v => v == null ? "—" : v.toFixed(2) + "×";
-const ago = ts => { const m = (Date.now()/1000 - ts)/60; return m < 60 ? Math.round(m)+"m ago" : m < 1440 ? Math.round(m/60)+"h ago" : Math.round(m/1440)+"d ago"; };
-const dir = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const ago = ts => { const m = (Date.now()/1000 - ts)/60; return m < 1 ? "just now" : m < 60 ? Math.round(m)+"m ago" : m < 1440 ? Math.round(m/60)+"h ago" : Math.round(m/1440)+"d ago"; };
+const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "";
 const safeUrl = u => /^https:\/\//.test(u || "") ? u : "#";
+const when = ts => new Date(ts * 1000).toLocaleString(undefined, {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"});
 
-// tiny markdown renderer — input is escaped first (coin names are untrusted)
+// markdown (input escaped first — coin names are untrusted)
 function md(src) {
   const lines = esc(src || "").split("\n"); let html = "", inList = false, table = [];
   const inline = t => t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  const flushTable = () => { if (!table.length) return;
+    .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a class="link" href="$2" target="_blank" rel="noopener">$1</a>');
+  const flush = () => { if (!table.length) return;
     const rows = table.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, "").split("|"));
     html += '<div class="tbl"><table>' + rows.map((r, i) => "<tr>" + r.map(c => (i ? "<td>" : "<th>") + inline(c.trim()) + (i ? "</td>" : "</th>")).join("") + "</tr>").join("") + "</table></div>";
     table = []; };
   for (const l of lines) {
-    if (/^\s*\|/.test(l)) { table.push(l.trim()); continue; } else flushTable();
+    if (/^\s*\|/.test(l)) { table.push(l.trim()); continue; } else flush();
     if (/^\s*[-*] /.test(l)) { if (!inList) { html += "<ul>"; inList = true; } html += "<li>" + inline(l.replace(/^\s*[-*] /, "")) + "</li>"; continue; }
     if (inList) { html += "</ul>"; inList = false; }
     const h = l.match(/^(#{1,3}) (.*)/);
     if (h) html += `<h3>${inline(h[2])}</h3>`; else if (l.trim()) html += `<p>${inline(l)}</p>`;
   }
-  flushTable(); if (inList) html += "</ul>"; return html;
+  flush(); if (inList) html += "</ul>"; return html;
 }
-
-function tile(label, value, sub, cls = "") {
-  return `<div class="card tile"><div class="label">${label}</div><div class="value ${cls}">${value}</div>${sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
-}
-function hbars(el, rows, color) {
+const stat = (k, v, c = "") => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+function bars(el, rows) {
   const max = Math.max(1, ...rows.map(r => r[1]));
-  el.innerHTML = rows.length ? rows.map(([l, v], i) => `<div class="bar-row"><span class="lbl" title="${esc(l)}">${esc(l)}</span>
-    <div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(1)}%;background:${typeof color === "function" ? color(i) : color}"></div></div>
-    <span class="v">${v.toLocaleString()}</span></div>`).join("") : '<div class="empty">Nothing yet</div>';
+  el.innerHTML = rows.length ? rows.map(([l, v]) => `<div class="bar-row"><span class="lbl" title="${esc(l)}">${esc(l)}</span><span class="v">${v.toLocaleString()}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%"></div></div></div>`).join("") : '<div class="empty">Nothing yet</div>';
 }
 
-const tip = $("#tip");
-function showTip(e, html) { tip.innerHTML = html; tip.hidden = false;
-  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
+/* ---------------- main chart (scrub to see any moment) ---------------- */
+const RANGES = {"1D": 86400, "1W": 7 * 86400, "1M": 30 * 86400, "3M": 90 * 86400, "ALL": Infinity};
+const RANGE_LABEL = {"1D": "Today", "1W": "Past week", "1M": "Past month", "3M": "Past 3 months", "ALL": "All time"};
+let EQ = [], RANGE = "ALL";
 
-function pnlChart(picks) {
-  const el = $("#pnlchart");
-  if (!picks.length) { el.innerHTML = '<div class="empty">No picks yet</div>'; return; }
-  const ps = [...picks].reverse().slice(-20), W = 460, rowH = 26, H = ps.length * rowH + 10, mid = W / 2 + 40;
-  const max = Math.max(5, ...ps.map(p => Math.abs(p.pnl)));
-  const sc = v => v / max * (W - mid - 60);
-  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Paper profit or loss per pick">`;
-  s += `<line x1="${mid}" x2="${mid}" y1="0" y2="${H}" stroke="var(--border)" stroke-width="1"/>`;
-  ps.forEach((p, i) => {
-    const y = i * rowH + 6, w = Math.max(2, Math.abs(sc(p.pnl))), x = p.pnl >= 0 ? mid + 1 : mid - 1 - w;
-    const fill = p.pnl >= 0 ? "var(--gain)" : "var(--loss)";
-    const r = 4, d = p.pnl >= 0
-      ? `M${x},${y} h${w - r} a${r},${r} 0 0 1 ${r},${r} v${16 - 2*r} a${r},${r} 0 0 1 -${r},${r} h-${w - r} z`
-      : `M${x + w},${y} h-${w - r} a${r},${r} 0 0 0 -${r},${r} v${16 - 2*r} a${r},${r} 0 0 0 ${r},${r} h${w - r} z`;
-    s += `<g class="hit" data-i="${i}"><rect x="0" y="${y - 4}" width="${W}" height="${rowH}" fill="transparent"/>
-      <text x="8" y="${y + 12}">${esc(p.symbol)}${p.status === "open" ? " •" : ""}</text>
-      <path d="${d}" fill="${fill}"/>
-      <text x="${p.pnl >= 0 ? x + w + 6 : x - 6}" y="${y + 12}" text-anchor="${p.pnl >= 0 ? "start" : "end"}" style="fill:var(--text)">${money(p.pnl, true)}</text></g>`;
-  });
-  s += "</svg>";
-  el.innerHTML = s + `<div style="color:var(--text-3);font-size:12px;margin-top:6px">▮ <span style="color:var(--gain)">gain</span> · ▮ <span style="color:var(--loss)">loss</span> · • still open</div>`;
-  el.querySelectorAll(".hit").forEach(g => {
-    const p = ps[+g.dataset.i];
-    g.addEventListener("mousemove", e => showTip(e, `<b>${esc(p.symbol)}</b> <span class="chip">${esc(p.chain)}</span><br>
-      P&amp;L ${money(p.pnl, true)} · now ${mult(p.mult_now)}<br>peak ${mult(p.peak / p.entry_price)} · score ${p.score}<br>
-      ${p.status === "open" ? "open" : "closed: " + esc(p.close_reason)}`));
-    g.addEventListener("mouseleave", () => tip.hidden = true);
-  });
+function rangePoints() {
+  const now = Date.now() / 1000, span = RANGES[RANGE];
+  if (span === Infinity) return EQ;
+  const inR = EQ.filter(p => p[0] >= now - span), before = EQ.filter(p => p[0] < now - span).pop();
+  return before ? [[now - span, before[1], before[2]], ...inR] : inR;
+}
+function setHero(pnl, basePnl, staked, label) {
+  const ch = pnl - basePnl;
+  $("#hero").textContent = signed$(pnl);
+  $("#delta").innerHTML = `<span class="${cls(ch)}">${arrow(ch)} ${signed$(ch)} (${pct(staked ? ch / staked * 100 : 0)})</span><span class="when">${esc(label)}</span>`;
+}
+function drawChart() {
+  const el = $("#chart"), pts = rangePoints().map(p => ({t: p[0], pnl: p[1] - p[2], staked: p[2]}));
+  document.querySelectorAll("#ranges button").forEach(b => b.setAttribute("aria-pressed", b.dataset.r === RANGE));
+  if (pts.length < 2) {
+    el.innerHTML = '<div class="empty">The chart fills in as scans run: one point every 15 minutes.</div>';
+    const last = pts[pts.length - 1] || {pnl: 0, staked: 0}; setHero(last.pnl, 0, last.staked, RANGE_LABEL[RANGE]); return;
+  }
+  const W = el.clientWidth || 700, H = 280, pad = 10;
+  const t0 = pts[0].t, t1 = pts[pts.length - 1].t, vals = pts.map(p => p.pnl), base = pts[0].pnl;
+  let lo = Math.min(base, ...vals), hi = Math.max(base, ...vals); if (hi - lo < 1) { hi += .5; lo -= .5; }
+  const x = t => (t - t0) / Math.max(1, t1 - t0) * W, y = v => pad + (hi - v) / (hi - lo) * (H - 2 * pad);
+  const upNow = pts[pts.length - 1].pnl >= base, color = upNow ? "var(--up-line)" : "var(--down-line)";
+  document.documentElement.style.setProperty("--accent-now", upNow ? "var(--up)" : "var(--down)");
+  $("#branddot").style.background = color;
+  const d = pts.map((p, i) => (i ? "L" : "M") + x(p.t).toFixed(1) + "," + y(p.pnl).toFixed(1)).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Paper profit and loss over time, ${esc(RANGE_LABEL[RANGE])}">
+      <line x1="0" x2="${W}" y1="${y(base)}" y2="${y(base)}" stroke="var(--cross)" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <line id="xh" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--cross)" stroke-width="1" visibility="hidden"/>
+      <circle id="xd" r="5" fill="${color}" stroke="var(--bg)" stroke-width="2" visibility="hidden"/>
+      <rect x="0" y="0" width="${W}" height="${H}" fill="transparent" id="hit"/>
+    </svg><div class="timelabel" id="tl" hidden></div>`;
+  const last = pts[pts.length - 1]; setHero(last.pnl, base, last.staked, RANGE_LABEL[RANGE]);
+  const svg = el.querySelector("svg");
+  const move = e => {
+    const r = svg.getBoundingClientRect(), cx = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * W;
+    let best = pts[0]; for (const p of pts) if (Math.abs(x(p.t) - cx) < Math.abs(x(best.t) - cx)) best = p;
+    const px = x(best.t);
+    for (const [id, a, v] of [["#xh", "x1", px], ["#xh", "x2", px], ["#xd", "cx", px], ["#xd", "cy", y(best.pnl)]]) $(id).setAttribute(a, v);
+    $("#xh").setAttribute("visibility", "visible"); $("#xd").setAttribute("visibility", "visible");
+    const tl = $("#tl"); tl.hidden = false; tl.textContent = when(best.t);
+    tl.style.left = Math.min(Math.max(px / W * r.width, 55), r.width - 55) + "px";
+    setHero(best.pnl, base, best.staked, "");
+  };
+  const leave = () => { $("#xh").setAttribute("visibility", "hidden"); $("#xd").setAttribute("visibility", "hidden"); $("#tl").hidden = true;
+    setHero(last.pnl, base, last.staked, RANGE_LABEL[RANGE]); };
+  svg.addEventListener("mousemove", move); svg.addEventListener("touchmove", move, {passive: true});
+  svg.addEventListener("mouseleave", leave); svg.addEventListener("touchend", leave);
+}
+document.querySelectorAll("#ranges button").forEach(b => b.addEventListener("click", () => { RANGE = b.dataset.r; drawChart(); }));
+addEventListener("resize", () => { clearTimeout(window._rz); window._rz = setTimeout(drawChart, 120); });
+
+/* ---------------- sparklines ---------------- */
+const SPARK = {};
+function sparkSvg(points, entry, up) {
+  if (!points || points.length < 2) return `<svg viewBox="0 0 84 34" aria-hidden="true"></svg>`;
+  const vs = points.map(p => p[1]), lo = Math.min(entry, ...vs), hi = Math.max(entry, ...vs), t0 = points[0][0], t1 = points[points.length - 1][0];
+  const x = t => (t - t0) / Math.max(1, t1 - t0) * 82 + 1, y = v => 3 + (hi - v) / Math.max(1e-18, hi - lo) * 28;
+  return `<svg viewBox="0 0 84 34" aria-hidden="true"><line x1="0" x2="84" y1="${y(entry)}" y2="${y(entry)}" stroke="var(--cross)" stroke-dasharray="1 3"/>
+    <path d="${points.map((p, i) => (i ? "L" : "M") + x(p[0]).toFixed(1) + "," + y(p[1]).toFixed(1)).join("")}" fill="none" stroke="${up ? "var(--up-line)" : "var(--down-line)"}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+async function loadSpark(p) {
+  const key = p.chain + p.token, hit = SPARK[key];
+  if (hit && Date.now() - hit.at < 300000) return hit.points;
+  try { const r = await (await fetch(`/api/spark?chain=${p.chain}&token=${encodeURIComponent(p.token)}&since=${Math.floor(p.picked_at)}`)).json();
+    SPARK[key] = {at: Date.now(), points: r.points || []}; return SPARK[key].points; } catch { return []; }
 }
 
+/* ---------------- meme coins tab ---------------- */
 async function loadTrencher() {
   const d = await (await fetch("/api/trencher")).json();
   const s = d.summary || {}, o = s.outcomes || {}, picks = d.picks || [];
-  $("#stake").textContent = (d.config || {}).paper_stake || 50;
-  $("#source").textContent = d.source ? ` Data: ${d.source}.` : "";
-  $("#source").style.color = d.stale ? "var(--crit)" : "";
-  $("#updated").textContent = d.updated_at ? "Last scan " + ago(d.updated_at) : "";
-  $("#tiles").innerHTML =
-    tile("Paper P&amp;L", money(s.pnl || 0, true), `$${(s.value || 0).toFixed(2)} value on $${(s.staked || 0).toFixed(0)} staked`, dir(s.pnl)) +
-    tile("Win rate (closed)", s.win_rate == null ? "—" : Math.round(s.win_rate * 100) + "%", `${picks.length - (s.open || 0)} closed picks`) +
-    tile("Open picks", s.open || 0, `max ${(d.config || {}).max_picks_per_day || 3} new per day`) +
-    tile("Coins scanned", (s.scanned || 0).toLocaleString(), `${(o.REJECT || 0).toLocaleString()} rejected as unsafe · ${s.incubating || 0} incubating`);
-  const open = picks.filter(p => p.status === "open"), closed = picks.filter(p => p.status !== "open");
-  $("#open").innerHTML = open.length ? `<table><tr><th>Coin</th><th class="num">Now</th><th class="num">P&amp;L</th><th class="num">Picked</th></tr>` +
-    open.map(p => `<tr><td><a href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener"><b>${esc(p.symbol)}</b></a> <span class="chip">${esc(p.chain)}</span>
-      <span class="chip">score ${p.score}</span>${p.took_stake ? ' <span class="chip">stake out ✓</span>' : ""}
-      <div class="reason">${esc(p.reason)}</div></td>
-      <td class="num">${mult(p.mult_now)}</td><td class="num ${dir(p.pnl)}">${money(p.pnl, true)}</td><td class="num">${ago(p.picked_at)}</td></tr>`).join("") + "</table>"
-    : '<div class="empty">No open picks — the scanner is waiting for a coin that passes every stage.</div>';
+  $("#updated").innerHTML = d.stale ? `<span class="stale">Showing old data</span>` : (d.updated_at ? "Last scan " + ago(d.updated_at) : "");
+  $("#source").innerHTML = d.source ? `Data: <span class="${d.stale ? "stale" : ""}">${esc(d.source)}</span>` : "";
+  EQ = d.equity || [];
+  if (EQ.length && s.value != null) EQ = [...EQ, [Date.now() / 1000, s.value, s.staked]];   // live point from current prices
+  drawChart();
+
+  const closed = picks.filter(p => p.status !== "open"), open = picks.filter(p => p.status === "open");
+  $("#stats").innerHTML = stat("Paper value", fmt$(s.value || 0)) + stat("Total staked", fmt$(s.staked || 0)) +
+    stat("Win rate (closed)", s.win_rate == null ? "—" : Math.round(s.win_rate * 100) + "%") + stat("Picks", `${picks.length} <span class="muted small">(${open.length} open)</span>`) +
+    stat("Coins scanned", (s.scanned || 0).toLocaleString()) + stat("Rejected as unsafe", (o.REJECT || 0).toLocaleString()) +
+    stat("Incubating", (s.incubating || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
+
+  $("#opencount").textContent = open.length ? `${open.length} open` : "";
+  $("#open").innerHTML = open.length ? open.map((p, i) => {
+    const ch = (p.mult_now - 1) * 100;
+    return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" title="${esc(p.reason)}">
+      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · score ${Math.round(p.score)} · ${ago(p.picked_at)}</div></div>
+      <span class="spark">${sparkSvg(null)}</span>
+      <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}">${pct(ch)}</span></a>`; }).join("")
+    : '<div class="emptyrow">No open picks. The scanner is waiting for a coin that passes every stage.</div>';
+  open.forEach(async (p, i) => { const pts = await loadSpark(p); const cell = document.querySelector(`#open .row[data-i="${i}"] .spark`);
+    if (cell) cell.innerHTML = sparkSvg(pts, p.entry_price, p.mult_now >= 1); });
+
   $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">P&amp;L</th><th>Exit</th></tr>` +
-    closed.map(p => `<tr><td><a href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">${esc(p.symbol)}</a></td><td class="num">${mult(p.p1h)}</td>
-      <td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td><td class="num ${dir(p.pnl)}">${money(p.pnl, true)}</td>
-      <td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
-    : '<div class="empty">No closed picks yet</div>';
-  pnlChart(picks);
+    closed.map(p => `<tr><td><a class="link" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">${esc(p.symbol)}</a> <span class="chip">${esc(p.chain)}</span>
+      <div class="reason">${esc(p.reason)}</div></td><td class="num">${mult(p.p1h)}</td><td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td>
+      <td class="num ${cls(p.pnl)}">${signed$(p.pnl)}</td><td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
+    : '<div class="empty">No closed picks yet.</div>';
+
   const total = s.scanned || 0, rej = o.REJECT || 0, reviewed = (o.PASS || 0) + (o.PICK || 0);
-  const seq = ["var(--seq-1)", "var(--seq-2)", "var(--seq-3)", "var(--seq-4)"];
-  hbars($("#funnel"), [["Scanned", total], ["Passed safety checks", total - rej], ["Reviewed by Claude", reviewed], ["Picked", o.PICK || 0]], i => seq[i]);
-  hbars($("#reasons"), (d.reject_reasons || []).slice(0, 8), "var(--seq-2)");
-  $("#weekly").innerHTML = d.weekly ? `<div style="color:var(--text-3);font-size:12px">${esc(d.weekly.name)}</div>` + md(d.weekly.markdown)
+  bars($("#funnel"), [["Scanned", total], ["Passed safety checks", total - rej], ["Reviewed by Claude", reviewed], ["Picked", o.PICK || 0]]);
+  bars($("#reasons"), (d.reject_reasons || []).slice(0, 6));
+  $("#weekly").innerHTML = d.weekly ? `<div class="muted small">${esc(d.weekly.name.replace(".md", ""))}</div>` + md(d.weekly.markdown)
     : '<div class="empty">The first weekly report arrives Monday at 8am.</div>';
   $("#recent").innerHTML = (d.recent || []).length ? `<table><tr><th>Coin</th><th>Result</th><th class="num">Seen</th></tr>` +
-    d.recent.slice(0, 40).map(r => `<tr><td><a href="https://dexscreener.com/${esc(r.chain)}/${esc(r.token)}" target="_blank" rel="noopener">${esc(r.token.slice(0, 6))}…</a> <span class="chip">${esc(r.chain)}</span></td>
-      <td style="font-size:12.5px;color:var(--text-2)">${esc(r.result)}${r.score != null ? ` <span class="chip">score ${Math.round(r.score)}</span>` : ""}</td><td class="num">${ago(r.first_seen)}</td></tr>`).join("") + "</table>"
-    : '<div class="empty">Nothing scanned yet</div>';
+    d.recent.slice(0, 25).map(r => `<tr><td><a class="link" href="https://dexscreener.com/${esc(r.chain)}/${esc(r.token)}" target="_blank" rel="noopener">${esc(r.token.slice(0, 6))}…</a>
+      <div class="muted small">${esc(r.chain)}</div></td><td class="muted small">${esc(r.result)}${r.score != null ? ` <span class="chip">score ${Math.round(r.score)}</span>` : ""}</td>
+      <td class="num muted small">${ago(r.first_seen)}</td></tr>`).join("") + "</table>" : '<div class="empty">Nothing scanned yet.</div>';
   $("#log").textContent = d.last_log || "No log yet today.";
   renderLearning(d);
 }
 
-function outcomeCells(s) {
-  if (!s || !s.n) return `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`;
-  return `<td class="num">${s.n}</td><td class="num">${s.median_24h}×</td><td class="num">${s.rug_pct}%</td><td class="num">${s.doubled_pct}%</td>`;
-}
+/* ---------------- learning tab ---------------- */
 const OUT_HEAD = `<th class="num">Tracked</th><th class="num">Median 24h</th><th class="num">Rugged</th><th class="num">Doubled</th>`;
+const outCells = s => !s || !s.n ? `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`
+  : `<td class="num">${s.n}</td><td class="num">${s.median_24h}×</td><td class="num">${s.rug_pct}%</td><td class="num">${s.doubled_pct}%</td>`;
 function renderLearning(d) {
   const a = d.analysis, tu = d.tuning || {};
-  $("#learn-meta").textContent = a ? ` ${a.tracked} coins being followed · ${a.with_24h_outcome} with a 24h result so far.` : "";
-  if (!a) { ["#golive", "#rules", "#stages", "#buckets", "#comps"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data — first results about 24h after the update.</div>'); }
-  else {
-    $("#golive").innerHTML = a.go_live.map(c => `<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--border)">
-      <span style="color:${c.ok ? "var(--good)" : "var(--text-3)"};font-weight:600;min-width:62px">${c.ok ? "✓ Pass" : "○ Not yet"}</span>
+  $("#learn-meta").textContent = a ? `${a.tracked} coins followed · ${a.with_24h_outcome} with 24h results` : "collecting data";
+  if (a) {
+    const passed = a.go_live.filter(c => c.ok).length;
+    $("#golive-head").innerHTML = `Ready for real money? <span class="${passed === a.go_live.length ? "up" : "muted"}">${passed}/${a.go_live.length}</span>`;
+    $("#golive").innerHTML = a.go_live.map(c => `<div class="check"><span class="st ${c.ok ? "up" : "muted"}">${c.ok ? "✓ Pass" : "○ Not yet"}</span>
       <span style="flex:1">${esc(c.check)}</span><span class="chip">${esc(c.value)}</span></div>`).join("");
     const rules = a.safety_rules.filter(r => r.n);
     $("#rules").innerHTML = rules.length ? `<table><tr><th>Rule</th>${OUT_HEAD}<th>Verdict</th></tr>` + rules.map(r => {
       const v = r.n < 20 ? "need more data" : r.doubled_pct >= 15 && r.rug_pct < 30 ? "⚠ may be too strict" : r.rug_pct >= 40 ? "✓ protecting you" : "ok";
-      return `<tr><td>${esc(r.rule)}</td>${outcomeCells(r)}<td><span class="chip">${v}</span></td></tr>`; }).join("") + "</table>"
+      return `<tr><td>${esc(r.rule)}</td>${outCells(r)}<td><span class="chip">${v}</span></td></tr>`; }).join("") + "</table>"
       : '<div class="empty">No 24h results for rejected coins yet.</div>';
     const names = {reject: "Rejected by safety", low_score: "Scored below cutoff", scored: "Scored, not reviewed", pass: "Claude passed", pick: "Claude picked"};
-    $("#stages").innerHTML = `<table><tr><th>Stage</th>${OUT_HEAD}</tr>` + Object.entries(a.by_stage).map(([k, s]) => `<tr><td>${names[k] || k}</td>${outcomeCells(s)}</tr>`).join("") + "</table>";
-    $("#buckets").innerHTML = `<table><tr><th>Score</th>${OUT_HEAD}</tr>` + Object.entries(a.score_buckets).map(([k, s]) => `<tr><td>${k}</td>${outcomeCells(s)}</tr>`).join("") + "</table>";
+    $("#stages").innerHTML = `<table><tr><th>Stage</th>${OUT_HEAD}</tr>` + Object.entries(a.by_stage).map(([k, s]) => `<tr><td>${names[k] || k}</td>${outCells(s)}</tr>`).join("") + "</table>";
+    $("#buckets").innerHTML = `<table><tr><th>Score</th>${OUT_HEAD}</tr>` + Object.entries(a.score_buckets).map(([k, s]) => `<tr><td>${k}</td>${outCells(s)}</tr>`).join("") + "</table>";
     const comps = Object.entries(a.score_components || {});
     $("#comps").innerHTML = comps.length ? `<table><tr><th>Factor</th><th></th>${OUT_HEAD}</tr>` + comps.map(([k, c]) =>
-      `<tr><td rowspan="2">${esc(k.replace("_", " "))}</td><td>high</td>${outcomeCells(c.high)}</tr><tr><td>low</td>${outcomeCells(c.low)}</tr>`).join("") + "</table>"
+      `<tr><td rowspan="2">${esc(k.replace("_", " "))}</td><td>high</td>${outCells(c.high)}</tr><tr><td>low</td>${outCells(c.low)}</tr>`).join("") + "</table>"
       : '<div class="empty">Needs at least 6 scored coins with results.</div>';
+  } else {
+    ["#golive", "#rules", "#stages", "#buckets", "#comps"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data.</div>');
   }
   const pend = tu.pending || [];
-  $("#pending").innerHTML = pend.length ? pend.map(p => `<div style="padding:6px 0;border-bottom:1px solid var(--border)"><b>${esc(p.key)}</b>: ${p.from} → ${p.to}
-      <div class="reason">${esc(p.reason)} (${p.evidence_n} outcomes)</div></div>`).join("") +
-      `<div style="color:var(--text-3);font-size:12px;margin-top:8px">These loosen a safety rule, so they wait for you. Tell Claude "approve ${esc(pend[0].key)}" (or "approve all").</div>`
+  $("#pending").innerHTML = pend.length ? pend.map(p => `<div class="check"><b>${esc(p.key)}</b><span style="flex:1" class="muted">${p.from} → ${p.to}<div class="reason">${esc(p.reason)} (${p.evidence_n} outcomes)</div></span></div>`).join("") +
+    `<p class="muted small">These loosen a safety rule, so they wait for you. Tell Claude "approve ${esc(pend[0].key)}" (or "approve all").</p>`
     : '<div class="empty">Nothing waiting on you.</div>';
   const log = (tu.changelog || []).slice().reverse();
-  $("#changelog").innerHTML = log.length ? `<table><tr><th>Date</th><th>Setting</th><th class="num">Change</th><th>Why</th></tr>` +
-    log.map(c => `<tr><td>${esc(c.date)}</td><td>${esc(c.key)}</td><td class="num">${c.from} → ${c.to}</td><td class="reason">${esc(c.reason)}</td></tr>`).join("") + "</table>"
-    : '<div class="empty">No changes yet — the first review is Monday.</div>';
+  $("#changelog").innerHTML = log.length ? `<table><tr><th>Date</th><th>Setting</th><th class="num">Change</th></tr>` +
+    log.map(c => `<tr><td>${esc(c.date)}</td><td>${esc(c.key)}<div class="reason">${esc(c.reason)}</div></td><td class="num">${c.from} → ${c.to}</td></tr>`).join("") + "</table>"
+    : '<div class="empty">No changes yet. The first review is Monday.</div>';
   $("#notebook").innerHTML = d.learnings ? md(d.learnings) : '<div class="empty">The agent starts its notebook at the first weekly review.</div>';
 }
 
+/* ---------------- CEO watcher tab ---------------- */
 async function loadCeo() {
   const d = await (await fetch("/api/ceo")).json(), st = d.state;
-  if (!st) { $("#ceo-tiles").innerHTML = '<div class="card empty">CEO Watcher job not found in ~/ceo-trader.</div>'; return; }
+  if (!st) { $("#ceo-head").textContent = "Not set up on this Mac"; return; }
   const pos = Object.entries(st.our_positions || {});
-  $("#ceo-tiles").innerHTML = tile("Positions managed", pos.length, "sold automatically when Connor exits") +
-    tile("Connor's portfolio", (st.connor_holdings || []).length, "holdings being watched") +
-    tile("Last run", esc(String(st.last_run || "—").slice(0, 16)), "weekdays at 7:00am PT") +
-    tile("Account", "••••" + String(st.account_number || "").slice(-4), "Robinhood Agentic");
-  $("#ceo-pos").innerHTML = pos.length ? `<table><tr><th>Ticker</th><th>Bought</th><th class="num">Amount</th><th>Source</th></tr>` +
-    pos.map(([t, p]) => `<tr><td><b>${esc(t)}</b></td><td>${esc(p.bought_date)}</td><td class="num">$${esc(p.dollar_amount)}</td><td><span class="chip">${esc(p.source)}</span></td></tr>`).join("") + "</table>"
-    : '<div class="empty">No positions yet</div>';
+  const invested = pos.reduce((a, [, p]) => a + parseFloat(p.dollar_amount || 0), 0);
+  $("#ceo-head").textContent = pos.length ? `${pos.length} position${pos.length > 1 ? "s" : ""} · ${fmt$(invested)} invested` : "No positions yet";
+  $("#ceo-sub").textContent = `Last run ${String(st.last_run || "—").slice(0, 16)} · runs weekdays at 7:00am PT`;
+  $("#ceo-stats").innerHTML = stat("Account", "••••" + String(st.account_number || "").slice(-4)) + stat("Positions", pos.length) +
+    stat("Connor's holdings", (st.connor_holdings || []).length) + stat("High Signal seen", (st.high_signal_seen || []).length);
+  $("#ceo-pos").innerHTML = pos.length ? pos.map(([t, p]) => `<div class="row" style="cursor:default"><div><div class="sym">${esc(t)}</div>
+      <div class="sub">bought ${esc(p.bought_date)} · ${esc(p.source)}</div></div><span></span><span class="pill flat">${fmt$(parseFloat(p.dollar_amount || 0))}</span></div>`).join("")
+    : '<div class="emptyrow">No positions yet.</div>';
   $("#ceo-connor").innerHTML = (st.connor_holdings || []).map(t => `<span class="chip">${esc(t)}</span>`).join("");
   $("#ceo-brief").innerHTML = d.briefings.length ? d.briefings.map((b, i) =>
-    `<details ${i ? "" : "open"}><summary><b>${esc(b.date)}</b></summary><div class="md">${md(b.markdown)}</div></details>`).join("")
-    : '<div class="empty">No briefings yet</div>';
+    `<details ${i ? "" : "open"} style="border-bottom:1px solid var(--border)"><summary>${esc(b.date)}</summary><div class="md">${md(b.markdown)}</div></details>`).join("")
+    : '<div class="empty">No briefings yet.</div>';
 }
 
 function load() {
-  loadTrencher().catch(e => $("#tiles").innerHTML = `<div class="card">Couldn't load trencher data: ${esc(e.message)}</div>`);
+  loadTrencher().catch(e => { $("#hero").textContent = "—"; $("#delta").innerHTML = `<span class="down">Couldn't load data: ${esc(e.message)}</span>`; });
   loadCeo().catch(() => {});
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
   ["trencher", "learning", "ceo"].forEach(n => $("#tab-" + n).hidden = b.dataset.tab !== n);
+  if (b.dataset.tab === "trencher") drawChart();
+  history.replaceState(null, "", "#" + b.dataset.tab);
 }));
 $("#refresh").addEventListener("click", load);
 const startTab = document.querySelector(`.tabs button[data-tab="${location.hash.slice(1)}"]`); if (startTab) startTab.click();
