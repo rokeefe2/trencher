@@ -62,6 +62,10 @@ def trencher():
         s = data["summary"]; s["value"] = round(sum(p["value_now"] for p in data["picks"]), 2)
         s["pnl"] = round(s["value"] - s.get("staked", 0), 2)
     data["source"] = source; data["stale"] = stale
+    try:   # exit watcher heartbeat (raw file server may lag up to ~5 min)
+        data["watcher"] = fetch(f"https://raw.githubusercontent.com/{REPO}/exits/heartbeat.json", ttl=60) if REPO else None
+    except Exception:
+        data["watcher"] = None
     BASE["data"] = data
     return data
 

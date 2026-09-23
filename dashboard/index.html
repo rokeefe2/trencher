@@ -100,6 +100,11 @@ section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin
 .row svg { width: 84px; height: 34px; display: block; }
 .pill { justify-self: end; min-width: 76px; text-align: center; font-size: 13px; font-weight: 700; padding: 6px 8px; border-radius: 4px; color: var(--pill-text); font-variant-numeric: tabular-nums; }
 .pill.up { background: var(--up-line); } .pill.down { background: var(--down-line); } .pill.flat { background: var(--raised); color: var(--text); }
+.watcher { padding: 8px 20px; font-size: 12px; color: var(--text-2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.watcher b { color: var(--text); font-weight: 600; }
+.ladder { display: flex; gap: 4px; margin-top: 5px; }
+.ladder span { font-size: 10.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: var(--raised); color: var(--text-3); }
+.ladder span.hit { background: var(--up-line); color: var(--pill-text); }
 .side .emptyrow { padding: 22px 20px; color: var(--text-3); font-size: 14px; }
 .side-section { padding: 18px 20px; border-top: 1px solid var(--border); }
 .side-section h2 { font-size: 15px; margin-bottom: 12px; }
@@ -176,6 +181,7 @@ details[open] > summary::before { transform: rotate(90deg); }
 
     <aside class="side">
       <h3>Open picks <small id="opencount"></small></h3>
+      <div class="watcher" id="watcher"></div>
       <div id="open"></div>
       <div class="side-section"><h2>Scan funnel</h2><div class="bars" id="funnel"></div></div>
       <div class="side-section"><h2>Why coins were rejected</h2><div class="bars" id="reasons"></div></div>
@@ -358,11 +364,17 @@ async function loadTrencher() {
     stat("Incubating", (s.incubating || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
 
   $("#opencount").textContent = open.length ? `${open.length} open` : ""; OPEN = {};
+  const w = d.watcher, wAge = w ? Date.now() / 1000 - w.t : Infinity;
+  $("#watcher").innerHTML = wAge < 600
+    ? `<span class="live" style="font-size:10px"><i></i></span><span><b>Exit watcher on</b> · checks every 30s · last check-in ${ago(w.t)}</span>`
+    : `<span class="live off" style="font-size:10px"><i></i></span><span><b>Exit watcher off</b> · the 15-min scanner is handling exits</span>`;
   $("#open").innerHTML = open.length ? open.map((p, i) => {
     const ch = (p.mult_now - 1) * 100;
     OPEN[p.token] = p;
     return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" data-token="${esc(p.token)}" title="${esc(p.reason)}">
-      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · score ${Math.round(p.score)} · ${ago(p.picked_at)}</div></div>
+      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · score ${Math.round(p.score)} · ${ago(p.picked_at)}</div>
+        <div class="ladder" title="Profit-taking ladder: sells part of the position at each level">${((d.config || {}).ladder || [[1.5,.3],[2,.3],[3,.2]]).map((l, j) =>
+          `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">${l[0]}×</span>`).join("")}</div></div>
       <span class="spark">${sparkSvg(null)}</span>
       <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}" data-pill>${pct(ch)}</span></a>`; }).join("")
     : '<div class="emptyrow">No open picks. The scanner is waiting for a coin that passes every stage.</div>';
