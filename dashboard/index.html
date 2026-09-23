@@ -321,6 +321,7 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
   ["trencher", "learning", "ceo"].forEach(n => $("#tab-" + n).hidden = b.dataset.tab !== n);
 }));
 $("#refresh").addEventListener("click", load);
+const startTab = document.querySelector(`.tabs button[data-tab="${location.hash.slice(1)}"]`); if (startTab) startTab.click();
 load(); setInterval(load, 60000);
 </script>
 </body>
