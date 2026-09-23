@@ -1,0 +1,38 @@
+name: weekly-report
+on:
+  schedule:
+    - cron: "0 15 * * 1"   # Mondays 15:00 UTC = 8am PT (7am in winter)
+  workflow_dispatch:
+concurrency:
+  group: trencher-data
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATA_DIR: ${{ github.workspace }}/data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: data
+      - name: Write report with Claude
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+          mkdir -p data/weekly
+          claude -p "$(cat weekly_prompt.md; echo; echo STATS:; python3 scanner.py stats)" --permission-mode dontAsk --allowedTools "" > "data/weekly/$(date -u +%F).md"
+          curl -s -H "Title: Trencher weekly report ready" -H "Tags: bar_chart" -d "Open your Trencher dashboard to read this week's paper-trading report." "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}" >/dev/null
+      - name: Save data
+        run: |
+          cd data
+          git config user.name "trencher-bot"; git config user.email "trencher-bot@users.noreply.github.com"
+          git checkout --orphan snapshot
+          git add -A
+          git commit -qm "weekly $(date -u +%F)"
+          git push -qf origin snapshot:data

@@ -1,0 +1,11 @@
+trencher.db
+candidates.json
+review_out.txt
+review.json
+dashboard.json
+logs/
+PAUSED
+run.sh
+__pycache__/
+data/
+dashboard/settings.json

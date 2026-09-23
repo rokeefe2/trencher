@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Local dashboard for the trencher (paper trading) + CEO Watcher trader.
+
+Run: python3 server.py  ->  http://localhost:8799
+Trencher data comes from the GitHub `data` branch (or ../dashboard.json before the cloud move);
+CEO Watcher data is read from ~/ceo-trader on this Mac. Stdlib only.
+"""
+import glob, json, os, time, urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SETTINGS = json.load(open(os.path.join(HERE, "settings.json"))) if os.path.exists(os.path.join(HERE, "settings.json")) else {}
+REPO = SETTINGS.get("repo")  # e.g. "username/trencher"
+CEO_DIR = os.path.expanduser("~/ceo-trader")
+PORT = 8799
+_cache = {}
+
+def fetch(url, ttl=60, raw=False):
+    hit = _cache.get(url)
+    if hit and time.time() - hit[0] < ttl: return hit[1]
+    req = urllib.request.Request(url, headers={"User-Agent": "trencher-dashboard", "Accept": "application/json",
+                                               "Cache-Control": "no-cache"})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        body = r.read().decode()
+    val = body if raw else json.loads(body)
+    _cache[url] = (time.time(), val)
+    return val
+
+def trencher():
+    source = "local file"
+    if REPO:
+        try:  # GitHub API (not raw CDN) so data is never stale
+            meta = fetch(f"https://api.github.com/repos/{REPO}/contents/dashboard.json?ref=data", ttl=60)
+            data = json.loads(fetch(meta["download_url"] + f"?t={meta['sha']}", ttl=3600, raw=True))
+            source = f"github.com/{REPO}"
+        except Exception as e:
+            data = None; source = f"GitHub unavailable ({e}); showing local file"
+    if not REPO or data is None:
+        p = os.path.join(HERE, "..", "dashboard.json")
+        data = json.load(open(p)) if os.path.exists(p) else {"summary": {}, "picks": [], "recent": []}
+    # live prices for open picks
+    open_picks = [p for p in data.get("picks", []) if p.get("status") == "open"]
+    for chain in {p["chain"] for p in open_picks}:
+        toks = [p["token"] for p in open_picks if p["chain"] == chain][:30]
+        try:
+            best = {}
+            for pr in fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(toks)}", ttl=30):
+                t = pr.get("baseToken", {}).get("address"); liq = float((pr.get("liquidity") or {}).get("usd") or 0)
+                if t and liq >= best.get(t, (0, 0))[0]: best[t] = (liq, float(pr.get("priceUsd") or 0))
+            for p in open_picks:
+                if p["token"] in best and best[p["token"]][1]:
+                    px = best[p["token"]][1]
+                    p["live_price"] = px
+                    p["mult_now"] = round(px / p["entry_price"], 3)
+                    p["value_now"] = round(p["realized"] + (p["tokens_left"] or 0) * px, 2)
+                    p["pnl"] = round(p["value_now"] - p["stake"], 2)
+        except Exception:
+            pass
+    if open_picks:
+        s = data["summary"]; s["value"] = round(sum(p["value_now"] for p in data["picks"]), 2)
+        s["pnl"] = round(s["value"] - s.get("staked", 0), 2)
+    weekly = None
+    if REPO:
+        try:
+            files = fetch(f"https://api.github.com/repos/{REPO}/contents/weekly?ref=data", ttl=600)
+            latest = sorted(files, key=lambda f: f["name"])[-1]
+            weekly = {"name": latest["name"], "markdown": fetch(latest["download_url"], ttl=3600, raw=True)}
+        except Exception:
+            pass
+    data["weekly"] = weekly; data["source"] = source
+    return data
+
+def ceo():
+    out = {"state": None, "briefings": []}
+    sp = os.path.join(CEO_DIR, "state.json")
+    if os.path.exists(sp):
+        out["state"] = json.load(open(sp))
+    for p in sorted(glob.glob(os.path.join(CEO_DIR, "logs", "20*.md")))[-10:][::-1]:
+        out["briefings"].append({"date": os.path.basename(p)[:-3], "markdown": open(p).read()})
+    return out
+
+class H(BaseHTTPRequestHandler):
+    def log_message(self, *a): pass
+    def send(self, code, body, ctype):
+        b = body.encode() if isinstance(body, str) else body
+        self.send_response(code); self.send_header("Content-Type", ctype)
+        self.send_header("Cache-Control", "no-store"); self.end_headers(); self.wfile.write(b)
+    def do_GET(self):
+        try:
+            if self.path in ("/", "/index.html"):
+                self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
+            elif self.path.startswith("/api/trencher"):
+                self.send(200, json.dumps(trencher(), default=str), "application/json")
+            elif self.path.startswith("/api/ceo"):
+                self.send(200, json.dumps(ceo(), default=str), "application/json")
+            else:
+                self.send(404, "not found", "text/plain")
+        except Exception as e:
+            self.send(500, json.dumps({"error": str(e)}), "application/json")
+
+if __name__ == "__main__":
+    print(f"Dashboard on http://localhost:{PORT}")
+    ThreadingHTTPServer(("127.0.0.1", PORT), H).serve_forever()

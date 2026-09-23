@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trencher</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f5f2; --surface: #fcfcfb; --surface-2: #f0efec; --border: #e4e2dc;
+  --text: #0b0b0b; --text-2: #52514e; --text-3: #8a8883;
+  --accent: #2a78d6; --gain: #2a78d6; --loss: #e34948; --neutral: #c9c7c0;
+  --good: #0ca30c; --warn: #fab219; --crit: #d03b3b;
+  --seq-1: #86b6ef; --seq-2: #5598e7; --seq-3: #2a78d6; --seq-4: #1c5cab;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #2e2e2b;
+    --text: #ffffff; --text-2: #c3c2b7; --text-3: #8d8c84;
+    --accent: #3987e5; --gain: #3987e5; --loss: #e66767; --neutral: #4a4a46;
+    --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #5598e7;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #2e2e2b;
+  --text: #ffffff; --text-2: #c3c2b7; --text-3: #8d8c84;
+  --accent: #3987e5; --gain: #3987e5; --loss: #e66767; --neutral: #4a4a46;
+  --seq-1: #184f95; --seq-2: #1c5cab; --seq-3: #2a78d6; --seq-4: #5598e7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 20px 60px; }
+header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2); margin: 0 0 12px; font-weight: 600; }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: 9px; }
+.tabs button { border: 0; background: transparent; color: var(--text-2); padding: 6px 14px; border-radius: 7px;
+  font: inherit; font-weight: 500; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+.meta { margin-left: auto; color: var(--text-3); font-size: 12px; display: flex; gap: 10px; align-items: center; }
+.meta button { font: inherit; border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
+  border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.banner { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  color: var(--text-2); margin-bottom: 16px; font-size: 13px; }
+.grid { display: grid; gap: 14px; }
+.tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 14px; }
+.two { grid-template-columns: 1.4fr 1fr; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.tile .label { color: var(--text-2); font-size: 12px; }
+.tile .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .sub { color: var(--text-3); font-size: 12px; margin-top: 2px; }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 500; color: var(--text-3); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+.chip { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--surface-2);
+  color: var(--text-2); border: 1px solid var(--border); white-space: nowrap; }
+
+.reason { color: var(--text-2); font-size: 12.5px; margin-top: 3px; max-width: 520px; }
+.empty { color: var(--text-3); padding: 18px 0; text-align: center; }
+.bars { display: grid; gap: 7px; }
+.bar-row { display: grid; grid-template-columns: minmax(120px, 42%) 1fr auto; gap: 10px; align-items: center; font-size: 12.5px; }
+.bar-row .lbl { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { height: 12px; }
+.bar-fill { height: 12px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-row .v { color: var(--text); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+svg text { fill: var(--text-2); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgb(0 0 0 / .18); z-index: 9; max-width: 280px; }
+.md { color: var(--text); font-size: 13.5px; overflow-x: auto; }
+.md h1, .md h2, .md h3 { text-transform: none; letter-spacing: 0; color: var(--text); font-size: 15px; margin: 14px 0 6px; }
+.md table { margin: 8px 0; } .md code { background: var(--surface-2); padding: 1px 4px; border-radius: 4px; font-size: 12px; }
+pre.log { background: var(--surface-2); border-radius: 8px; padding: 10px; font-size: 11.5px; overflow: auto; max-height: 260px;
+  color: var(--text-2); margin: 0; white-space: pre-wrap; }
+details summary { cursor: pointer; color: var(--text-2); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Trencher</h1>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="trencher" aria-selected="true">Meme coins</button>
+      <button role="tab" data-tab="ceo" aria-selected="false">CEO Watcher</button>
+    </div>
+    <div class="meta"><span id="updated"></span><button id="refresh">Refresh</button></div>
+  </header>
+
+  <section id="tab-trencher">
+    <div class="banner">📝 <b>Paper trading</b> — every pick is a pretend $<span id="stake">50</span> bet. No real money moves.
+      <span id="source"></span></div>
+    <div class="grid tiles" id="tiles"></div>
+    <div class="grid two" style="margin-bottom:14px">
+      <div class="card"><h2>Open picks</h2><div class="tbl" id="open"></div></div>
+      <div class="card"><h2>P&amp;L by pick</h2><div id="pnlchart"></div></div>
+    </div>
+    <div class="grid two" style="margin-bottom:14px">
+      <div class="card"><h2>Closed picks</h2><div class="tbl" id="closed"></div></div>
+      <div class="card"><h2>Scan funnel</h2><div id="funnel" class="bars"></div>
+        <h2 style="margin-top:20px">Top reasons coins were rejected</h2><div id="reasons" class="bars"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px"><h2>Weekly report</h2><div id="weekly" class="md"></div></div>
+    <div class="grid two">
+      <div class="card"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></div>
+      <div class="card"><h2>Latest scan log</h2><pre class="log" id="log"></pre></div>
+    </div>
+  </section>
+
+  <section id="tab-ceo" hidden>
+    <div class="grid tiles" id="ceo-tiles"></div>
+    <div class="grid two">
+      <div class="card"><h2>Positions the job manages</h2><div class="tbl" id="ceo-pos"></div>
+        <h2 style="margin-top:20px">Connor's current portfolio</h2><div id="ceo-connor" style="display:flex;flex-wrap:wrap;gap:6px"></div></div>
+      <div class="card"><h2>Daily briefings</h2><div id="ceo-brief"></div></div>
+    </div>
+  </section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = (v, sign) => (sign && v > 0 ? "+" : v < 0 ? "−" : "") + "$" + Math.abs(v).toFixed(2);
+const mult = v => v == null ? "—" : v.toFixed(2) + "×";
+const ago = ts => { const m = (Date.now()/1000 - ts)/60; return m < 60 ? Math.round(m)+"m ago" : m < 1440 ? Math.round(m/60)+"h ago" : Math.round(m/1440)+"d ago"; };
+const dir = v => v > 0 ? "up" : v < 0 ? "down" : "";
+const safeUrl = u => /^https:\/\//.test(u || "") ? u : "#";
+
+// tiny markdown renderer — input is escaped first (coin names are untrusted)
+function md(src) {
+  const lines = esc(src || "").split("\n"); let html = "", inList = false, table = [];
+  const inline = t => t.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  const flushTable = () => { if (!table.length) return;
+    const rows = table.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, "").split("|"));
+    html += '<div class="tbl"><table>' + rows.map((r, i) => "<tr>" + r.map(c => (i ? "<td>" : "<th>") + inline(c.trim()) + (i ? "</td>" : "</th>")).join("") + "</tr>").join("") + "</table></div>";
+    table = []; };
+  for (const l of lines) {
+    if (/^\s*\|/.test(l)) { table.push(l.trim()); continue; } else flushTable();
+    if (/^\s*[-*] /.test(l)) { if (!inList) { html += "<ul>"; inList = true; } html += "<li>" + inline(l.replace(/^\s*[-*] /, "")) + "</li>"; continue; }
+    if (inList) { html += "</ul>"; inList = false; }
+    const h = l.match(/^(#{1,3}) (.*)/);
+    if (h) html += `<h3>${inline(h[2])}</h3>`; else if (l.trim()) html += `<p>${inline(l)}</p>`;
+  }
+  flushTable(); if (inList) html += "</ul>"; return html;
+}
+
+function tile(label, value, sub, cls = "") {
+  return `<div class="card tile"><div class="label">${label}</div><div class="value ${cls}">${value}</div>${sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
+}
+function hbars(el, rows, color) {
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  el.innerHTML = rows.length ? rows.map(([l, v], i) => `<div class="bar-row"><span class="lbl" title="${esc(l)}">${esc(l)}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(1)}%;background:${typeof color === "function" ? color(i) : color}"></div></div>
+    <span class="v">${v.toLocaleString()}</span></div>`).join("") : '<div class="empty">Nothing yet</div>';
+}
+
+const tip = $("#tip");
+function showTip(e, html) { tip.innerHTML = html; tip.hidden = false;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
+
+function pnlChart(picks) {
+  const el = $("#pnlchart");
+  if (!picks.length) { el.innerHTML = '<div class="empty">No picks yet</div>'; return; }
+  const ps = [...picks].reverse().slice(-20), W = 460, rowH = 26, H = ps.length * rowH + 10, mid = W / 2 + 40;
+  const max = Math.max(5, ...ps.map(p => Math.abs(p.pnl)));
+  const sc = v => v / max * (W - mid - 60);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Paper profit or loss per pick">`;
+  s += `<line x1="${mid}" x2="${mid}" y1="0" y2="${H}" stroke="var(--border)" stroke-width="1"/>`;
+  ps.forEach((p, i) => {
+    const y = i * rowH + 6, w = Math.max(2, Math.abs(sc(p.pnl))), x = p.pnl >= 0 ? mid + 1 : mid - 1 - w;
+    const fill = p.pnl >= 0 ? "var(--gain)" : "var(--loss)";
+    const r = 4, d = p.pnl >= 0
+      ? `M${x},${y} h${w - r} a${r},${r} 0 0 1 ${r},${r} v${16 - 2*r} a${r},${r} 0 0 1 -${r},${r} h-${w - r} z`
+      : `M${x + w},${y} h-${w - r} a${r},${r} 0 0 0 -${r},${r} v${16 - 2*r} a${r},${r} 0 0 0 ${r},${r} h${w - r} z`;
+    s += `<g class="hit" data-i="${i}"><rect x="0" y="${y - 4}" width="${W}" height="${rowH}" fill="transparent"/>
+      <text x="8" y="${y + 12}">${esc(p.symbol)}${p.status === "open" ? " •" : ""}</text>
+      <path d="${d}" fill="${fill}"/>
+      <text x="${p.pnl >= 0 ? x + w + 6 : x - 6}" y="${y + 12}" text-anchor="${p.pnl >= 0 ? "start" : "end"}" style="fill:var(--text)">${money(p.pnl, true)}</text></g>`;
+  });
+  s += "</svg>";
+  el.innerHTML = s + `<div style="color:var(--text-3);font-size:12px;margin-top:6px">▮ <span style="color:var(--gain)">gain</span> · ▮ <span style="color:var(--loss)">loss</span> · • still open</div>`;
+  el.querySelectorAll(".hit").forEach(g => {
+    const p = ps[+g.dataset.i];
+    g.addEventListener("mousemove", e => showTip(e, `<b>${esc(p.symbol)}</b> <span class="chip">${esc(p.chain)}</span><br>
+      P&amp;L ${money(p.pnl, true)} · now ${mult(p.mult_now)}<br>peak ${mult(p.peak / p.entry_price)} · score ${p.score}<br>
+      ${p.status === "open" ? "open" : "closed: " + esc(p.close_reason)}`));
+    g.addEventListener("mouseleave", () => tip.hidden = true);
+  });
+}
+
+async function loadTrencher() {
+  const d = await (await fetch("/api/trencher")).json();
+  const s = d.summary || {}, o = s.outcomes || {}, picks = d.picks || [];
+  $("#stake").textContent = (d.config || {}).paper_stake || 50;
+  $("#source").textContent = d.source ? ` Data: ${d.source}.` : "";
+  $("#updated").textContent = d.updated_at ? "Last scan " + ago(d.updated_at) : "";
+  $("#tiles").innerHTML =
+    tile("Paper P&amp;L", money(s.pnl || 0, true), `$${(s.value || 0).toFixed(2)} value on $${(s.staked || 0).toFixed(0)} staked`, dir(s.pnl)) +
+    tile("Win rate (closed)", s.win_rate == null ? "—" : Math.round(s.win_rate * 100) + "%", `${picks.length - (s.open || 0)} closed picks`) +
+    tile("Open picks", s.open || 0, `max ${(d.config || {}).max_picks_per_day || 3} new per day`) +
+    tile("Coins scanned", (s.scanned || 0).toLocaleString(), `${(o.REJECT || 0).toLocaleString()} rejected as unsafe · ${s.incubating || 0} incubating`);
+  const open = picks.filter(p => p.status === "open"), closed = picks.filter(p => p.status !== "open");
+  $("#open").innerHTML = open.length ? `<table><tr><th>Coin</th><th class="num">Now</th><th class="num">P&amp;L</th><th class="num">Picked</th></tr>` +
+    open.map(p => `<tr><td><a href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener"><b>${esc(p.symbol)}</b></a> <span class="chip">${esc(p.chain)}</span>
+      <span class="chip">score ${p.score}</span>${p.took_stake ? ' <span class="chip">stake out ✓</span>' : ""}
+      <div class="reason">${esc(p.reason)}</div></td>
+      <td class="num">${mult(p.mult_now)}</td><td class="num ${dir(p.pnl)}">${money(p.pnl, true)}</td><td class="num">${ago(p.picked_at)}</td></tr>`).join("") + "</table>"
+    : '<div class="empty">No open picks — the scanner is waiting for a coin that passes every stage.</div>';
+  $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">P&amp;L</th><th>Exit</th></tr>` +
+    closed.map(p => `<tr><td><a href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">${esc(p.symbol)}</a></td><td class="num">${mult(p.p1h)}</td>
+      <td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td><td class="num ${dir(p.pnl)}">${money(p.pnl, true)}</td>
+      <td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
+    : '<div class="empty">No closed picks yet</div>';
+  pnlChart(picks);
+  const total = s.scanned || 0, rej = o.REJECT || 0, reviewed = (o.PASS || 0) + (o.PICK || 0);
+  const seq = ["var(--seq-1)", "var(--seq-2)", "var(--seq-3)", "var(--seq-4)"];
+  hbars($("#funnel"), [["Scanned", total], ["Passed safety checks", total - rej], ["Reviewed by Claude", reviewed], ["Picked", o.PICK || 0]], i => seq[i]);
+  hbars($("#reasons"), (d.reject_reasons || []).slice(0, 8), "var(--seq-2)");
+  $("#weekly").innerHTML = d.weekly ? `<div style="color:var(--text-3);font-size:12px">${esc(d.weekly.name)}</div>` + md(d.weekly.markdown)
+    : '<div class="empty">The first weekly report arrives Monday at 8am.</div>';
+  $("#recent").innerHTML = (d.recent || []).length ? `<table><tr><th>Coin</th><th>Result</th><th class="num">Seen</th></tr>` +
+    d.recent.slice(0, 40).map(r => `<tr><td><a href="https://dexscreener.com/${esc(r.chain)}/${esc(r.token)}" target="_blank" rel="noopener">${esc(r.token.slice(0, 6))}…</a> <span class="chip">${esc(r.chain)}</span></td>
+      <td style="font-size:12.5px;color:var(--text-2)">${esc(r.result)}${r.score != null ? ` <span class="chip">score ${Math.round(r.score)}</span>` : ""}</td><td class="num">${ago(r.first_seen)}</td></tr>`).join("") + "</table>"
+    : '<div class="empty">Nothing scanned yet</div>';
+  $("#log").textContent = d.last_log || "No log yet today.";
+}
+
+async function loadCeo() {
+  const d = await (await fetch("/api/ceo")).json(), st = d.state;
+  if (!st) { $("#ceo-tiles").innerHTML = '<div class="card empty">CEO Watcher job not found in ~/ceo-trader.</div>'; return; }
+  const pos = Object.entries(st.our_positions || {});
+  $("#ceo-tiles").innerHTML = tile("Positions managed", pos.length, "sold automatically when Connor exits") +
+    tile("Connor's portfolio", (st.connor_holdings || []).length, "holdings being watched") +
+    tile("Last run", esc(String(st.last_run || "—").slice(0, 16)), "weekdays at 7:00am PT") +
+    tile("Account", "••••" + String(st.account_number || "").slice(-4), "Robinhood Agentic");
+  $("#ceo-pos").innerHTML = pos.length ? `<table><tr><th>Ticker</th><th>Bought</th><th class="num">Amount</th><th>Source</th></tr>` +
+    pos.map(([t, p]) => `<tr><td><b>${esc(t)}</b></td><td>${esc(p.bought_date)}</td><td class="num">$${esc(p.dollar_amount)}</td><td><span class="chip">${esc(p.source)}</span></td></tr>`).join("") + "</table>"
+    : '<div class="empty">No positions yet</div>';
+  $("#ceo-connor").innerHTML = (st.connor_holdings || []).map(t => `<span class="chip">${esc(t)}</span>`).join("");
+  $("#ceo-brief").innerHTML = d.briefings.length ? d.briefings.map((b, i) =>
+    `<details ${i ? "" : "open"}><summary><b>${esc(b.date)}</b></summary><div class="md">${md(b.markdown)}</div></details>`).join("")
+    : '<div class="empty">No briefings yet</div>';
+}
+
+function load() {
+  loadTrencher().catch(e => $("#tiles").innerHTML = `<div class="card">Couldn't load trencher data: ${esc(e.message)}</div>`);
+  loadCeo().catch(() => {});
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#tab-trencher").hidden = b.dataset.tab !== "trencher"; $("#tab-ceo").hidden = b.dataset.tab !== "ceo";
+}));
+$("#refresh").addEventListener("click", load);
+load(); setInterval(load, 60000);
+</script>
+</body>
+</html>
