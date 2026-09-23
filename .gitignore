@@ -10,3 +10,4 @@ __pycache__/
 data/
 dashboard/settings.json
 local-retired/
+set-claude-token.sh

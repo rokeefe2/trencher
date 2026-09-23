@@ -32,7 +32,10 @@ jobs:
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
+          T="$CLAUDE_CODE_OAUTH_TOKEN"
+          echo "token check: length=${#T} starts=${T:0:13} bad_chars=$(printf '%s' "$T" | tr -d 'A-Za-z0-9_-' | wc -c | tr -d ' ')"
           npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+          claude --version
           R=$(claude -p "Reply with exactly the word OK" --permission-mode dontAsk --allowedTools "" 2>&1 | tail -1)
           echo "claude said: $R"
           curl -s -H "Title: Trencher cloud self-test" -H "Tags: white_check_mark" -d "Cloud scanner is live. Claude review check: $R" "https://ntfy.sh/$NTFY_TOPIC" >/dev/null
