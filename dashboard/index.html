@@ -102,7 +102,7 @@ section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin
 .pill.up { background: var(--up-line); } .pill.down { background: var(--down-line); } .pill.flat { background: var(--raised); color: var(--text); }
 .watcher { padding: 8px 20px; font-size: 12px; color: var(--text-2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
 .watcher b { color: var(--text); font-weight: 600; }
-.ladder { display: flex; gap: 4px; margin-top: 5px; }
+.ladder { display: flex; gap: 4px; margin-top: 5px; align-items: center; }
 .ladder span { font-size: 10.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: var(--raised); color: var(--text-3); }
 .ladder span.hit { background: var(--up-line); color: var(--pill-text); }
 .act { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
@@ -388,9 +388,10 @@ async function loadTrencher() {
     const ch = (p.mult_now - 1) * 100;
     OPEN[p.token] = p;
     return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" data-token="${esc(p.token)}" title="${esc(p.reason)}">
-      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · ${ago(p.picked_at)}${p.realized_pnl ? ` · <span class="${cls(p.realized_pnl)}">${signed$(p.realized_pnl)} banked</span>` : ""}</div>
+      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · ${ago(p.picked_at)}</div>
         <div class="ladder" title="Profit-taking ladder: sells part of the position at each level">${((d.config || {}).ladder || [[1.5,.3],[2,.3],[3,.2]]).map((l, j) =>
-          `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">${l[0]}×</span>`).join("")}</div></div>
+          `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">${l[0]}×</span>`).join("")}${p.realized_pnl ?
+          `<em class="${cls(p.realized_pnl)}" style="font-style:normal;font-size:11px;font-weight:700;margin-left:4px">${signed$(p.realized_pnl)} banked</em>` : ""}</div></div>
       <span class="spark">${sparkSvg(null)}</span>
       <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}" data-pill>${pct(ch)}</span></a>`; }).join("")
     : '<div class="emptyrow">No open picks. The scanner is waiting for a coin that passes every stage.</div>';
