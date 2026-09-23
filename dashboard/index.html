@@ -69,6 +69,12 @@ section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin
 .delta { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 20px; }
 .delta .when { color: var(--text-2); font-weight: 500; margin-left: 6px; }
 .up { color: var(--up); } .down { color: var(--down); }
+.live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--up); }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--up-line); animation: pulse 1.6s ease-out infinite; }
+.live.off { color: var(--text-3); } .live.off i { background: var(--text-3); animation: none; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--up-line) 60%, transparent); } 100% { box-shadow: 0 0 0 8px transparent; } }
+.hero.flash-up { animation: fu 0.9s ease-out; } .hero.flash-down { animation: fd 0.9s ease-out; }
+@keyframes fu { 0% { color: var(--up); } 100% { color: var(--text); } } @keyframes fd { 0% { color: var(--down); } 100% { color: var(--text); } }
 
 /* chart */
 .chart { position: relative; margin: 26px 0 8px; height: 280px; user-select: none; touch-action: pan-y; }
@@ -148,7 +154,7 @@ details[open] > summary::before { transform: rotate(90deg); }
 <section id="tab-trencher">
   <div class="layout">
     <main>
-      <div class="eyebrow">Paper P&amp;L <span class="tag">Paper trading</span></div>
+      <div class="eyebrow">Paper P&amp;L <span class="tag">Paper trading</span> <span class="live off" id="live"><i></i>LIVE</span></div>
       <div class="hero" id="hero">$0.00</div>
       <div class="delta" id="delta"></div>
       <div class="chart" id="chart"></div>
@@ -261,12 +267,15 @@ function bars(el, rows) {
 /* ---------------- main chart (scrub to see any moment) ---------------- */
 const RANGES = {"1D": 86400, "1W": 7 * 86400, "1M": 30 * 86400, "3M": 90 * 86400, "ALL": Infinity};
 const RANGE_LABEL = {"1D": "Today", "1W": "Past week", "1M": "Past month", "3M": "Past 3 months", "ALL": "All time"};
-let EQ = [], RANGE = "ALL";
+let EQ = [], RANGE = "ALL", LIVEPTS = [], SCRUB = false, OPEN = {};
+try { LIVEPTS = JSON.parse(localStorage.getItem("trencher-live") || "[]").filter(p => p[0] > Date.now() / 1000 - 86400); } catch { LIVEPTS = []; }
+const allPoints = () => [...EQ.filter(p => !LIVEPTS.length || p[0] < LIVEPTS[0][0]), ...LIVEPTS];
 
 function rangePoints() {
   const now = Date.now() / 1000, span = RANGES[RANGE];
-  if (span === Infinity) return EQ;
-  const inR = EQ.filter(p => p[0] >= now - span), before = EQ.filter(p => p[0] < now - span).pop();
+  const ALLP = allPoints();
+  if (span === Infinity) return ALLP;
+  const inR = ALLP.filter(p => p[0] >= now - span), before = ALLP.filter(p => p[0] < now - span).pop();
   return before ? [[now - span, before[1], before[2]], ...inR] : inR;
 }
 function setHero(pnl, basePnl, staked, label) {
@@ -298,7 +307,7 @@ function drawChart() {
     </svg><div class="timelabel" id="tl" hidden></div>`;
   const last = pts[pts.length - 1]; setHero(last.pnl, base, last.staked, RANGE_LABEL[RANGE]);
   const svg = el.querySelector("svg");
-  const move = e => {
+  const move = e => { SCRUB = true;
     const r = svg.getBoundingClientRect(), cx = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * W;
     let best = pts[0]; for (const p of pts) if (Math.abs(x(p.t) - cx) < Math.abs(x(best.t) - cx)) best = p;
     const px = x(best.t);
@@ -308,7 +317,7 @@ function drawChart() {
     tl.style.left = Math.min(Math.max(px / W * r.width, 55), r.width - 55) + "px";
     setHero(best.pnl, base, best.staked, "");
   };
-  const leave = () => { $("#xh").setAttribute("visibility", "hidden"); $("#xd").setAttribute("visibility", "hidden"); $("#tl").hidden = true;
+  const leave = () => { SCRUB = false; $("#xh").setAttribute("visibility", "hidden"); $("#xd").setAttribute("visibility", "hidden"); $("#tl").hidden = true;
     setHero(last.pnl, base, last.staked, RANGE_LABEL[RANGE]); };
   svg.addEventListener("mousemove", move); svg.addEventListener("touchmove", move, {passive: true});
   svg.addEventListener("mouseleave", leave); svg.addEventListener("touchend", leave);
@@ -339,7 +348,7 @@ async function loadTrencher() {
   $("#updated").innerHTML = d.stale ? `<span class="stale">Showing old data</span>` : (d.updated_at ? "Last scan " + ago(d.updated_at) : "");
   $("#source").innerHTML = d.source ? `Data: <span class="${d.stale ? "stale" : ""}">${esc(d.source)}</span>` : "";
   EQ = d.equity || [];
-  if (EQ.length && s.value != null) EQ = [...EQ, [Date.now() / 1000, s.value, s.staked]];   // live point from current prices
+  if (!LIVEPTS.length && s.value != null) EQ = [...EQ, [Date.now() / 1000, s.value, s.staked]];
   drawChart();
 
   const closed = picks.filter(p => p.status !== "open"), open = picks.filter(p => p.status === "open");
@@ -348,13 +357,14 @@ async function loadTrencher() {
     stat("Coins scanned", (s.scanned || 0).toLocaleString()) + stat("Rejected as unsafe", (o.REJECT || 0).toLocaleString()) +
     stat("Incubating", (s.incubating || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
 
-  $("#opencount").textContent = open.length ? `${open.length} open` : "";
+  $("#opencount").textContent = open.length ? `${open.length} open` : ""; OPEN = {};
   $("#open").innerHTML = open.length ? open.map((p, i) => {
     const ch = (p.mult_now - 1) * 100;
-    return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" title="${esc(p.reason)}">
+    OPEN[p.token] = p;
+    return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" data-token="${esc(p.token)}" title="${esc(p.reason)}">
       <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · score ${Math.round(p.score)} · ${ago(p.picked_at)}</div></div>
       <span class="spark">${sparkSvg(null)}</span>
-      <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}">${pct(ch)}</span></a>`; }).join("")
+      <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}" data-pill>${pct(ch)}</span></a>`; }).join("")
     : '<div class="emptyrow">No open picks. The scanner is waiting for a coin that passes every stage.</div>';
   open.forEach(async (p, i) => { const pts = await loadSpark(p); const cell = document.querySelector(`#open .row[data-i="${i}"] .spark`);
     if (cell) cell.innerHTML = sparkSvg(pts, p.entry_price, p.mult_now >= 1); });
@@ -435,6 +445,42 @@ async function loadCeo() {
     : '<div class="empty">No briefings yet.</div>';
 }
 
+/* ---------------- live feed: reprice open picks every 5s ---------------- */
+let lastLiveVal = null, liveTimer = null;
+async function tick() {
+  const visible = document.visibilityState === "visible" && !$("#tab-trencher").hidden;
+  if (!visible || !Object.keys(OPEN).length) { $("#live").classList.add("off"); return; }
+  try {
+    const L = await (await fetch("/api/live")).json();
+    if (L.error) throw new Error(L.error);
+    $("#live").classList.remove("off");
+    const lastPt = LIVEPTS[LIVEPTS.length - 1];
+    if (!lastPt || L.t - lastPt[0] >= 15 || Math.abs(L.value - lastPt[1]) > 1e-6) {   // keep the stored series lean
+      LIVEPTS.push([L.t, L.value, L.staked]);
+      LIVEPTS = LIVEPTS.filter(p => p[0] > L.t - 86400).slice(-6000);
+      try { localStorage.setItem("trencher-live", JSON.stringify(LIVEPTS)); } catch {}
+    }
+    for (const q of L.picks) {
+      const row = document.querySelector(`#open .row[data-token="${CSS.escape(q.token)}"]`), p = OPEN[q.token];
+      if (!row || !p) continue;
+      const ch = (q.mult - 1) * 100, pill = row.querySelector("[data-pill]");
+      pill.className = "pill " + (ch > 0 ? "up" : ch < 0 ? "down" : "flat"); pill.textContent = pct(ch);
+      const sp = SPARK[q.token + ""] || SPARK[p.chain + p.token];
+      if (sp && sp.points.length) { sp.points.push([L.t, q.price]); row.querySelector(".spark").innerHTML = sparkSvg(sp.points, p.entry_price, q.mult >= 1); }
+    }
+    if (!SCRUB) {
+      drawChart();
+      if (lastLiveVal != null && L.value !== lastLiveVal) {
+        const h = $("#hero"); h.classList.remove("flash-up", "flash-down"); void h.offsetWidth;
+        h.classList.add(L.value > lastLiveVal ? "flash-up" : "flash-down");
+      }
+    }
+    lastLiveVal = L.value;
+  } catch { $("#live").classList.add("off"); }
+}
+function startLive() { clearInterval(liveTimer); liveTimer = setInterval(tick, 5000); tick(); }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") tick(); });
+
 function load() {
   loadTrencher().catch(e => { $("#hero").textContent = "—"; $("#delta").innerHTML = `<span class="down">Couldn't load data: ${esc(e.message)}</span>`; });
   loadCeo().catch(() => {});
@@ -447,7 +493,7 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
 }));
 $("#refresh").addEventListener("click", load);
 const startTab = document.querySelector(`.tabs button[data-tab="${location.hash.slice(1)}"]`); if (startTab) startTab.click();
-load(); setInterval(load, 60000);
+load(); setInterval(load, 60000); startLive();
 </script>
 </body>
 </html>

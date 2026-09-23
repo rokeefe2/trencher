@@ -26,6 +26,8 @@ def fetch(url, ttl=60, raw=False):
     _cache[url] = (time.time(), val)
     return val
 
+BASE = {"data": None}
+
 def trencher():
     source, stale = "local file", False
     if REPO:
@@ -60,7 +62,26 @@ def trencher():
         s = data["summary"]; s["value"] = round(sum(p["value_now"] for p in data["picks"]), 2)
         s["pnl"] = round(s["value"] - s.get("staked", 0), 2)
     data["source"] = source; data["stale"] = stale
+    BASE["data"] = data
     return data
+
+def live():
+    """Fast reprice of open picks from DexScreener (polled every ~5s by the page)."""
+    d = BASE["data"] or trencher()
+    picks = d.get("picks", []); out = []
+    for chain in {p["chain"] for p in picks if p["status"] == "open"}:
+        toks = [p["token"] for p in picks if p["status"] == "open" and p["chain"] == chain][:30]
+        best = {}
+        for pr in fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(toks)}", ttl=4):
+            tk = pr.get("baseToken", {}).get("address"); liq = float((pr.get("liquidity") or {}).get("usd") or 0)
+            if tk and liq >= best.get(tk, (0, 0))[0]: best[tk] = (liq, float(pr.get("priceUsd") or 0))
+        for p in picks:
+            if p["status"] == "open" and p["chain"] == chain and best.get(p["token"], (0, 0))[1]:
+                px = best[p["token"]][1]; val = p["realized"] + (p["tokens_left"] or 0) * px
+                out.append({"token": p["token"], "price": px, "mult": px / p["entry_price"], "value": val})
+    live_vals = {o["token"]: o["value"] for o in out}
+    value = sum(live_vals.get(p["token"], p["value_now"]) if p["status"] == "open" else p["value_now"] for p in picks)
+    return {"t": time.time(), "value": round(value, 4), "staked": sum(p["stake"] for p in picks), "picks": out}
 
 def spark(chain, token, since):
     """Price history for a pick's mini chart: DexScreener finds the main pool, GeckoTerminal gives candles."""
@@ -93,6 +114,8 @@ class H(BaseHTTPRequestHandler):
                 self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
             elif self.path.startswith("/api/trencher"):
                 self.send(200, json.dumps(trencher(), default=str), "application/json")
+            elif self.path.startswith("/api/live"):
+                self.send(200, json.dumps(live()), "application/json")
             elif self.path.startswith("/api/spark"):
                 from urllib.parse import urlparse, parse_qs
                 q = {k: v[0] for k, v in parse_qs(urlparse(self.path).query).items()}
