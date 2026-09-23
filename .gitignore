@@ -9,3 +9,4 @@ run.sh
 __pycache__/
 data/
 dashboard/settings.json
+local-retired/

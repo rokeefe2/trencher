@@ -14,6 +14,7 @@ jobs:
     timeout-minutes: 15
     env:
       DATA_DIR: ${{ github.workspace }}/data
+      TZ: America/Los_Angeles
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4

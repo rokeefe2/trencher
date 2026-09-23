@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
+    inputs:
+      selftest:
+        description: "Test Claude + phone alert instead of scanning"
+        type: boolean
+        default: false
 concurrency:
   group: trencher-data
   cancel-in-progress: false
@@ -15,19 +20,32 @@ jobs:
     env:
       DATA_DIR: ${{ github.workspace }}/data
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      TZ: America/Los_Angeles
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           ref: data
           path: data
+      - name: Self-test (Claude login + phone alert)
+        if: inputs.selftest
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+          R=$(claude -p "Reply with exactly the word OK" --permission-mode dontAsk --allowedTools "" 2>&1 | tail -1)
+          echo "claude said: $R"
+          curl -s -H "Title: Trencher cloud self-test" -H "Tags: white_check_mark" -d "Cloud scanner is live. Claude review check: $R" "https://ntfy.sh/$NTFY_TOPIC" >/dev/null
+          [ "$R" = "OK" ]
       - name: Track open paper trades
+        if: ${{ !inputs.selftest }}
         run: python3 scanner.py track
       - name: Scan
+        if: ${{ !inputs.selftest }}
         id: scan
         run: echo "n=$(python3 scanner.py scan | python3 -c 'import json,sys;print(json.load(sys.stdin)["to_review"])')" >> "$GITHUB_OUTPUT"
       - name: Claude review
-        if: steps.scan.outputs.n != '0'
+        if: ${{ !inputs.selftest && steps.scan.outputs.n != '0' }}
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: |
@@ -36,8 +54,10 @@ jobs:
           claude -p "$PROMPT" --permission-mode dontAsk --allowedTools "" > data/review_out.txt || echo "claude failed" >> data/review_out.txt
           python3 scanner.py record
       - name: Export dashboard data
+        if: ${{ !inputs.selftest }}
         run: python3 scanner.py export
       - name: Save data (single-commit data branch)
+        if: ${{ !inputs.selftest }}
         run: |
           cd data
           git config user.name "trencher-bot"; git config user.email "trencher-bot@users.noreply.github.com"
