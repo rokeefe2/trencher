@@ -1,0 +1,34 @@
+name: watch
+# 30-second exit watcher. Each run lasts ~5h45m; the next queued run starts when it ends (continuous coverage).
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: trencher-watcher
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      DATA_DIR: ${{ github.workspace }}/data        # read-only copy (config overrides); never pushed
+      EXITS_DIR: ${{ github.workspace }}/exits
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WATCH_MINUTES: "345"
+      TZ: America/Los_Angeles
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: data
+      - uses: actions/checkout@v4
+        with:
+          ref: exits
+          path: exits
+      - name: Watch open picks every 30 seconds
+        run: python3 watcher.py

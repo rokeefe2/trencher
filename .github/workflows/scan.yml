@@ -23,6 +23,7 @@ jobs:
     timeout-minutes: 25
     env:
       DATA_DIR: ${{ github.workspace }}/data
+      EXITS_DIR: ${{ github.workspace }}/exits
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
       TZ: America/Los_Angeles
     steps:
@@ -31,6 +32,10 @@ jobs:
         with:
           ref: data
           path: data
+      - uses: actions/checkout@v4
+        with:
+          ref: exits
+          path: exits
       - name: Self-test (Claude login + phone alert)
         if: inputs.selftest
         env:

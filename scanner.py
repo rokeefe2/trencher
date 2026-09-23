@@ -22,6 +22,11 @@ for _k, _v in TUNING.get("overrides", {}).items():
     if isinstance(_v, dict) and isinstance(CFG.get(_k), dict): CFG[_k] = {**CFG[_k], **_v}
     else: CFG[_k] = _v
 DB = sqlite3.connect(os.path.join(HERE, "trencher.db"))
+for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0")):
+    try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
+    except sqlite3.OperationalError: pass
+DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
+DB.execute("CREATE TABLE IF NOT EXISTS applied_events (id TEXT PRIMARY KEY)")
 NOW = time.time()
 COST = CFG.get("cost_pct_each_way", 1.5) / 100   # DEX fee + slippage per side, so paper P&L isn't flattering
 
@@ -300,16 +305,78 @@ def cmd_record():
         if v.get("verdict") != "PICK" or slots <= 0: continue
         slots -= 1
         price = c["price_usd"]; stake = CFG["paper_stake"]
-        DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak) "
-                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
-                   c["score"], v.get("reason", ""), stake * (1 - COST) / price, price, price))
+        tokens = stake * (1 - COST) / price
+        DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak,tokens0,ladder_hit) "
+                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0)", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
+                   c["score"], v.get("reason", ""), tokens, price, price, tokens))
         ntfy(f"PAPER PICK: {c['symbol']} ({c['chain']}) score {c['score']}",
              f"{v.get('reason','')[:300]}\nMcap ${c['mcap_usd']:,} | Liq ${c['liquidity_usd']:,} | Age {c['age_h']}h\n"
              f"Paper entry ${price:.8g} x ${stake}", c.get("dexscreener"), "high")
         log(f"PICK {c['symbol']} {c['token']} @ {price}")
     DB.commit()
 
+# ---------------------------------------------------------------- exits: profit-taking ladder (shared with watcher.py)
+def decide_exit(p, px, now, cfg):
+    """Pure decision. p needs entry_price, ladder_hit, peak_x, picked_at. Returns (ladder_levels_to_sell, close_reason, peak_x)."""
+    mult = px / p["entry_price"]; peak_x = max(p.get("peak_x") or 1.0, mult)
+    ladder = cfg.get("ladder", [[1.5, .3], [2.0, .3], [3.0, .2]]); hit = p.get("ladder_hit") or 0
+    sells = []
+    while hit < len(ladder) and mult >= ladder[hit][0]:
+        sells.append(hit); hit += 1
+    age_h = (now - p["picked_at"]) / 3600
+    if hit == 0:
+        stop_x, stop_name = 1 - cfg["stop_loss_pct"] / 100, "stop loss"
+    else:
+        trail = peak_x * (1 - cfg.get("trail_pct", 30) / 100)
+        stop_x, stop_name = (trail, "trailing stop") if trail > cfg.get("breakeven_x", 1.0) else (cfg.get("breakeven_x", 1.0), "break-even stop")
+    close = None
+    if mult <= stop_x: close = stop_name
+    elif hit == 0 and age_h >= cfg["no_move_hours"] and mult < 1 + cfg["no_move_min_gain_pct"] / 100: close = f"no move in {cfg['no_move_hours']}h"
+    elif age_h >= 72: close = "72h max hold"
+    return sells, close, peak_x
+
+def apply_ladder(pid, level, px):
+    row = DB.execute("SELECT stake, tokens0, tokens_left, realized, ladder_hit, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
+    if not row or row[5] != "open" or (row[4] or 0) > level: return False   # already applied / closed
+    stake, tokens0, left, realized, _, _, sym = row
+    frac = CFG.get("ladder", [[1.5, .3], [2.0, .3], [3.0, .2]])[level][1]
+    sell = min(left, frac * (tokens0 or left)); realized += sell * px * (1 - COST); left -= sell
+    DB.execute("UPDATE picks SET tokens_left=?, realized=?, ladder_hit=?, took_stake=? WHERE id=?",
+               (left, realized, level + 1, int(realized >= stake), pid))
+    log(f"LADDER {sym}: sold {int(frac*100)}% at level {level+1}"); return True
+
+def apply_close(pid, px, reason):
+    row = DB.execute("SELECT tokens_left, realized, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
+    if not row or row[2] != "open": return False
+    DB.execute("UPDATE picks SET status='closed', realized=?, tokens_left=0, closed_at=?, close_reason=?, last_price=? WHERE id=?",
+               (row[1] + row[0] * px * (1 - COST), NOW, reason, px, pid))
+    log(f"CLOSE {row[3]}: {reason}"); return True
+
+def watcher_healthy():
+    d = os.environ.get("EXITS_DIR")
+    try: return d and NOW - json.load(open(os.path.join(d, "heartbeat.json")))["t"] < 180
+    except Exception: return False
+
+def apply_watcher_events():
+    d = os.environ.get("EXITS_DIR"); fp = os.path.join(d or "", "events.jsonl")
+    if not d or not os.path.exists(fp): return
+    for line in open(fp):
+        try: e = json.loads(line)
+        except ValueError: continue
+        if DB.execute("SELECT 1 FROM applied_events WHERE id=?", (e["id"],)).fetchone(): continue
+        if e["kind"] == "ladder": apply_ladder(e["pick_id"], e["level"], e["price"])
+        elif e["kind"] == "close": apply_close(e["pick_id"], e["price"], e["reason"])
+        if e.get("peak_price"): DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=?", (e["peak_price"], e["pick_id"]))
+        DB.execute("INSERT INTO applied_events VALUES (?)", (e["id"],))
+    try:   # watcher's 30-second peaks feed the trailing stop
+        for pid, pk in json.load(open(os.path.join(d, "heartbeat.json"))).get("peaks", {}).items():
+            DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=?", (pk, int(pid)))
+    except Exception: pass
+    DB.commit()
+
 def cmd_track():
+    apply_watcher_events()
+    watcher_on = watcher_healthy()
     rows = DB.execute("SELECT id,chain,token,symbol,picked_at,entry_price,stake,tokens_left,realized,took_stake,peak,p1h,p6h,p24h,p72h "
                       "FROM picks WHERE status='open' OR p72h IS NULL").fetchall()
     by_chain = {}
@@ -324,21 +391,15 @@ def cmd_track():
         upd = {"last_price": px, "peak": max(peak or px, px)}
         for col, h, cur in (("p1h", 1, p1), ("p6h", 6, p6), ("p24h", 24, p24), ("p72h", 72, p72)):
             if cur is None and age_h >= h: upd[col] = mult
-        status = DB.execute("SELECT status FROM picks WHERE id=?", (pid,)).fetchone()[0]
-        if status == "open":
-            if not took and mult >= 2:          # take original stake out
-                sell = stake / (px * (1 - COST)); left -= sell; realized += stake; took = 1
-                upd.update(tokens_left=left, realized=realized, took_stake=1)
-                ntfy(f"{sym} hit 2x (paper)", f"Took the ${stake:.0f} stake back out. Riding the rest on house money.", prio="default")
-            close = None
-            if mult <= 1 - CFG["stop_loss_pct"] / 100: close = "stop loss"
-            elif not took and age_h >= CFG["no_move_hours"] and mult < 1 + CFG["no_move_min_gain_pct"] / 100: close = f"no move in {CFG['no_move_hours']}h"
-            elif age_h >= 72: close = "72h max hold"
-            if close:
-                upd.update(status="closed", realized=realized + left * px * (1 - COST), tokens_left=0, closed_at=NOW, close_reason=close)
-                log(f"CLOSE {sym}: {close} at {mult:.2f}x")
         sets = ",".join(f"{k}=?" for k in upd)
-        DB.execute(f"UPDATE picks SET {sets} WHERE id=?", (*upd.values(), pid))
+        DB.execute(f"UPDATE picks SET {sets} WHERE id=?", (*upd.values(), pid)); upd = {}
+        prow = DB.execute("SELECT status, ladder_hit, peak FROM picks WHERE id=?", (pid,)).fetchone()
+        if prow[0] == "open" and not watcher_on:   # the 30s watcher normally handles exits; this is the fallback
+            sells, close, _ = decide_exit({"entry_price": entry, "ladder_hit": prow[1], "peak_x": (prow[2] or px) / entry,
+                                           "picked_at": t0}, px, NOW, CFG)
+            for lvl in sells:
+                if apply_ladder(pid, lvl, px): ntfy(f"{sym} hit {CFG['ladder'][lvl][0]}x (paper)", f"Sold {int(CFG['ladder'][lvl][1]*100)}% of the position.")
+            if close and apply_close(pid, px, close): ntfy(f"{sym} closed (paper): {close}", f"Exited at {mult:.2f}x.")
     # pools that vanished for >6h after 72h window: count as total loss
     DB.execute("UPDATE picks SET status='closed', close_reason='no price (pool gone)', closed_at=?, tokens_left=0 "
                "WHERE status='open' AND picked_at<? AND (last_price IS NULL OR last_price=entry_price)", (NOW, NOW - 78 * 3600))
@@ -460,7 +521,8 @@ def cmd_stats():
 def cmd_export():
     """Write dashboard JSON (dashboard.json) and prune old data so the data branch stays small."""
     cols = ["id", "chain", "token", "symbol", "name", "picked_at", "entry_price", "stake", "score", "reason", "status",
-            "tokens_left", "realized", "took_stake", "p1h", "p6h", "p24h", "p72h", "last_price", "peak", "closed_at", "close_reason"]
+            "tokens_left", "realized", "took_stake", "p1h", "p6h", "p24h", "p72h", "last_price", "peak", "closed_at", "close_reason",
+            "tokens0", "ladder_hit"]
     picks = []
     for r in DB.execute(f"SELECT {','.join(cols)} FROM picks ORDER BY picked_at DESC"):
         p = dict(zip(cols, r))
@@ -520,7 +582,7 @@ def cmd_export():
 # safety rule (auto-applied); the looser direction needs Ray's approval. None = tuning knob, auto both ways.
 TUNABLE = {
     "min_score": (50, 85, 5, None), "max_picks_per_day": (1, 5, 1, None), "max_reviews_per_run": (2, 6, 1, None),
-    "stop_loss_pct": (25, 60, 10, None), "no_move_hours": (6, 24, 6, None), "no_move_min_gain_pct": (10, 40, 10, None),
+    "stop_loss_pct": (25, 60, 10, None), "trail_pct": (15, 50, 5, None), "no_move_hours": (6, 24, 6, None), "no_move_min_gain_pct": (10, 40, 10, None),
     "min_age_h": (0.5, 6, 1, None), "max_age_h": (12, 72, 12, None),
     "max_top10_pct": (15, 30, 5, "down"), "max_creator_pct": (1, 5, 1, "down"), "max_linked_wallets": (10, 40, 10, "down"),
     "max_insider_pct": (5, 15, 5, "down"), "max_sell_tax_pct": (0, 10, 5, "down"),

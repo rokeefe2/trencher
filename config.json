@@ -33,5 +33,21 @@
   "survival": 1
  },
  "cost_pct_each_way": 1.5,
- "shadow_rejects_per_run": 8
+ "shadow_rejects_per_run": 8,
+ "ladder": [
+  [
+   1.5,
+   0.3
+  ],
+  [
+   2.0,
+   0.3
+  ],
+  [
+   3.0,
+   0.2
+  ]
+ ],
+ "trail_pct": 30,
+ "breakeven_x": 1.0
 }
