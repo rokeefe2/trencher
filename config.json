@@ -23,5 +23,15 @@
   "base": 5,
   "solana": 2
  },
- "min_holders": 100
+ "min_holders": 100,
+ "weights": {
+  "momentum": 1,
+  "holders": 1,
+  "liquidity": 1,
+  "buyer_breadth": 1,
+  "social": 1,
+  "survival": 1
+ },
+ "cost_pct_each_way": 1.5,
+ "shadow_rejects_per_run": 8
 }

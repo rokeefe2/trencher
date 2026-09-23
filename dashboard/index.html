@@ -89,6 +89,7 @@ details summary { cursor: pointer; color: var(--text-2); }
     <h1>Trencher</h1>
     <div class="tabs" role="tablist">
       <button role="tab" data-tab="trencher" aria-selected="true">Meme coins</button>
+      <button role="tab" data-tab="learning" aria-selected="false">Learning</button>
       <button role="tab" data-tab="ceo" aria-selected="false">CEO Watcher</button>
     </div>
     <div class="meta"><span id="updated"></span><button id="refresh">Refresh</button></div>
@@ -112,6 +113,27 @@ details summary { cursor: pointer; color: var(--text-2); }
       <div class="card"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></div>
       <div class="card"><h2>Latest scan log</h2><pre class="log" id="log"></pre></div>
     </div>
+  </section>
+
+  <section id="tab-learning" hidden>
+    <div class="banner">🧪 The agent follows every coin it scans, including the ones it rejected, and checks whether each rule
+      was right. Every Monday it reviews the evidence, tunes itself within guardrails, and updates its notebook.
+      <span id="learn-meta"></span></div>
+    <div class="grid two" style="margin-bottom:14px">
+      <div class="card"><h2>Ready for real money?</h2><div id="golive"></div></div>
+      <div class="card"><h2>Waiting for your approval</h2><div id="pending"></div>
+        <h2 style="margin-top:20px">Changes the agent made</h2><div class="tbl" id="changelog"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px"><h2>Safety rule report card</h2>
+      <div style="color:var(--text-3);font-size:12px;margin-bottom:8px">For coins each rule blocked: how many later rugged
+        (the rule protected you) vs. doubled (a missed winner). Judged 24h after the coin was seen.</div>
+      <div class="tbl" id="rules"></div></div>
+    <div class="grid two" style="margin-bottom:14px">
+      <div class="card"><h2>Outcome by stage</h2><div class="tbl" id="stages"></div>
+        <h2 style="margin-top:20px">Outcome by score</h2><div class="tbl" id="buckets"></div></div>
+      <div class="card"><h2>Which score factors predict winners?</h2><div class="tbl" id="comps"></div></div>
+    </div>
+    <div class="card"><h2>Agent's notebook</h2><div id="notebook" class="md"></div></div>
   </section>
 
   <section id="tab-ceo" hidden>
@@ -232,6 +254,45 @@ async function loadTrencher() {
       <td style="font-size:12.5px;color:var(--text-2)">${esc(r.result)}${r.score != null ? ` <span class="chip">score ${Math.round(r.score)}</span>` : ""}</td><td class="num">${ago(r.first_seen)}</td></tr>`).join("") + "</table>"
     : '<div class="empty">Nothing scanned yet</div>';
   $("#log").textContent = d.last_log || "No log yet today.";
+  renderLearning(d);
+}
+
+function outcomeCells(s) {
+  if (!s || !s.n) return `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`;
+  return `<td class="num">${s.n}</td><td class="num">${s.median_24h}×</td><td class="num">${s.rug_pct}%</td><td class="num">${s.doubled_pct}%</td>`;
+}
+const OUT_HEAD = `<th class="num">Tracked</th><th class="num">Median 24h</th><th class="num">Rugged</th><th class="num">Doubled</th>`;
+function renderLearning(d) {
+  const a = d.analysis, tu = d.tuning || {};
+  $("#learn-meta").textContent = a ? ` ${a.tracked} coins being followed · ${a.with_24h_outcome} with a 24h result so far.` : "";
+  if (!a) { ["#golive", "#rules", "#stages", "#buckets", "#comps"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data — first results about 24h after the update.</div>'); }
+  else {
+    $("#golive").innerHTML = a.go_live.map(c => `<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="color:${c.ok ? "var(--good)" : "var(--text-3)"};font-weight:600;min-width:62px">${c.ok ? "✓ Pass" : "○ Not yet"}</span>
+      <span style="flex:1">${esc(c.check)}</span><span class="chip">${esc(c.value)}</span></div>`).join("");
+    const rules = a.safety_rules.filter(r => r.n);
+    $("#rules").innerHTML = rules.length ? `<table><tr><th>Rule</th>${OUT_HEAD}<th>Verdict</th></tr>` + rules.map(r => {
+      const v = r.n < 20 ? "need more data" : r.doubled_pct >= 15 && r.rug_pct < 30 ? "⚠ may be too strict" : r.rug_pct >= 40 ? "✓ protecting you" : "ok";
+      return `<tr><td>${esc(r.rule)}</td>${outcomeCells(r)}<td><span class="chip">${v}</span></td></tr>`; }).join("") + "</table>"
+      : '<div class="empty">No 24h results for rejected coins yet.</div>';
+    const names = {reject: "Rejected by safety", low_score: "Scored below cutoff", scored: "Scored, not reviewed", pass: "Claude passed", pick: "Claude picked"};
+    $("#stages").innerHTML = `<table><tr><th>Stage</th>${OUT_HEAD}</tr>` + Object.entries(a.by_stage).map(([k, s]) => `<tr><td>${names[k] || k}</td>${outcomeCells(s)}</tr>`).join("") + "</table>";
+    $("#buckets").innerHTML = `<table><tr><th>Score</th>${OUT_HEAD}</tr>` + Object.entries(a.score_buckets).map(([k, s]) => `<tr><td>${k}</td>${outcomeCells(s)}</tr>`).join("") + "</table>";
+    const comps = Object.entries(a.score_components || {});
+    $("#comps").innerHTML = comps.length ? `<table><tr><th>Factor</th><th></th>${OUT_HEAD}</tr>` + comps.map(([k, c]) =>
+      `<tr><td rowspan="2">${esc(k.replace("_", " "))}</td><td>high</td>${outcomeCells(c.high)}</tr><tr><td>low</td>${outcomeCells(c.low)}</tr>`).join("") + "</table>"
+      : '<div class="empty">Needs at least 6 scored coins with results.</div>';
+  }
+  const pend = tu.pending || [];
+  $("#pending").innerHTML = pend.length ? pend.map(p => `<div style="padding:6px 0;border-bottom:1px solid var(--border)"><b>${esc(p.key)}</b>: ${p.from} → ${p.to}
+      <div class="reason">${esc(p.reason)} (${p.evidence_n} outcomes)</div></div>`).join("") +
+      `<div style="color:var(--text-3);font-size:12px;margin-top:8px">These loosen a safety rule, so they wait for you. Tell Claude "approve ${esc(pend[0].key)}" (or "approve all").</div>`
+    : '<div class="empty">Nothing waiting on you.</div>';
+  const log = (tu.changelog || []).slice().reverse();
+  $("#changelog").innerHTML = log.length ? `<table><tr><th>Date</th><th>Setting</th><th class="num">Change</th><th>Why</th></tr>` +
+    log.map(c => `<tr><td>${esc(c.date)}</td><td>${esc(c.key)}</td><td class="num">${c.from} → ${c.to}</td><td class="reason">${esc(c.reason)}</td></tr>`).join("") + "</table>"
+    : '<div class="empty">No changes yet — the first review is Monday.</div>';
+  $("#notebook").innerHTML = d.learnings ? md(d.learnings) : '<div class="empty">The agent starts its notebook at the first weekly review.</div>';
 }
 
 async function loadCeo() {
@@ -257,7 +318,7 @@ function load() {
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
-  $("#tab-trencher").hidden = b.dataset.tab !== "trencher"; $("#tab-ceo").hidden = b.dataset.tab !== "ceo";
+  ["trencher", "learning", "ceo"].forEach(n => $("#tab-" + n).hidden = b.dataset.tab !== n);
 }));
 $("#refresh").addEventListener("click", load);
 load(); setInterval(load, 60000);

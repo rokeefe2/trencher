@@ -16,11 +16,20 @@ HERE = os.environ.get("DATA_DIR") or CODE          # data lives in DATA_DIR (the
 os.makedirs(os.path.join(HERE, "logs"), exist_ok=True)
 CFG = json.load(open(os.path.join(CODE, "config.json")))
 CFG["ntfy_topic"] = os.environ.get("NTFY_TOPIC") or CFG.get("ntfy_topic")  # secret in the cloud
+TUNING_PATH = os.path.join(HERE, "tuning.json")   # self-tuning overrides live with the data, not the code
+TUNING = json.load(open(TUNING_PATH)) if os.path.exists(TUNING_PATH) else {"overrides": {}, "changelog": [], "pending": []}
+for _k, _v in TUNING.get("overrides", {}).items():
+    if isinstance(_v, dict) and isinstance(CFG.get(_k), dict): CFG[_k] = {**CFG[_k], **_v}
+    else: CFG[_k] = _v
 DB = sqlite3.connect(os.path.join(HERE, "trencher.db"))
 NOW = time.time()
+COST = CFG.get("cost_pct_each_way", 1.5) / 100   # DEX fee + slippage per side, so paper P&L isn't flattering
 
 DB.executescript("""
 CREATE TABLE IF NOT EXISTS seen (chain TEXT, token TEXT, first_seen REAL, last_result TEXT, score REAL,
+  PRIMARY KEY(chain, token));
+CREATE TABLE IF NOT EXISTS shadow (chain TEXT, token TEXT, t0 REAL, stage TEXT, reason TEXT, score REAL,
+  parts TEXT, metrics TEXT, entry REAL, liq0 REAL, p1h REAL, p6h REAL, p24h REAL, p72h REAL, liq24 REAL,
   PRIMARY KEY(chain, token));
 CREATE TABLE IF NOT EXISTS incubator (chain TEXT, token TEXT, created_at REAL, PRIMARY KEY(chain, token));
 CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT, symbol TEXT, name TEXT,
@@ -211,7 +220,9 @@ def score(c, s, dx):
     parts["social"] = (6 if soc.get("twitter") else 0) + (4 if soc.get("telegram") else 0) + (5 if dx.get("websites") else 0)
     a = c["age_h"]
     parts["survival"] = 10 if 3 <= a <= 24 else 6
-    return sum(parts.values()), parts, {"turnover_1h": round(turnover, 2), "buy_ratio_1h": round(buy_ratio, 2),
+    w = CFG.get("weights", {}); mx = {"momentum": 25, "holders": 20, "liquidity": 15, "buyer_breadth": 15, "social": 15, "survival": 10}
+    total = round(100 * sum(parts[k] * w.get(k, 1) for k in parts) / sum(mx[k] * w.get(k, 1) for k in mx), 1)
+    return total, parts, {"turnover_1h": round(turnover, 2), "buy_ratio_1h": round(buy_ratio, 2),
                                         "price_change": c["pc"], "buyers_6h": b6, "liq_to_mcap": round(lm, 3)}
 
 def holder_check(fails, s):
@@ -219,8 +230,13 @@ def holder_check(fails, s):
         fails.append(f"only {int(f(s.get('holders')))} holders (too few, or data not ready)")
     return fails, s
 
+def shadow(chain, token, stage, reason, price, liq, score=None, parts=None, metrics=None):
+    if not price: return
+    DB.execute("INSERT OR IGNORE INTO shadow (chain,token,t0,stage,reason,score,parts,metrics,entry,liq0) VALUES (?,?,?,?,?,?,?,?,?,?)",
+               (chain, token, NOW, stage, reason, score, json.dumps(parts or {}), json.dumps(metrics or {}), price, liq))
+
 def cmd_scan():
-    cands = []
+    cands = []; rejects_tracked = 0
     for chain in CFG["chains"]:
         pools = discover(chain)
         new = [p for p in pools if not DB.execute(
@@ -231,10 +247,17 @@ def cmd_scan():
             fails, s = holder_check(*(safety_solana if chain == "solana" else safety_base)(c))
             if fails:
                 DB.execute("INSERT OR REPLACE INTO seen VALUES (?,?,?,?,?)", (chain, c["token"], NOW, "REJECT: " + "; ".join(fails), None))
+                if rejects_tracked < CFG.get("shadow_rejects_per_run", 8):   # sample rejects to learn if the rule was right
+                    shadow(chain, c["token"], "reject", "; ".join(fails), c["price"], c["liq"],
+                           metrics={"age_h": round(c["age_h"], 1), "mcap": round(c["mcap"]), "pc": c["pc"]})
+                    rejects_tracked += 1
                 continue
             d = dx.get(c["token"], {})
             total, parts, metrics = score(c, s, d)
             DB.execute("INSERT OR REPLACE INTO seen VALUES (?,?,?,?,?)", (chain, c["token"], NOW, "SCORED", total))
+            shadow(chain, c["token"], "scored" if total >= CFG["min_score"] else "low_score", "", d.get("price") or c["price"],
+                   c["liq"], total, parts, {**metrics, "safety": s, "age_h": round(c["age_h"], 1), "mcap": round(c["mcap"]),
+                                            "boosts": d.get("boosts")})
             if total >= CFG["min_score"]:
                 cands.append({"chain": chain, "token": c["token"], "symbol": d.get("symbol"), "name": d.get("name") or c["name"],
                               "score": total, "score_parts": parts, "age_h": round(c["age_h"], 1), "liquidity_usd": round(c["liq"]),
@@ -265,19 +288,20 @@ def cmd_record():
     blocks = re.findall(r"```json\s*(\{.*?\})\s*```", txt, re.S)
     if not blocks:
         log("record: no json verdict block in Claude output"); return
-    rv = json.loads(blocks[-1])
+    rv = json.loads(blocks[-1], strict=False)
     cands = {c["token"]: c for c in json.load(open(os.path.join(HERE, "candidates.json")))["candidates"]}
     slots = json.load(open(os.path.join(HERE, "candidates.json")))["slots_left_today"]
     for v in rv.get("verdicts", []):
         c = cands.get(v.get("token"))
         if not c: continue
         DB.execute("UPDATE seen SET last_result=? WHERE chain=? AND token=?", (f"{v.get('verdict')}: {v.get('reason','')[:300]}", c["chain"], c["token"]))
+        DB.execute("UPDATE shadow SET stage=?, reason=? WHERE chain=? AND token=?", (v.get("verdict", "").lower(), v.get("reason", "")[:300], c["chain"], c["token"]))
         if v.get("verdict") != "PICK" or slots <= 0: continue
         slots -= 1
         price = c["price_usd"]; stake = CFG["paper_stake"]
         DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak) "
                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
-                   c["score"], v.get("reason", ""), stake / price, price, price))
+                   c["score"], v.get("reason", ""), stake * (1 - COST) / price, price, price))
         ntfy(f"PAPER PICK: {c['symbol']} ({c['chain']}) score {c['score']}",
              f"{v.get('reason','')[:300]}\nMcap ${c['mcap_usd']:,} | Liq ${c['liquidity_usd']:,} | Age {c['age_h']}h\n"
              f"Paper entry ${price:.8g} x ${stake}", c.get("dexscreener"), "high")
@@ -302,22 +326,116 @@ def cmd_track():
         status = DB.execute("SELECT status FROM picks WHERE id=?", (pid,)).fetchone()[0]
         if status == "open":
             if not took and mult >= 2:          # take original stake out
-                sell = stake / px; left -= sell; realized += stake; took = 1
+                sell = stake / (px * (1 - COST)); left -= sell; realized += stake; took = 1
                 upd.update(tokens_left=left, realized=realized, took_stake=1)
                 ntfy(f"{sym} hit 2x (paper)", f"Took the ${stake:.0f} stake back out. Riding the rest on house money.", prio="default")
             close = None
             if mult <= 1 - CFG["stop_loss_pct"] / 100: close = "stop loss"
-            elif not took and age_h >= CFG["no_move_hours"] and mult < 1 + CFG["no_move_min_gain_pct"] / 100: close = "no move in 12h"
+            elif not took and age_h >= CFG["no_move_hours"] and mult < 1 + CFG["no_move_min_gain_pct"] / 100: close = f"no move in {CFG['no_move_hours']}h"
             elif age_h >= 72: close = "72h max hold"
             if close:
-                upd.update(status="closed", realized=realized + left * px, tokens_left=0, closed_at=NOW, close_reason=close)
+                upd.update(status="closed", realized=realized + left * px * (1 - COST), tokens_left=0, closed_at=NOW, close_reason=close)
                 log(f"CLOSE {sym}: {close} at {mult:.2f}x")
         sets = ",".join(f"{k}=?" for k in upd)
         DB.execute(f"UPDATE picks SET {sets} WHERE id=?", (*upd.values(), pid))
     # pools that vanished for >6h after 72h window: count as total loss
-    DB.execute("UPDATE picks SET status='closed', close_reason='no price (pool gone)', closed_at=? "
+    DB.execute("UPDATE picks SET status='closed', close_reason='no price (pool gone)', closed_at=?, tokens_left=0 "
                "WHERE status='open' AND picked_at<? AND (last_price IS NULL OR last_price=entry_price)", (NOW, NOW - 78 * 3600))
     DB.commit()
+    track_shadows()
+
+def track_shadows():
+    """Price non-picked coins at 1h/6h/24h/72h checkpoints (each coin fetched ~4 times total)."""
+    due = DB.execute("SELECT chain,token,t0,entry,p1h,p6h,p24h,p72h FROM shadow WHERE "
+                     "(p1h IS NULL AND t0<?) OR (p6h IS NULL AND t0<?) OR (p24h IS NULL AND t0<?) OR (p72h IS NULL AND t0<?) LIMIT 600",
+                     (NOW - 3600, NOW - 6 * 3600, NOW - 24 * 3600, NOW - 72 * 3600)).fetchall()
+    by_chain = {}
+    for r in due: by_chain.setdefault(r[0], []).append(r[1])
+    info = {}
+    for chain, toks in by_chain.items():
+        for tkn, d in dex_info(chain, toks).items(): info[(chain, tkn)] = d
+    for chain, tok, t0, entry, p1, p6, p24, p72 in due:
+        d = info.get((chain, tok)); age_h = (NOW - t0) / 3600
+        mult = (d["price"] / entry) if d and d["price"] else 0.0   # no pair data any more = treated as dead
+        upd = {}
+        for col, h, cur in (("p1h", 1, p1), ("p6h", 6, p6), ("p24h", 24, p24), ("p72h", 72, p72)):
+            if cur is None and age_h >= h: upd[col] = round(mult, 4)
+        if "p24h" in upd: upd["liq24"] = d["liq"] if d else 0
+        if upd:
+            DB.execute(f"UPDATE shadow SET {','.join(k + '=?' for k in upd)} WHERE chain=? AND token=?", (*upd.values(), chain, tok))
+    DB.execute("DELETE FROM shadow WHERE t0<?", (NOW - 35 * 86400,))
+    DB.commit()
+
+# ---------------------------------------------------------------- learning: rule report card
+def _stats(rows):
+    """rows: list of (p24h, best_mult, rugged). Returns outcome summary."""
+    rows = [r for r in rows if r[0] is not None]
+    if not rows: return {"n": 0}
+    m = sorted(r[0] for r in rows)
+    return {"n": len(rows), "median_24h": round(m[len(m) // 2], 2),
+            "rug_pct": round(100 * sum(r[2] for r in rows) / len(rows)),
+            "doubled_pct": round(100 * sum(r[1] >= 2 for r in rows) / len(rows)),
+            "up50_pct": round(100 * sum(r[1] >= 1.5 for r in rows) / len(rows))}
+
+def cmd_analyze():
+    import re
+    rows = DB.execute("SELECT stage,reason,score,parts,metrics,p1h,p6h,p24h,p72h,liq24,t0 FROM shadow").fetchall()
+    recs = []
+    for stage, reason, sc, parts, metrics, p1, p6, p24, p72, liq24, t0 in rows:
+        ms = [x for x in (p1, p6, p24, p72) if x is not None]
+        best = max(ms) if ms else None
+        rug = int(p24 is not None and (p24 < 0.2 or (liq24 is not None and liq24 < 2000)))
+        recs.append({"stage": stage, "reason": reason or "", "score": sc, "parts": json.loads(parts or "{}"),
+                     "metrics": json.loads(metrics or "{}"), "p24": p24, "best": best or 0, "rug": rug, "t0": t0})
+    out = {"generated_at": NOW, "tracked": len(recs), "with_24h_outcome": sum(r["p24"] is not None for r in recs)}
+    # safety rules: did each rule block scams, or winners?
+    by_rule = {}
+    for r in recs:
+        if r["stage"] != "reject": continue
+        for part in r["reason"].split(";"):
+            key = re.sub(r"\d+(\.\d+)?%", "X%", part.strip()); key = re.sub(r"^\d+ wallets linked.*", "many linked wallets", key)
+            key = re.sub(r"only \d+ holders.*", "too few holders", key).replace("rugcheck danger: ", "")[:60]
+            by_rule.setdefault(key, []).append((r["p24"], r["best"], r["rug"]))
+    out["safety_rules"] = sorted(({"rule": k, **_stats(v)} for k, v in by_rule.items()), key=lambda x: -x["n"])
+    # stages: rejected vs low score vs Claude PASS vs Claude PICK
+    out["by_stage"] = {st: _stats([(r["p24"], r["best"], r["rug"]) for r in recs if r["stage"] == st])
+                       for st in ("reject", "low_score", "scored", "pass", "pick")}
+    # score buckets and each score component (does a higher component predict better outcomes?)
+    scored = [r for r in recs if r["score"] is not None]
+    out["score_buckets"] = {b: _stats([(r["p24"], r["best"], r["rug"]) for r in scored if lo <= r["score"] < hi])
+                            for b, lo, hi in (("<50", 0, 50), ("50-59", 50, 60), ("60-69", 60, 70), ("70-79", 70, 80), ("80+", 80, 101))}
+    comps = {}
+    for k in ("momentum", "holders", "liquidity", "buyer_breadth", "social", "survival"):
+        vals = [r for r in scored if k in r["parts"]]
+        if len(vals) < 6: continue
+        med = sorted(r["parts"][k] for r in vals)[len(vals) // 2]
+        comps[k] = {"high": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] > med]),
+                    "low": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] <= med]), "split_at": med}
+    out["score_components"] = comps
+    # exits: compare the live exit rules with simple alternatives on actual picks (checkpoint approximation)
+    picks = DB.execute("SELECT pnl_x, p24h, p72h, stake FROM (SELECT (realized + tokens_left*last_price)/stake AS pnl_x, p24h, p72h, stake FROM picks WHERE status='closed')").fetchall()
+    if picks:
+        out["exits"] = {"n": len(picks), "actual_avg_x": round(sum(p[0] for p in picks) / len(picks), 3),
+                        "hold_24h_avg_x": round(sum((p[1] or 0) for p in picks) / len(picks), 3),
+                        "hold_72h_avg_x": round(sum((p[2] or 0) for p in picks) / len(picks), 3)}
+    # go-live readiness
+    closed = DB.execute("SELECT stake, realized + tokens_left*COALESCE(last_price,0), picked_at FROM picks WHERE status='closed'").fetchall()
+    n = len(closed); pnl = sum(v - s for s, v, _ in closed)
+    wins = sum(v > s for s, v, _ in closed)
+    weeks = {}
+    for s, v, ts in closed: weeks.setdefault(datetime.fromtimestamp(ts).strftime("%G-W%V"), []).append(v - s)
+    last3 = [sum(x) for _, x in sorted(weeks.items())[-3:]]
+    out["go_live"] = [
+        {"check": "At least 30 closed paper picks", "ok": n >= 30, "value": n},
+        {"check": "Total paper P&L positive (after fees and slippage)", "ok": pnl > 0, "value": round(pnl, 2)},
+        {"check": "Win rate at least 35%", "ok": n > 0 and wins / n >= .35, "value": f"{round(100 * wins / n) if n else 0}%"},
+        {"check": "Profitable in 2 of the last 3 weeks", "ok": sum(x > 0 for x in last3) >= 2 and len(last3) >= 3,
+         "value": " / ".join(f"{x:+.0f}" for x in last3) or "-"},
+        {"check": "Claude's picks beat its passes (median 24h)", "ok": (out["by_stage"]["pick"].get("median_24h") or 0) >
+         (out["by_stage"]["pass"].get("median_24h") or 0) and out["by_stage"]["pick"].get("n", 0) >= 10,
+         "value": f'{out["by_stage"]["pick"].get("median_24h", "-")} vs {out["by_stage"]["pass"].get("median_24h", "-")}'}]
+    json.dump(out, open(os.path.join(HERE, "analysis.json"), "w"), indent=1, default=str)
+    print(json.dumps(out, indent=1, default=str))
 
 def cmd_stats():
     rows = DB.execute("SELECT symbol,chain,picked_at,stake,realized,tokens_left,last_price,status,close_reason,p1h,p6h,p24h,p72h,score,reason,entry_price "
@@ -371,6 +489,9 @@ def cmd_export():
                        "incubating": DB.execute("SELECT COUNT(*) FROM incubator").fetchone()[0]},
            "reject_reasons": sorted(reasons.items(), key=lambda x: -x[1])[:15],
            "picks": picks, "recent": seen,
+           "analysis": json.load(open(os.path.join(HERE, "analysis.json"))) if os.path.exists(os.path.join(HERE, "analysis.json")) else None,
+           "tuning": {**TUNING, "effective": {k: _get(k) for k in TUNABLE}},
+           "learnings": open(os.path.join(HERE, "learnings.md")).read() if os.path.exists(os.path.join(HERE, "learnings.md")) else "",
            "last_log": open(os.path.join(HERE, "logs", datetime.now().strftime("%Y-%m-%d") + ".log")).read()[-4000:]
                        if os.path.exists(os.path.join(HERE, "logs", datetime.now().strftime("%Y-%m-%d") + ".log")) else ""}
     json.dump(out, open(os.path.join(HERE, "dashboard.json"), "w"), default=str)
@@ -380,5 +501,73 @@ def cmd_export():
         fp = os.path.join(HERE, "logs", fn)
         if os.path.getmtime(fp) < NOW - 3 * 86400: os.remove(fp)
 
+# ---------------------------------------------------------------- self-tuning with guardrails
+# key: (min, max, max step per week, safety_dir). safety_dir: "down"/"up" = the STRICTER direction for a
+# safety rule (auto-applied); the looser direction needs Ray's approval. None = tuning knob, auto both ways.
+TUNABLE = {
+    "min_score": (50, 85, 5, None), "max_picks_per_day": (1, 5, 1, None), "max_reviews_per_run": (2, 6, 1, None),
+    "stop_loss_pct": (25, 60, 10, None), "no_move_hours": (6, 24, 6, None), "no_move_min_gain_pct": (10, 40, 10, None),
+    "min_age_h": (0.5, 6, 1, None), "max_age_h": (12, 72, 12, None),
+    "max_top10_pct": (15, 30, 5, "down"), "max_creator_pct": (1, 5, 1, "down"), "max_linked_wallets": (10, 40, 10, "down"),
+    "max_insider_pct": (5, 15, 5, "down"), "max_sell_tax_pct": (0, 10, 5, "down"),
+    "min_lp_locked_pct": (80, 100, 10, "up"), "min_liquidity": (20000, 100000, 20000, "up"), "min_holders": (100, 1000, 200, "up"),
+    **{f"weights.{k}": (0.5, 1.5, 0.25, None) for k in ("momentum", "holders", "liquidity", "buyer_breadth", "social", "survival")},
+}
+MIN_EVIDENCE = 20   # outcomes needed behind any change
+
+def _get(key):
+    if key.startswith("weights."): return CFG.get("weights", {}).get(key.split(".", 1)[1], 1)
+    return CFG.get(key)
+
+def _set_override(key, val):
+    ov = TUNING.setdefault("overrides", {})
+    if key.startswith("weights."): ov.setdefault("weights", {})[key.split(".", 1)[1]] = val
+    else: ov[key] = val
+
+def cmd_tune():
+    """Apply Claude's weekly proposals (weekly_out.txt) within guardrails; loosening safety -> pending for Ray."""
+    import re
+    txt = open(os.path.join(HERE, "weekly_out.txt")).read()
+    blocks = re.findall(r"```json\s*(\{.*?\})\s*```", txt, re.S)
+    prop = json.loads(blocks[-1], strict=False) if blocks else {}   # strict=False: tolerate raw newlines in notebook text
+    if prop.get("notebook"):
+        open(os.path.join(HERE, "learnings.md"), "w").write(prop["notebook"])
+    report = re.sub(r"```json\s*\{.*?\}\s*```", "", txt, flags=re.S).strip()
+    os.makedirs(os.path.join(HERE, "weekly"), exist_ok=True)
+    open(os.path.join(HERE, "weekly", datetime.now().strftime("%Y-%m-%d") + ".md"), "w").write(report)
+    applied, pending, refused = [], [], []
+    for ch in prop.get("changes", []):
+        key, reason, n = ch.get("key"), ch.get("reason", ""), int(f(ch.get("evidence_n")))
+        if key not in TUNABLE: refused.append(f"{key}: not tunable"); continue
+        lo, hi, step, sdir = TUNABLE[key]; cur = f(_get(key)); new = f(ch.get("value"))
+        if n < MIN_EVIDENCE: refused.append(f"{key}: only {n} outcomes (need {MIN_EVIDENCE})"); continue
+        new = max(lo, min(hi, new)); new = cur + max(-step, min(step, new - cur))   # clamp to bounds and weekly step
+        if new == cur: refused.append(f"{key}: already at its limit ({cur})"); continue
+        if isinstance(_get(key), int) and key != "min_age_h": new = int(round(new))
+        entry = {"date": datetime.now().strftime("%Y-%m-%d"), "key": key, "from": cur, "to": new, "reason": reason, "evidence_n": n}
+        loosening = sdir and ((sdir == "down" and new > cur) or (sdir == "up" and new < cur))
+        if loosening: pending.append(entry); continue
+        _set_override(key, new); applied.append(entry)
+    TUNING.setdefault("changelog", []).extend(applied)
+    TUNING["pending"] = [p for p in TUNING.get("pending", []) if p["key"] not in {x["key"] for x in pending}] + pending
+    json.dump(TUNING, open(TUNING_PATH, "w"), indent=1)
+    msg = (f"Applied {len(applied)} change(s): " + "; ".join(f"{a['key']} {a['from']}->{a['to']}" for a in applied) if applied else "No auto changes.")
+    if pending: msg += f"\n{len(pending)} safety loosening(s) need YOUR approval: " + "; ".join(f"{p['key']} {p['from']}->{p['to']}" for p in pending)
+    ntfy("Trencher weekly report ready", msg + "\nOpen the dashboard for details.", prio="high" if pending else "default")
+    log(f"tune: applied={applied} pending={pending} refused={refused}")
+    print(msg)
+
+def cmd_approve():
+    """scanner.py approve <key|all> — apply a pending safety change that Ray approved."""
+    want = sys.argv[2]
+    keep = []
+    for p in TUNING.get("pending", []):
+        if want in ("all", p["key"]):
+            _set_override(p["key"], p["to"]); TUNING.setdefault("changelog", []).append({**p, "approved_by": "Ray"})
+        else: keep.append(p)
+    TUNING["pending"] = keep
+    json.dump(TUNING, open(TUNING_PATH, "w"), indent=1); print("approved", want)
+
 if __name__ == "__main__":
-    {"scan": cmd_scan, "track": cmd_track, "record": cmd_record, "stats": cmd_stats, "export": cmd_export}[sys.argv[1]]()
+    {"scan": cmd_scan, "track": cmd_track, "record": cmd_record, "stats": cmd_stats, "export": cmd_export,
+     "analyze": cmd_analyze, "tune": cmd_tune, "approve": cmd_approve}[sys.argv[1]]()

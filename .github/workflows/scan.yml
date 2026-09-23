@@ -8,6 +8,10 @@ on:
         description: "Test Claude + phone alert instead of scanning"
         type: boolean
         default: false
+      approve:
+        description: "Approve a pending safety change (setting name, or 'all')"
+        type: string
+        default: ""
 concurrency:
   group: trencher-data
   cancel-in-progress: false
@@ -37,6 +41,9 @@ jobs:
           echo "claude said: $R"
           curl -s -H "Title: Trencher cloud self-test" -H "Tags: white_check_mark" -d "Cloud scanner is live. Claude review check: $R" "https://ntfy.sh/$NTFY_TOPIC" >/dev/null
           [ "$R" = "OK" ]
+      - name: Approve pending change
+        if: ${{ inputs.approve != '' && inputs.approve != null }}
+        run: python3 scanner.py approve "${{ inputs.approve }}"
       - name: Track open paper trades
         if: ${{ !inputs.selftest }}
         run: python3 scanner.py track
@@ -55,7 +62,7 @@ jobs:
           python3 scanner.py record
       - name: Export dashboard data
         if: ${{ !inputs.selftest }}
-        run: python3 scanner.py export
+        run: python3 scanner.py analyze > /dev/null && python3 scanner.py export
       - name: Save data (single-commit data branch)
         if: ${{ !inputs.selftest }}
         run: |
