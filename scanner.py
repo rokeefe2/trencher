@@ -8,7 +8,7 @@ Usage:
   scanner.py stats       print paper-trading stats as JSON
 Stdlib only. All data from free public APIs (GeckoTerminal, DexScreener, RugCheck, GoPlus, Honeypot.is).
 """
-import json, os, sqlite3, sys, time, urllib.request, urllib.parse
+import json, os, sqlite3, sys, time, urllib.request, urllib.parse, uuid
 from datetime import datetime, timezone
 
 CODE = os.path.dirname(os.path.abspath(__file__))
@@ -27,6 +27,8 @@ for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0")):
     except sqlite3.OperationalError: pass
 DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
 DB.execute("CREATE TABLE IF NOT EXISTS applied_events (id TEXT PRIMARY KEY)")
+DB.execute("""CREATE TABLE IF NOT EXISTS sales (id TEXT PRIMARY KEY, pick_id INTEGER, t REAL, kind TEXT, detail TEXT,
+  fraction REAL, price REAL, mult REAL, tokens REAL, proceeds REAL, cost_basis REAL, pnl REAL)""")
 NOW = time.time()
 COST = CFG.get("cost_pct_each_way", 1.5) / 100   # DEX fee + slippage per side, so paper P&L isn't flattering
 
@@ -335,19 +337,30 @@ def decide_exit(p, px, now, cfg):
     elif age_h >= 72: close = "72h max hold"
     return sells, close, peak_x
 
-def apply_ladder(pid, level, px):
+def record_sale(sale_id, pid, kind, detail, sell_tokens, px, t_sale=None):
+    """Ledger row: proceeds after fees, cost basis of the tokens sold, realized profit on this sale."""
+    stake, tokens0, entry = DB.execute("SELECT stake, tokens0, entry_price FROM picks WHERE id=?", (pid,)).fetchone()
+    tokens0 = tokens0 or stake / entry
+    proceeds = sell_tokens * px * (1 - COST); basis = stake * sell_tokens / tokens0
+    DB.execute("INSERT OR IGNORE INTO sales VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+               (sale_id or uuid.uuid4().hex, pid, t_sale or NOW, kind, detail, sell_tokens / tokens0, px, px / entry,
+                sell_tokens, proceeds, basis, proceeds - basis))
+
+def apply_ladder(pid, level, px, sale_id=None, t_sale=None):
     row = DB.execute("SELECT stake, tokens0, tokens_left, realized, ladder_hit, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
     if not row or row[5] != "open" or (row[4] or 0) > level: return False   # already applied / closed
     stake, tokens0, left, realized, _, _, sym = row
     frac = CFG.get("ladder", [[1.5, .3], [2.0, .3], [3.0, .2]])[level][1]
     sell = min(left, frac * (tokens0 or left)); realized += sell * px * (1 - COST); left -= sell
+    record_sale(sale_id, pid, "partial", f"took profit at {CFG['ladder'][level][0]}x", sell, px, t_sale)
     DB.execute("UPDATE picks SET tokens_left=?, realized=?, ladder_hit=?, took_stake=? WHERE id=?",
                (left, realized, level + 1, int(realized >= stake), pid))
     log(f"LADDER {sym}: sold {int(frac*100)}% at level {level+1}"); return True
 
-def apply_close(pid, px, reason):
+def apply_close(pid, px, reason, sale_id=None, t_sale=None):
     row = DB.execute("SELECT tokens_left, realized, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
     if not row or row[2] != "open": return False
+    if row[0] > 0: record_sale(sale_id, pid, "close", reason, row[0], px, t_sale)
     DB.execute("UPDATE picks SET status='closed', realized=?, tokens_left=0, closed_at=?, close_reason=?, last_price=? WHERE id=?",
                (row[1] + row[0] * px * (1 - COST), NOW, reason, px, pid))
     log(f"CLOSE {row[3]}: {reason}"); return True
@@ -363,9 +376,15 @@ def apply_watcher_events():
     for line in open(fp):
         try: e = json.loads(line)
         except ValueError: continue
-        if DB.execute("SELECT 1 FROM applied_events WHERE id=?", (e["id"],)).fetchone(): continue
-        if e["kind"] == "ladder": apply_ladder(e["pick_id"], e["level"], e["price"])
-        elif e["kind"] == "close": apply_close(e["pick_id"], e["price"], e["reason"])
+        if DB.execute("SELECT 1 FROM applied_events WHERE id=?", (e["id"],)).fetchone():
+            if e["kind"] == "ladder" and not DB.execute("SELECT 1 FROM sales WHERE id=?", (e["id"],)).fetchone():   # backfill
+                tk0 = DB.execute("SELECT tokens0 FROM picks WHERE id=?", (e["pick_id"],)).fetchone()
+                if tk0 and tk0[0]:
+                    record_sale(e["id"], e["pick_id"], "partial", f"took profit at {CFG['ladder'][e['level']][0]}x",
+                                CFG["ladder"][e["level"]][1] * tk0[0], e["price"], e["t"])
+            continue
+        if e["kind"] == "ladder": apply_ladder(e["pick_id"], e["level"], e["price"], e["id"], e["t"])
+        elif e["kind"] == "close": apply_close(e["pick_id"], e["price"], e["reason"], e["id"], e["t"])
         if e.get("peak_price"): DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=?", (e["peak_price"], e["pick_id"]))
         DB.execute("INSERT INTO applied_events VALUES (?)", (e["id"],))
     try:   # watcher's 30-second peaks feed the trailing stop
@@ -543,6 +562,15 @@ def cmd_export():
             key = re.sub(r"only \d+ holders.*", "too few holders", key).replace("rugcheck danger: ", "")[:60]
             reasons[key] = reasons.get(key, 0) + 1
     closed = [p for p in picks if p["status"] == "closed"]
+    sym = {p["id"]: (p["symbol"], p["chain"], p["dexscreener"]) for p in picks}
+    sales = [dict(zip(["id", "pick_id", "t", "kind", "detail", "fraction", "price", "mult", "tokens", "proceeds", "cost_basis", "pnl"], r))
+             for r in DB.execute("SELECT * FROM sales ORDER BY t DESC")]
+    for s_ in sales: s_["symbol"], s_["chain"], s_["dexscreener"] = sym.get(s_["pick_id"], ("?", "", ""))
+    realized_pnl = round(sum(s_["pnl"] for s_ in sales), 2)
+    for p in picks:   # per-pick realized profit and unrealized profit on what's still held
+        p["realized_pnl"] = round(sum(s_["pnl"] for s_ in sales if s_["pick_id"] == p["id"]), 2)
+        held_basis = p["stake"] * (p["tokens_left"] or 0) / (p["tokens0"] or p["stake"] / p["entry_price"])
+        p["unrealized_pnl"] = round((p["tokens_left"] or 0) * (p["last_price"] or 0) * (1 - COST) - held_basis, 2)
     # equity curve: one point per scan (the dashboard's main chart)
     if not DB.execute("SELECT 1 FROM equity LIMIT 1").fetchone():   # first run: backfill a start point per pick
         for p in sorted(picks, key=lambda x: x["picked_at"]):
@@ -558,11 +586,13 @@ def cmd_export():
            "summary": {"picks": len(picks), "open": sum(p["status"] == "open" for p in picks),
                        "staked": sum(p["stake"] for p in picks), "value": round(sum(p["value_now"] for p in picks), 2),
                        "pnl": round(sum(p["pnl"] for p in picks), 2),
+                       "realized_pnl": realized_pnl, "unrealized_pnl": round(sum(p["unrealized_pnl"] for p in picks if p["status"] == "open"), 2),
+                       "sales_count": len(sales),
                        "win_rate": round(sum(p["pnl"] > 0 for p in closed) / len(closed), 2) if closed else None,
                        "scanned": sum(counts.values()), "outcomes": counts,
                        "incubating": DB.execute("SELECT COUNT(*) FROM incubator").fetchone()[0]},
            "reject_reasons": sorted(reasons.items(), key=lambda x: -x[1])[:15],
-           "picks": picks, "recent": seen,
+           "picks": picks, "recent": seen, "sales": sales[:500],
            "analysis": json.load(open(os.path.join(HERE, "analysis.json"))) if os.path.exists(os.path.join(HERE, "analysis.json")) else None,
            "tuning": {**TUNING, "effective": {k: _get(k) for k in TUNABLE}},
            "learnings": open(os.path.join(HERE, "learnings.md")).read() if os.path.exists(os.path.join(HERE, "learnings.md")) else "",

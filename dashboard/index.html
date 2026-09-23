@@ -105,6 +105,10 @@ section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin
 .ladder { display: flex; gap: 4px; margin-top: 5px; }
 .ladder span { font-size: 10.5px; font-weight: 700; padding: 1px 5px; border-radius: 3px; background: var(--raised); color: var(--text-3); }
 .ladder span.hit { background: var(--up-line); color: var(--pill-text); }
+.act { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.act:last-child { border-bottom: 0; }
+.act .what { font-weight: 600; } .act .amt { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.act .meta, .act .sub2 { font-size: 13px; color: var(--text-2); } .act .sub2 { text-align: right; }
 .side .emptyrow { padding: 22px 20px; color: var(--text-3); font-size: 14px; }
 .side-section { padding: 18px 20px; border-top: 1px solid var(--border); }
 .side-section h2 { font-size: 15px; margin-bottom: 12px; }
@@ -172,7 +176,10 @@ details[open] > summary::before { transform: rotate(90deg); }
         <h2>Key statistics</h2>
         <div class="stats" id="stats"></div>
       </section>
-      <section class="block"><h2>Closed picks</h2><div class="tbl" id="closed"></div></section>
+      <section class="block"><h2>Activity</h2>
+        <p class="muted small" style="margin-top:-8px">Every sale, including partial profit-taking. Profit = what the sale brought in, after fees, minus what that part cost.</p>
+        <div id="activity"></div></section>
+      <section class="block"><h2>Closed positions</h2><div class="tbl" id="closed"></div></section>
       <section class="block"><h2>Weekly report</h2><div id="weekly" class="md"></div></section>
       <section class="block"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></section>
       <section class="block"><details><summary>Latest scan log</summary><pre class="log" id="log"></pre></details>
@@ -358,10 +365,19 @@ async function loadTrencher() {
   drawChart();
 
   const closed = picks.filter(p => p.status !== "open"), open = picks.filter(p => p.status === "open");
-  $("#stats").innerHTML = stat("Paper value", fmt$(s.value || 0)) + stat("Total staked", fmt$(s.staked || 0)) +
+  $("#stats").innerHTML = stat("Realized profit", signed$(s.realized_pnl || 0), cls(s.realized_pnl)) +
+    stat("Unrealized profit", signed$(s.unrealized_pnl || 0), cls(s.unrealized_pnl)) +
+    stat("Paper value", fmt$(s.value || 0)) + stat("Total staked", fmt$(s.staked || 0)) +
     stat("Win rate (closed)", s.win_rate == null ? "—" : Math.round(s.win_rate * 100) + "%") + stat("Picks", `${picks.length} <span class="muted small">(${open.length} open)</span>`) +
     stat("Coins scanned", (s.scanned || 0).toLocaleString()) + stat("Rejected as unsafe", (o.REJECT || 0).toLocaleString()) +
-    stat("Incubating", (s.incubating || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
+    stat("Sales", (s.sales_count || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
+  const sales = d.sales || [];
+  $("#activity").innerHTML = sales.length ? sales.slice(0, 50).map(x => `<div class="act">
+      <a class="what" href="${safeUrl(x.dexscreener)}" target="_blank" rel="noopener">${esc(x.symbol)} · ${x.kind === "partial" ? "Sold " + Math.round(x.fraction * 100) + "%" : "Sold the rest"}</a>
+      <span class="amt ${cls(x.pnl)}">${signed$(x.pnl)}</span>
+      <span class="meta">${esc(x.detail)} · ${mult(x.mult)} · ${when(x.t)}</span>
+      <span class="sub2">${fmt$(x.proceeds)} received</span></div>`).join("")
+    : '<div class="empty">No sales yet. They appear here the moment the watcher sells.</div>';
 
   $("#opencount").textContent = open.length ? `${open.length} open` : ""; OPEN = {};
   const w = d.watcher, wAge = w ? Date.now() / 1000 - w.t : Infinity;
@@ -372,7 +388,7 @@ async function loadTrencher() {
     const ch = (p.mult_now - 1) * 100;
     OPEN[p.token] = p;
     return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" data-token="${esc(p.token)}" title="${esc(p.reason)}">
-      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · score ${Math.round(p.score)} · ${ago(p.picked_at)}</div>
+      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · ${ago(p.picked_at)}${p.realized_pnl ? ` · <span class="${cls(p.realized_pnl)}">${signed$(p.realized_pnl)} banked</span>` : ""}</div>
         <div class="ladder" title="Profit-taking ladder: sells part of the position at each level">${((d.config || {}).ladder || [[1.5,.3],[2,.3],[3,.2]]).map((l, j) =>
           `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">${l[0]}×</span>`).join("")}</div></div>
       <span class="spark">${sparkSvg(null)}</span>
@@ -381,11 +397,11 @@ async function loadTrencher() {
   open.forEach(async (p, i) => { const pts = await loadSpark(p); const cell = document.querySelector(`#open .row[data-i="${i}"] .spark`);
     if (cell) cell.innerHTML = sparkSvg(pts, p.entry_price, p.mult_now >= 1); });
 
-  $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">P&amp;L</th><th>Exit</th></tr>` +
+  $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">Total profit</th><th>Final exit</th></tr>` +
     closed.map(p => `<tr><td><a class="link" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">${esc(p.symbol)}</a> <span class="chip">${esc(p.chain)}</span>
       <div class="reason">${esc(p.reason)}</div></td><td class="num">${mult(p.p1h)}</td><td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td>
       <td class="num ${cls(p.pnl)}">${signed$(p.pnl)}</td><td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
-    : '<div class="empty">No closed picks yet.</div>';
+    : '<div class="empty">No fully closed positions yet. Partial sales show in Activity above.</div>';
 
   const total = s.scanned || 0, rej = o.REJECT || 0, reviewed = (o.PASS || 0) + (o.PICK || 0);
   bars($("#funnel"), [["Scanned", total], ["Passed safety checks", total - rej], ["Reviewed by Claude", reviewed], ["Picked", o.PICK || 0]]);
