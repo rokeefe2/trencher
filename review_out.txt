@@ -1,0 +1,11 @@
+Looking at both candidates against the momentum, distribution, and narrative criteria:
+
+**SPLIT** — Strong distribution for a 1.1h-old token: 8,297 holders, top10 only 12.9%, buy ratio 0.56, liquidity at 15.5% of mcap (well above the 8% bar), and it has real branding (dedicated Twitter account + website), unlike most pump.fun tosses. The one caution: it's decelerating (m5 is already negative after a 257% 1h run), so it may be pausing rather than truly early — but the underlying holder/liquidity health is genuinely above bar.
+
+**o** — Single-letter, no discernible narrative, and its only "social" link is a random tweet URL rather than a project account — essentially no story to ride. A 557% 1h spike with only 8.3x turnover (thin trading relative to the price move) is a classic vertical-candle-late-entry setup, and holder count (1,628) is far thinner than SPLIT's. This is a copycat-tier token riding a fast pump with no real distinguishing feature.
+
+Given only one slot, SPLIT is the clear pick on fundamentals; o gets passed for lacking a narrative and showing late-stage vertical action.
+
+```json
+{"verdicts": [{"token": "DRKGYsGALqr5p2aTcGLK9zqiPB5wk7JV78bJv4mPpump", "verdict": "PICK", "reason": "8,297 holders with top10 at just 12.9% and liquidity at 15.5% of mcap shows genuinely broad, healthy distribution for a token barely an hour old, backed by a real Twitter account and website rather than the usual anonymous pump.fun shell. Main risk: momentum just cooled (5m change turned negative after a 257% 1h run), so it may be pausing before another leg or starting to roll over — size accordingly."}, {"token": "2bX5CKZ7SHvacmMQFq7nBjQMmpPFbCZkpA7367du9Wa2", "verdict": "PASS", "reason": "No real narrative (just the letter 'o') and its only social link is a random tweet, not a project account, while a 557% 1h spike on modest turnover looks like a late vertical candle rather than sustainable buying. Thinner holder base (1,628) and higher top10 concentration (17.5%) than the alternative make this the weaker bet."}]}
+```
