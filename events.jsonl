@@ -1,0 +1,16 @@
+{"id": "44c6234cb4714d6983543cd9cc87b99a", "t": 1790177822.2212193, "pick_id": 2, "kind": "ladder", "level": 0, "price": 0.0003133, "peak_price": 0.0003133}
+{"id": "da38d34554ad4bbc822c3e283445ab03", "t": 1790182712.2376504, "pick_id": 2, "kind": "close", "reason": "trailing stop", "price": 0.0002348, "peak_price": 0.000338}
+{"id": "36c5da975a484845945a57696420688f", "t": 1790183342.2397273, "pick_id": 3, "kind": "ladder", "level": 0, "price": 0.0004067, "peak_price": 0.0004067}
+{"id": "b61c44f81a0a45208b60334953490f2f", "t": 1790183912.2416046, "pick_id": 3, "kind": "close", "reason": "trailing stop", "price": 0.0002153, "peak_price": 0.0004115}
+{"id": "2a761669dff1401ab63b26cfb2c07dc4", "t": 1790211463.4675207, "pick_id": 1, "kind": "close", "reason": "no move in 12h", "price": 0.0001001, "peak_price": 0.0001187}
+{"id": "06d0231d09404297b8af3ffd1548da60", "t": 1790256572.504847, "pick_id": 4, "kind": "ladder", "level": 0, "price": 7.804e-05, "peak_price": 7.804e-05}
+{"id": "fad05a3a288644da8a6a26d2e9d9aea1", "t": 1790257772.5100086, "pick_id": 4, "kind": "close", "reason": "trailing stop", "price": 6.204e-05, "peak_price": 9.102e-05}
+{"id": "4ac96fb5ee114693a4591de69745a6ff", "t": 1790267716.241167, "pick_id": 6, "kind": "ladder", "level": 0, "price": 0.0004416, "peak_price": 0.0004416}
+{"id": "1375a8c97251483185f995ded13c0e3b", "t": 1790268076.2428896, "pick_id": 6, "kind": "close", "reason": "trailing stop", "price": 0.0003287, "peak_price": 0.0004742}
+{"id": "6da216a987e84a1cbdb1ce921a0d4988", "t": 1790307008.6935875, "pick_id": 5, "kind": "close", "reason": "no move in 12h", "price": 0.0002421, "peak_price": 0.0003698}
+{"id": "7f4dbb5ebee8479ca80dee5d263707f2", "t": 1790351105.0693731, "pick_id": 7, "kind": "ladder", "level": 0, "price": 9.197e-05, "peak_price": 9.197e-05}
+{"id": "b8ecf2c4df5d48688029fe25bebaa218", "t": 1790355035.086332, "pick_id": 7, "kind": "close", "reason": "trailing stop", "price": 7.207e-05, "peak_price": 0.0001046}
+{"id": "5231b3a0ec4a428ea198742a37153487", "t": 1790361875.1174037, "pick_id": 8, "kind": "close", "reason": "stop loss", "price": 0.0002132, "peak_price": 0.0003636}
+{"id": "cb2de76db6614075bff271e9211d63b4", "t": 1790368365.1104624, "pick_id": 9, "kind": "close", "reason": "stop loss", "price": 0.0002001, "peak_price": 0.0004693}
+{"id": "286380d732824cbeb39a0579df7632d1", "t": 1790440158.4362772, "pick_id": 10, "kind": "ladder", "level": 0, "price": 0.00013, "peak_price": 0.00013}
+{"id": "7b09abeeeca14d1fb0d096d9d0cd22f8", "t": 1790440668.4383588, "pick_id": 10, "kind": "close", "reason": "trailing stop", "price": 9.735e-05, "peak_price": 0.0001395}
