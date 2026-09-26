@@ -16,3 +16,4 @@
 {"id": "7b09abeeeca14d1fb0d096d9d0cd22f8", "t": 1790440668.4383588, "pick_id": 10, "kind": "close", "reason": "trailing stop", "price": 9.735e-05, "peak_price": 0.0001395}
 {"id": "6649dc1aa30b4e2db757ce876a233939", "t": 1790453158.417095, "pick_id": 11, "kind": "ladder", "level": 0, "price": 0.001755, "peak_price": 0.001755}
 {"id": "77b1e98699a949d5870bf1fb7136bc57", "t": 1790453278.4176135, "pick_id": 11, "kind": "ladder", "level": 1, "price": 0.002136, "peak_price": 0.002136}
+{"id": "e63221a2afa94dcebaf706a715d311f1", "t": 1790454178.4214246, "pick_id": 11, "kind": "close", "reason": "trailing stop", "price": 0.001738, "peak_price": 0.00254}
