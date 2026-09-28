@@ -362,7 +362,14 @@ const RANGES = {"1D": 86400, "1W": 7 * 86400, "1M": 30 * 86400, "3M": 90 * 86400
 const RANGE_LABEL = {"1D": "Today", "1W": "Past week", "1M": "Past month", "3M": "Past 3 months", "ALL": "All time"};
 let EQ = [], RANGE = "ALL", LIVEPTS = [], SCRUB = false, OPEN = {};
 try { LIVEPTS = JSON.parse(localStorage.getItem("trencher-live") || "[]").filter(p => p[0] > Date.now() / 1000 - 86400); } catch { LIVEPTS = []; }
-const allPoints = () => [...EQ.filter(p => !LIVEPTS.length || p[0] < LIVEPTS[0][0]), ...LIVEPTS];
+// Live 5-second points replace the 15-minute scan points only while the page was actually open; scan points fill the
+// hours in between (a gap over LIVE_GAP seconds ends a live stretch), so reopening the app later shows the real path.
+const LIVE_GAP = 120;
+function allPoints() {
+  const spans = [];
+  for (const p of LIVEPTS) { const s = spans[spans.length - 1]; if (s && p[0] - s[1] <= LIVE_GAP) s[1] = p[0]; else spans.push([p[0], p[0]]); }
+  return [...EQ.filter(p => !spans.some(([a, b]) => p[0] >= a && p[0] <= b)), ...LIVEPTS].sort((a, b) => a[0] - b[0]);
+}
 
 function rangePoints() {
   const now = Date.now() / 1000, span = RANGES[RANGE];
@@ -440,7 +447,8 @@ async function loadTrencher() {
   $("#updated").innerHTML = d.stale ? `<span class="stale">Showing old data</span>` : (d.updated_at ? "Last scan " + ago(d.updated_at) : "");
   $("#source").innerHTML = d.source ? `Data: <span class="${d.stale ? "stale" : ""}">${esc(d.source)}</span>` : "";
   EQ = d.equity || [];
-  if (!LIVEPTS.length && s.value != null) EQ = [...EQ, [Date.now() / 1000, s.value, s.staked]];
+  const lastLive = LIVEPTS[LIVEPTS.length - 1];
+  if (s.value != null && (!lastLive || Date.now() / 1000 - lastLive[0] > LIVE_GAP)) EQ = [...EQ, [Date.now() / 1000, s.value, s.staked]];
   drawChart();
 
   const closed = picks.filter(p => p.status !== "open"), open = picks.filter(p => p.status === "open");
