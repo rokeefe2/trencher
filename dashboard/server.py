@@ -93,13 +93,16 @@ def live():
     value = sum(live_vals.get(p["token"], p["value_now"]) if p["status"] == "open" else p["value_now"] for p in picks)
     return {"t": time.time(), "value": round(value, 4), "staked": sum(p["stake"] for p in picks), "picks": out}
 
-def spark(chain, token, since):
-    """Price history for a pick's mini chart: DexScreener finds the main pool, GeckoTerminal gives candles."""
-    pairs = fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{token}", ttl=600)
-    pair = max(pairs, key=lambda p: float((p.get("liquidity") or {}).get("usd") or 0))["pairAddress"]
-    hrs = (time.time() - since) / 3600
-    tf, agg = ("minute", 15) if hrs <= 24 else ("hour", 1)
-    d = fetch(f"https://api.geckoterminal.com/api/v2/networks/{chain}/pools/{pair}/ohlcv/{tf}?aggregate={agg}&limit=300", ttl=300)
+def spark(chain, token, since, tf=None, agg=None, before=None, pair=None):
+    """Price history for a pick's chart: DexScreener finds the main pool, GeckoTerminal gives candles.
+    The page picks the window (tf/agg/before) so a sold coin's chart is zoomed on the trade."""
+    if not pair:
+        pairs = fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{token}", ttl=600)
+        pair = max(pairs, key=lambda p: float((p.get("liquidity") or {}).get("usd") or 0))["pairAddress"]
+    if tf is None:
+        tf, agg = ("minute", 15) if (time.time() - since) / 3600 <= 24 else ("hour", 1)
+    d = fetch(f"https://api.geckoterminal.com/api/v2/networks/{chain}/pools/{pair}/ohlcv/{tf}?aggregate={agg}&limit=300"
+              + (f"&before_timestamp={before}" if before else ""), ttl=300)
     pts = sorted([c[0], c[4]] for c in d["data"]["attributes"]["ohlcv_list"] if c[0] >= since - 3600)
     return {"points": pts}
 
@@ -129,9 +132,13 @@ class H(BaseHTTPRequestHandler):
             elif self.path.startswith("/api/spark"):
                 from urllib.parse import urlparse, parse_qs
                 q = {k: v[0] for k, v in parse_qs(urlparse(self.path).query).items()}
-                if q.get("chain") not in ("solana", "base") or not q.get("token", "").isalnum():
+                if q.get("chain") not in ("solana", "base") or not q.get("token", "").isalnum() or not q.get("pair", "x").isalnum():
                     self.send(400, "bad request", "text/plain"); return
-                self.send(200, json.dumps(spark(q["chain"], q["token"], float(q.get("since", 0)))), "application/json")
+                tf, agg = q.get("tf"), q.get("agg")
+                if tf is not None and (tf, agg) not in {("minute", "1"), ("minute", "5"), ("minute", "15"), ("hour", "1"), ("hour", "4"), ("hour", "12"), ("day", "1")}:
+                    self.send(400, "bad request", "text/plain"); return
+                self.send(200, json.dumps(spark(q["chain"], q["token"], float(q.get("since", 0)), tf, agg,
+                                                int(float(q["before"])) if q.get("before") else None, q.get("pair"))), "application/json")
             elif self.path.startswith("/api/ceo"):
                 self.send(200, json.dumps(ceo(), default=str), "application/json")
             else:

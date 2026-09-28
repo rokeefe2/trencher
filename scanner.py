@@ -145,7 +145,7 @@ def dex_info(chain, tokens):
                       "websites": [w.get("url") for w in info.get("websites", [])],
                       "boosts": (p.get("boosts") or {}).get("active", 0),
                       "mcap": f(p.get("marketCap") or p.get("fdv")), "vol24": f((p.get("volume") or {}).get("h24")),
-                      "chg24": f((p.get("priceChange") or {}).get("h24")), "image": info.get("imageUrl")}
+                      "chg24": f((p.get("priceChange") or {}).get("h24")), "image": info.get("imageUrl"), "pair": p.get("pairAddress")}
     return out
 
 # ---------------------------------------------------------------- stage 1: hard filters
@@ -419,7 +419,7 @@ def cmd_track():
         age_h = (NOW - t0) / 3600; mult = px / entry
         d = infos[(chain, tok)]
         upd = {"last_price": px, "info": json.dumps({"t": NOW, "mcap": d["mcap"], "liq": d["liq"], "vol24": d["vol24"], "chg24": d["chg24"],
-                                                    "image": d["image"], "socials": d["socials"], "websites": d["websites"]})}
+                                                    "image": d["image"], "socials": d["socials"], "websites": d["websites"], "pair": d["pair"]})}
         if status == "open": upd["peak"] = max(peak or px, px)   # closed picks are still priced for p6h..p72h, but their peak is frozen
         for col, h, cur in (("p1h", 1, p1), ("p6h", 6, p6), ("p24h", 24, p24), ("p72h", 72, p72)):
             if cur is None and age_h >= h: upd[col] = mult
