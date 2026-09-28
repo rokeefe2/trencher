@@ -1,5 +1,6 @@
 name: watch
-# 30-second exit watcher. Each run lasts ~5h45m; the next queued run starts when it ends (continuous coverage).
+# Exit watcher (checks every watch_tick_s seconds, 5 by default). Each run lasts ~5h45m; the next queued run starts
+# when it ends (continuous coverage).
 on:
   schedule:
     - cron: "*/30 * * * *"
@@ -30,5 +31,5 @@ jobs:
         with:
           ref: exits
           path: exits
-      - name: Watch open picks every 30 seconds
+      - name: Watch open picks every few seconds
         run: python3 watcher.py

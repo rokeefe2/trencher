@@ -397,7 +397,7 @@ def apply_watcher_events():
         elif e["kind"] == "close": apply_close(e["pick_id"], e["price"], e["reason"], e["id"], e["t"])
         if e.get("peak_price"): DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=?", (e["peak_price"], e["pick_id"]))
         DB.execute("INSERT INTO applied_events VALUES (?)", (e["id"],))
-    try:   # watcher's 30-second peaks feed the trailing stop
+    try:   # the watcher's peaks (seen every few seconds) feed the trailing stop
         for pid, pk in json.load(open(os.path.join(d, "heartbeat.json"))).get("peaks", {}).items():
             DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=? AND status='open'", (pk, int(pid)))
     except Exception: pass
@@ -426,7 +426,7 @@ def cmd_track():
         sets = ",".join(f"{k}=?" for k in upd)
         DB.execute(f"UPDATE picks SET {sets} WHERE id=?", (*upd.values(), pid)); upd = {}
         prow = DB.execute("SELECT status, ladder_hit, peak FROM picks WHERE id=?", (pid,)).fetchone()
-        if prow[0] == "open" and not watcher_on:   # the 30s watcher normally handles exits; this is the fallback
+        if prow[0] == "open" and not watcher_on:   # the watcher normally handles exits; this is the fallback
             sells, close, _ = decide_exit({"entry_price": entry, "ladder_hit": prow[1], "peak_x": (prow[2] or px) / entry,
                                            "picked_at": t0}, px, NOW, CFG)
             for lvl in sells:
