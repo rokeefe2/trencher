@@ -22,10 +22,6 @@ for _k, _v in TUNING.get("overrides", {}).items():
     if isinstance(_v, dict) and isinstance(CFG.get(_k), dict): CFG[_k] = {**CFG[_k], **_v}
     else: CFG[_k] = _v
 DB = sqlite3.connect(os.path.join(HERE, "trencher.db"))
-for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0")):
-    try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
-    except sqlite3.OperationalError: pass
-DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
 DB.execute("CREATE TABLE IF NOT EXISTS applied_events (id TEXT PRIMARY KEY)")
 DB.execute("""CREATE TABLE IF NOT EXISTS sales (id TEXT PRIMARY KEY, pick_id INTEGER, t REAL, kind TEXT, detail TEXT,
   fraction REAL, price REAL, mult REAL, tokens REAL, proceeds REAL, cost_basis REAL, pnl REAL)""")
@@ -45,6 +41,14 @@ CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT
   status TEXT DEFAULT 'open', tokens_left REAL, realized REAL DEFAULT 0, took_stake INTEGER DEFAULT 0,
   p1h REAL, p6h REAL, p24h REAL, p72h REAL, last_price REAL, peak REAL, closed_at REAL, close_reason TEXT);
 """)
+for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0"), ("parts", "TEXT"), ("snapshot", "TEXT"), ("info", "TEXT")):
+    try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
+    except sqlite3.OperationalError: pass
+DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
+# picks made before parts/snapshot were stored: copy them from the shadow row written when the coin was scored
+for _pid, _tok, _t in DB.execute("SELECT id, token, picked_at FROM picks WHERE parts IS NULL").fetchall():
+    _r = DB.execute("SELECT parts, metrics FROM shadow WHERE token=? AND ABS(t0-?)<3*3600", (_tok, _t)).fetchone()
+    if _r: DB.execute("UPDATE picks SET parts=?, snapshot=? WHERE id=?", (_r[0], _r[1], _pid))
 
 def get(url, tries=3):
     for i in range(tries):
@@ -139,7 +143,9 @@ def dex_info(chain, tokens):
                       "name": p.get("baseToken", {}).get("name"), "url": p.get("url"),
                       "socials": {s.get("type"): s.get("url") for s in info.get("socials", [])},
                       "websites": [w.get("url") for w in info.get("websites", [])],
-                      "boosts": (p.get("boosts") or {}).get("active", 0)}
+                      "boosts": (p.get("boosts") or {}).get("active", 0),
+                      "mcap": f(p.get("marketCap") or p.get("fdv")), "vol24": f((p.get("volume") or {}).get("h24")),
+                      "chg24": f((p.get("priceChange") or {}).get("h24")), "image": info.get("imageUrl")}
     return out
 
 # ---------------------------------------------------------------- stage 1: hard filters
@@ -308,9 +314,11 @@ def cmd_record():
         slots -= 1
         price = c["price_usd"]; stake = CFG["paper_stake"]
         tokens = stake * (1 - COST) / price
-        DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak,tokens0,ladder_hit) "
-                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0)", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
-                   c["score"], v.get("reason", ""), tokens, price, price, tokens))
+        snap = {**c["metrics"], "safety": c["safety"], "age_h": c["age_h"], "mcap": c["mcap_usd"], "liq": c["liquidity_usd"],
+                "socials": c.get("socials"), "websites": c.get("websites"), "boosts": c.get("paid_boosts")}
+        DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak,tokens0,ladder_hit,parts,snapshot) "
+                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
+                   c["score"], v.get("reason", ""), tokens, price, price, tokens, json.dumps(c["score_parts"]), json.dumps(snap, default=str)))
         ntfy(f"PAPER PICK: {c['symbol']} ({c['chain']}) score {c['score']}",
              f"{v.get('reason','')[:300]}\nMcap ${c['mcap_usd']:,} | Liq ${c['liquidity_usd']:,} | Age {c['age_h']}h\n"
              f"Paper entry ${price:.8g} x ${stake}", c.get("dexscreener"), "high")
@@ -402,14 +410,16 @@ def cmd_track():
                       "FROM picks WHERE status='open' OR p72h IS NULL").fetchall()
     by_chain = {}
     for r in rows: by_chain.setdefault(r[1], []).append(r[2])
-    prices = {}
+    prices, infos = {}, {}
     for chain, toks in by_chain.items():
-        for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]
+        for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]; infos[(chain, t)] = d
     for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status) in rows:
         px = prices.get((chain, tok))
         if not px: continue  # no price = pool gone; handled at 72h
         age_h = (NOW - t0) / 3600; mult = px / entry
-        upd = {"last_price": px}
+        d = infos[(chain, tok)]
+        upd = {"last_price": px, "info": json.dumps({"t": NOW, "mcap": d["mcap"], "liq": d["liq"], "vol24": d["vol24"], "chg24": d["chg24"],
+                                                    "image": d["image"], "socials": d["socials"], "websites": d["websites"]})}
         if status == "open": upd["peak"] = max(peak or px, px)   # closed picks are still priced for p6h..p72h, but their peak is frozen
         for col, h, cur in (("p1h", 1, p1), ("p6h", 6, p6), ("p24h", 24, p24), ("p72h", 72, p72)):
             if cur is None and age_h >= h: upd[col] = mult
@@ -568,10 +578,11 @@ def cmd_export():
     """Write dashboard JSON (dashboard.json) and prune old data so the data branch stays small."""
     cols = ["id", "chain", "token", "symbol", "name", "picked_at", "entry_price", "stake", "score", "reason", "status",
             "tokens_left", "realized", "took_stake", "p1h", "p6h", "p24h", "p72h", "last_price", "peak", "closed_at", "close_reason",
-            "tokens0", "ladder_hit"]
+            "tokens0", "ladder_hit", "parts", "snapshot", "info"]
     picks = []
     for r in DB.execute(f"SELECT {','.join(cols)} FROM picks ORDER BY picked_at DESC"):
         p = dict(zip(cols, r))
+        for k in ("parts", "snapshot", "info"): p[k] = json.loads(p[k]) if p[k] else None
         p["value_now"] = round(p["realized"] + (p["tokens_left"] or 0) * (p["last_price"] or 0), 2)
         p["pnl"] = round(p["value_now"] - p["stake"], 2)
         p["mult_now"] = round((p["last_price"] or p["entry_price"]) / p["entry_price"], 3)

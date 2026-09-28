@@ -48,10 +48,15 @@ def trencher():
             best = {}
             for pr in fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(toks)}", ttl=30):
                 t = pr.get("baseToken", {}).get("address"); liq = float((pr.get("liquidity") or {}).get("usd") or 0)
-                if t and liq >= best.get(t, (0, 0))[0]: best[t] = (liq, float(pr.get("priceUsd") or 0))
+                if t and liq >= best.get(t, (0, 0))[0]:
+                    best[t] = (liq, float(pr.get("priceUsd") or 0), float(pr.get("marketCap") or pr.get("fdv") or 0),
+                               float((pr.get("volume") or {}).get("h24") or 0), float((pr.get("priceChange") or {}).get("h24") or 0),
+                               (pr.get("info") or {}).get("imageUrl"))
             for p in open_picks:
                 if p["token"] in best and best[p["token"]][1]:
-                    px = best[p["token"]][1]
+                    liq, px, mcap, vol24, chg24, image = best[p["token"]]
+                    p["info"] = {**(p.get("info") or {}), "t": time.time(), "liq": liq, "mcap": mcap, "vol24": vol24, "chg24": chg24,
+                                 "image": image or (p.get("info") or {}).get("image")}
                     p["live_price"] = px
                     p["mult_now"] = round(px / p["entry_price"], 3)
                     p["value_now"] = round(p["realized"] + (p["tokens_left"] or 0) * px, 2)
@@ -78,11 +83,12 @@ def live():
         best = {}
         for pr in fetch(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(toks)}", ttl=4):
             tk = pr.get("baseToken", {}).get("address"); liq = float((pr.get("liquidity") or {}).get("usd") or 0)
-            if tk and liq >= best.get(tk, (0, 0))[0]: best[tk] = (liq, float(pr.get("priceUsd") or 0))
+            if tk and liq >= best.get(tk, (0, 0, 0))[0]:
+                best[tk] = (liq, float(pr.get("priceUsd") or 0), float(pr.get("marketCap") or pr.get("fdv") or 0))
         for p in picks:
-            if p["status"] == "open" and p["chain"] == chain and best.get(p["token"], (0, 0))[1]:
+            if p["status"] == "open" and p["chain"] == chain and best.get(p["token"], (0, 0, 0))[1]:
                 px = best[p["token"]][1]; val = p["realized"] + (p["tokens_left"] or 0) * px
-                out.append({"token": p["token"], "price": px, "mult": px / p["entry_price"], "value": val})
+                out.append({"token": p["token"], "price": px, "mult": px / p["entry_price"], "value": val, "mcap": best[p["token"]][2]})
     live_vals = {o["token"]: o["value"] for o in out}
     value = sum(live_vals.get(p["token"], p["value_now"]) if p["status"] == "open" else p["value_now"] for p in picks)
     return {"t": time.time(), "value": round(value, 4), "staked": sum(p["stake"] for p in picks), "picks": out}

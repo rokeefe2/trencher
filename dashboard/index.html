@@ -154,6 +154,44 @@ details[open] > summary::before { transform: rotate(90deg); }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
 .check { display: flex; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .check .st { font-weight: 700; min-width: 70px; font-size: 13px; }
+
+/* holdings (wallet list under the chart) */
+.hold { display: grid; grid-template-columns: 40px minmax(0, 1fr) 72px minmax(84px, auto); align-items: center; gap: 12px;
+  padding: 14px 0; border-bottom: 1px solid var(--border); }
+.hold:last-child { border-bottom: 0; }
+.hold:hover .sym { text-decoration: underline; }
+.hold .sym { font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hold .sub { font-size: 13px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hold .px { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hold .chg { text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hold svg { width: 72px; height: 30px; display: block; }
+.logo { width: 40px; height: 40px; border-radius: 50%; background: var(--raised); color: var(--text-2); display: grid; place-items: center;
+  font-weight: 700; font-size: 15px; overflow: hidden; flex: none; }
+.logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.logo.lg { width: 48px; height: 48px; font-size: 18px; }
+.hold-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.hold-head .watcher { padding: 0; border: 0; }
+
+/* coin page */
+.back { all: unset; cursor: pointer; font-weight: 600; font-size: 15px; color: var(--text); display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 0; }
+.coin-top { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.coin-top .nm { font-size: 15px; color: var(--text-2); font-weight: 500; }
+.coin-top .tk { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.score-big { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.score-big small { font-size: 18px; color: var(--text-2); font-weight: 500; }
+.parts { display: grid; gap: 14px; margin-top: 16px; }
+.part .top { display: flex; justify-content: space-between; font-size: 14px; } .part .top b { font-weight: 600; }
+.part .hint { font-size: 12px; color: var(--text-2); margin: 2px 0 6px; }
+.part .bar-track { height: 6px; border-radius: 3px; } .part .bar-fill { height: 6px; border-radius: 3px; background: var(--up-line); }
+.addr { display: flex; align-items: center; gap: 10px; font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text-2);
+  background: var(--raised); border-radius: 8px; padding: 10px 12px; margin-top: 16px; }
+.addr span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn { all: unset; cursor: pointer; font: 600 13px -apple-system, BlinkMacSystemFont, sans-serif; color: var(--up); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.links a { font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 16px; border: 1px solid var(--border); }
+.links a:hover { background: var(--raised); }
+.why { font-size: 15px; line-height: 1.55; margin: 0; }
 </style>
 </head>
 <body>
@@ -185,6 +223,12 @@ details[open] > summary::before { transform: rotate(90deg); }
       </div>
 
       <section class="block" style="border-top:0">
+        <div class="hold-head"><h2 style="margin:0">Holdings <small class="muted small" id="opencount" style="font-weight:500"></small></h2>
+          <div class="watcher small" id="watcher"></div></div>
+        <div id="holdings" style="margin-top:8px"></div>
+      </section>
+
+      <section class="block" style="border-top:0">
         <h2>Key statistics</h2>
         <div class="stats" id="stats"></div>
       </section>
@@ -199,10 +243,7 @@ details[open] > summary::before { transform: rotate(90deg); }
     </main>
 
     <aside class="side">
-      <h3>Open picks <small id="opencount"></small></h3>
-      <div class="watcher" id="watcher"></div>
-      <div id="open"></div>
-      <div class="side-section"><h2>Scan funnel</h2><div class="bars" id="funnel"></div></div>
+      <div class="side-section" style="border-top:0"><h2>Scan funnel</h2><div class="bars" id="funnel"></div></div>
       <div class="side-section"><h2>Why coins were rejected</h2><div class="bars" id="reasons"></div></div>
     </aside>
   </div>
@@ -232,6 +273,15 @@ details[open] > summary::before { transform: rotate(90deg); }
       <p class="muted small" style="margin-top:-8px">Not used for picking yet. For coins that scored high enough to pick: did the ones showing the signal crash more often in their first hour?</p>
       <div class="tbl" id="signals"></div></section>
     <section class="block"><h2>Agent's notebook</h2><div id="notebook" class="md"></div></section>
+  </div>
+</section>
+
+<!-- ================= COIN PAGE ================= -->
+<section id="tab-coin" hidden>
+  <div style="max-width:760px;padding-top:12px">
+    <button class="back" id="coin-back" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Back</button>
+    <div id="coin"></div>
   </div>
 </section>
 
@@ -266,6 +316,25 @@ const cls = v => v > 0 ? "up" : v < 0 ? "down" : "";
 const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "";
 const safeUrl = u => /^https:\/\//.test(u || "") ? u : "#";
 const when = ts => new Date(ts * 1000).toLocaleString(undefined, {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"});
+const SUB = "₀₁₂₃₄₅₆₇₈₉";
+const fmtPrice = v => {   // meme-coin prices: $0.0002851, or $0.0₅2328 for very small ones
+  if (v == null || !isFinite(v) || v <= 0) return "—";
+  if (v >= 1) return "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  if (v >= 1e-4) return "$" + v.toPrecision(4);
+  const zeros = Math.floor(-Math.log10(v));
+  return "$0.0" + String(zeros).split("").map(c => SUB[c]).join("") + (v * 10 ** (zeros + 1)).toPrecision(4).replace(".", "");
+};
+const fmtBig = v => !v ? "—" : v >= 1e9 ? "$" + (v / 1e9).toFixed(2) + "B" : v >= 1e6 ? "$" + (v / 1e6).toFixed(2) + "M"
+  : v >= 1e3 ? "$" + (v / 1e3).toFixed(1) + "K" : "$" + v.toFixed(0);
+const fmtNum = v => v == null ? "—" : v >= 1e6 ? (v / 1e6).toFixed(2) + "M" : v >= 1e3 ? (v / 1e3).toFixed(1) + "K" : Math.round(v).toLocaleString();
+const dur = s => s < 3600 ? Math.max(1, Math.round(s / 60)) + " min" : s < 86400 ? (s / 3600).toFixed(1).replace(".0", "") + " hr" : (s / 86400).toFixed(1).replace(".0", "") + " days";
+const logo = (p, big) => {   // DexScreener's token image, else the first letter
+  const img = p.info?.image;
+  return `<span class="logo${big ? " lg" : ""}">${/^https:\/\//.test(img || "") ? `<img src="${esc(img)}" alt="" loading="lazy" data-f="${esc((p.symbol || "?")[0])}">`
+    : esc((p.symbol || "?")[0])}</span>`;
+};
+const mcapOf = p => p.info?.mcap || p.snapshot?.mcap;
+addEventListener("error", e => { const t = e.target; if (t.matches?.(".logo img")) t.replaceWith(t.dataset.f || "?"); }, true);   // broken logo: first letter
 
 /* ---------------- data source ----------------
    On the Mac, server.py serves /api/*. As the phone web app (GitHub Pages) there is no server, so the page reads the
@@ -279,7 +348,8 @@ async function dexPrices(chain, toks) {   // token -> {price, pair} from its dee
   const best = {};
   for (const pr of await getJSON(`https://api.dexscreener.com/tokens/v1/${chain}/${toks.slice(0, 30).join(",")}`)) {
     const t = pr.baseToken?.address, liq = +(pr.liquidity?.usd || 0);
-    if (t && liq >= (best[t]?.liq ?? -1)) best[t] = {liq, price: +(pr.priceUsd || 0), pair: pr.pairAddress};
+    if (t && liq >= (best[t]?.liq ?? -1)) best[t] = {liq, price: +(pr.priceUsd || 0), pair: pr.pairAddress, mcap: +(pr.marketCap || pr.fdv || 0),
+      vol24: +(pr.volume?.h24 || 0), chg24: +(pr.priceChange?.h24 || 0), image: pr.info?.imageUrl};
   }
   return best;
 }
@@ -296,7 +366,8 @@ const API = REPO ? {
       try {
         const best = await dexPrices(chain, open.filter(p => p.chain === chain).map(p => p.token));
         for (const p of open) if (p.chain === chain && best[p.token]?.price) {
-          const px = best[p.token].price;
+          const px = best[p.token].price, b = best[p.token];
+          p.info = {...(p.info || {}), t: Date.now() / 1000, liq: b.liq, mcap: b.mcap, vol24: b.vol24, chg24: b.chg24, image: b.image || p.info?.image};
           p.live_price = px; p.mult_now = +(px / p.entry_price).toFixed(3);
           p.value_now = +(p.realized + (p.tokens_left || 0) * px).toFixed(2); p.pnl = +(p.value_now - p.stake).toFixed(2);
         }
@@ -311,7 +382,7 @@ const API = REPO ? {
       const best = await dexPrices(chain, open.filter(p => p.chain === chain).map(p => p.token));
       for (const p of open) if (p.chain === chain && best[p.token]?.price) {
         const px = best[p.token].price;
-        out.push({token: p.token, price: px, mult: px / p.entry_price, value: p.realized + (p.tokens_left || 0) * px});
+        out.push({token: p.token, price: px, mult: px / p.entry_price, value: p.realized + (p.tokens_left || 0) * px, mcap: best[p.token].mcap});
       }
     }
     const lv = Object.fromEntries(out.map(o => [o.token, o.value]));
@@ -350,7 +421,7 @@ function md(src) {
   }
   flush(); if (inList) html += "</ul>"; return html;
 }
-const stat = (k, v, c = "") => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+const stat = (k, v, c = "", id = "") => `<div class="stat"><div class="k">${k}</div><div class="v ${c}"${id ? ` id="${id}"` : ""}>${v}</div></div>`;
 function bars(el, rows) {
   const max = Math.max(1, ...rows.map(r => r[1]));
   el.innerHTML = rows.length ? rows.map(([l, v]) => `<div class="bar-row"><span class="lbl" title="${esc(l)}">${esc(l)}</span><span class="v">${v.toLocaleString()}</span>
@@ -460,33 +531,25 @@ async function loadTrencher() {
     stat("Sales", (s.sales_count || 0).toLocaleString()) + stat("Stake per pick", fmt$((d.config || {}).paper_stake || 50));
   const sales = d.sales || [];
   $("#activity").innerHTML = sales.length ? sales.slice(0, 50).map(x => `<div class="act">
-      <a class="what" href="${safeUrl(x.dexscreener)}" target="_blank" rel="noopener">${esc(x.symbol)} · ${x.kind === "partial" ? "Sold " + Math.round(x.fraction * 100) + "%" : "Sold the rest"}</a>
+      <a class="what" href="#coin-${x.pick_id}">${esc(x.symbol)} · ${x.kind === "partial" ? "Sold " + Math.round(x.fraction * 100) + "%" : "Sold the rest"}</a>
       <span class="amt ${cls(x.pnl)}">${signed$(x.pnl)}</span>
       <span class="meta">${esc(x.detail)} · ${mult(x.mult)} · ${when(x.t)}</span>
       <span class="sub2">${fmt$(x.proceeds)} received</span></div>`).join("")
     : '<div class="empty">No sales yet. They appear here the moment the watcher sells.</div>';
 
-  $("#opencount").textContent = open.length ? `${open.length} open` : ""; OPEN = {};
+  $("#opencount").textContent = open.length ? `· ${open.length}` : ""; OPEN = {}; DATA = d;
   const w = d.watcher, wAge = w ? Date.now() / 1000 - w.t : Infinity;
   $("#watcher").innerHTML = wAge < 600
-    ? `<span class="live" style="font-size:10px"><i></i></span><span><b>Exit watcher on</b> · checks every 30s · last check-in ${ago(w.t)}</span>`
-    : `<span class="live off" style="font-size:10px"><i></i></span><span><b>Exit watcher off</b> · the 15-min scanner is handling exits</span>`;
-  $("#open").innerHTML = open.length ? open.map((p, i) => {
-    const ch = (p.mult_now - 1) * 100;
-    OPEN[p.token] = p;
-    return `<a class="row" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener" data-i="${i}" data-token="${esc(p.token)}" title="${esc(p.reason)}">
-      <div><div class="sym">${esc(p.symbol)}</div><div class="sub">${esc(p.chain)} · ${ago(p.picked_at)}</div>
-        <div class="ladder" title="Profit-taking ladder: sells part of the position at each level">${((d.config || {}).ladder || [[1.5,.3],[2,.3],[3,.2]]).map((l, j) =>
-          `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">${l[0]}×</span>`).join("")}${p.realized_pnl ?
-          `<em class="${cls(p.realized_pnl)}" style="font-style:normal;font-size:11px;font-weight:700;margin-left:4px">${signed$(p.realized_pnl)} banked</em>` : ""}</div></div>
-      <span class="spark">${sparkSvg(null)}</span>
-      <span class="pill ${ch > 0 ? "up" : ch < 0 ? "down" : "flat"}" data-pill>${pct(ch)}</span></a>`; }).join("")
-    : '<div class="emptyrow">No open picks. The scanner is waiting for a coin that passes every stage.</div>';
-  open.forEach(async (p, i) => { const pts = await loadSpark(p); const cell = document.querySelector(`#open .row[data-i="${i}"] .spark`);
+    ? `<span class="live" style="font-size:10px"><i></i></span><span>Exit watcher on · checked ${ago(w.t)}</span>`
+    : `<span class="live off" style="font-size:10px"><i></i></span><span>Exit watcher off · the 15-min scanner handles exits</span>`;
+  $("#holdings").innerHTML = open.length ? open.map(p => { OPEN[p.token] = p; return holdRow(p); }).join("")
+    : `<div class="empty">No coins held right now. Trencher buys when a coin passes every check (up to ${(d.config || {}).max_picks_per_day || 5} a day).
+       Tap any closed position below to see why it was bought.</div>`;
+  open.forEach(async p => { const pts = await loadSpark(p), cell = document.querySelector(`#holdings .hold[data-token="${CSS.escape(p.token)}"] .spark`);
     if (cell) cell.innerHTML = sparkSvg(pts, p.entry_price, p.mult_now >= 1); });
 
   $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">Total profit</th><th>Final exit</th></tr>` +
-    closed.map(p => `<tr><td><a class="link" href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">${esc(p.symbol)}</a> <span class="chip">${esc(p.chain)}</span>
+    closed.map(p => `<tr><td><a class="link" href="#coin-${p.id}">${esc(p.symbol)}</a> <span class="chip">${esc(p.chain)}</span>
       <div class="reason">${esc(p.reason)}</div></td><td class="num">${mult(p.p1h)}</td><td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td>
       <td class="num ${cls(p.pnl)}">${signed$(p.pnl)}</td><td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
     : '<div class="empty">No fully closed positions yet. Partial sales show in Activity above.</div>';
@@ -502,6 +565,120 @@ async function loadTrencher() {
       <td class="num muted small">${ago(r.first_seen)}</td></tr>`).join("") + "</table>" : '<div class="empty">Nothing scanned yet.</div>';
   $("#log").textContent = d.last_log || "No log yet today.";
   renderLearning(d);
+}
+
+/* ---------------- holdings row ---------------- */
+let DATA = null;
+function holdRow(p) {
+  const ch = ((p.mult_now || 1) - 1) * 100;
+  return `<a class="hold" href="#coin-${p.id}" data-token="${esc(p.token)}">${logo(p)}
+    <div style="min-width:0"><div class="sym">${esc(p.symbol)}</div><div class="sub"><span class="mc">MC ${fmtBig(mcapOf(p))}</span> · ${esc(p.name || p.chain)}</div></div>
+    <span class="spark">${sparkSvg(null)}</span>
+    <div><div class="px">${fmtPrice(p.live_price || p.last_price)}</div><div class="chg ${cls(ch)}">${pct(ch)}</div></div></a>`;
+}
+
+/* ---------------- coin page ---------------- */
+const PARTS = [["momentum", "Momentum", 25, "Trading activity, buy pressure and the 1-hour move"],
+  ["holders", "Holder spread", 20, "How spread out the coin is: top-10 share and holder count"],
+  ["liquidity", "Liquidity depth", 15, "Pool size compared with market cap (can we sell?)"],
+  ["buyer_breadth", "Buyer breadth", 15, "How many different wallets bought in the last 6 hours"],
+  ["social", "Socials", 15, "Has an X account, Telegram and website"],
+  ["survival", "Survival", 10, "Age: 3 to 24 hours old scores best"]];
+const rating = s => s >= 85 ? "Strong" : s >= 70 ? "Good" : s >= 60 ? "Fair" : "Weak";
+let COIN = null, COIN_PTS = [];
+
+function renderCoin(id) {
+  const p = (DATA?.picks || []).find(x => x.id === id);
+  if (!p) { $("#coin").innerHTML = DATA ? '<div class="empty">That position isn\'t in the data any more.</div>' : '<div class="empty">Loading…</div>'; return; }
+  COIN = p;
+  const isOpen = p.status === "open", px = p.live_price || p.last_price, snap = p.snapshot || {}, sf = snap.safety || {}, info = p.info || {};
+  const sales = (DATA.sales || []).filter(x => x.pick_id === p.id);
+  const socials = {...(snap.socials || {}), ...(info.socials || {})}, sites = info.websites || snap.websites || [];
+  const liq = info.liq || snap.liq || (snap.liq_to_mcap && snap.mcap ? snap.liq_to_mcap * snap.mcap : null);
+  const heldFor = (isOpen ? Date.now() / 1000 : p.closed_at || Date.now() / 1000) - p.picked_at;
+  const ladder = (DATA.config || {}).ladder || [[1.5, .3], [2, .3], [3, .2]];
+  const parts = p.parts ? PARTS.filter(([k]) => k in p.parts) : [];
+  const liveNote = info.t ? (Date.now() / 1000 - info.t < 120 ? "live" : "as of " + ago(info.t)) : "";
+  $("#coin").innerHTML = `
+    <div class="coin-top">${logo(p, true)}<div style="min-width:0"><div class="tk">${esc(p.symbol)}</div>
+      <div class="nm">${esc(p.name || "")} <span class="chip">${esc(p.chain)}</span> <span class="chip">${isOpen ? "Holding" : "Sold"}</span></div></div></div>
+    <div class="hero" id="coin-price" style="margin-top:14px">${fmtPrice(px)}</div>
+    <div class="delta" id="coin-delta"></div>
+    <div class="chart" id="coin-chart" style="height:240px"><div class="empty">Loading price history…</div></div>
+
+    <section class="block"><h2>Your position</h2><div class="stats">
+      ${stat(isOpen ? "Current value" : "Final value", fmt$(p.value_now), "", "coin-value")}
+      ${stat("Total return", retHtml(p), cls(p.pnl), "coin-ret")}
+      ${stat("Invested", fmt$(p.stake))}${stat("Buy price", fmtPrice(p.entry_price))}
+      ${isOpen ? stat("Tokens held", fmtNum(p.tokens_left)) + stat("Banked so far", signed$(p.realized_pnl || 0), cls(p.realized_pnl))
+               : stat("Exit", esc(p.close_reason || "—")) + stat("Sold", when(p.closed_at))}
+      ${stat("Bought", when(p.picked_at))}${stat(isOpen ? "Holding for" : "Held for", dur(heldFor))}</div>
+      <div class="ladder" style="margin-top:16px" title="Profit-taking ladder">${ladder.map((l, j) =>
+        `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">Sell ${Math.round(l[1] * 100)}% at ${l[0]}×</span>`).join("")}</div></section>
+
+    <section class="block"><h2>Why we bought it</h2><p class="why">${esc(p.reason)}</p>
+      <p class="muted small" style="margin:10px 0 0">Claude's review, ${when(p.picked_at)}.</p></section>
+
+    <section class="block"><h2>Rating</h2>
+      <div class="score-big">${Math.round(p.score)}<small> / 100 · ${rating(p.score)}</small></div>
+      ${parts.length ? `<div class="parts">${parts.map(([k, label, max, hint]) => `<div class="part"><div class="top"><b>${label}</b><span>${p.parts[k]} / ${max}</span></div>
+        <div class="hint">${hint}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, p.parts[k] / max * 100).toFixed(0)}%"></div></div></div>`).join("")}</div>`
+      : '<p class="muted small">The score breakdown wasn\'t saved for this early pick.</p>'}</section>
+
+    <section class="block"><h2>About ${esc(p.symbol)}</h2>
+      <div class="stats">${stat("Market cap", fmtBig(mcapOf(p)))}${stat("Liquidity", fmtBig(liq))}
+        ${info.vol24 != null ? stat("24h volume", fmtBig(info.vol24)) + stat("24h change", pct(info.chg24 || 0), cls(info.chg24)) : ""}
+        ${sf.holders != null ? stat("Holders", fmtNum(sf.holders)) : ""}${sf.top10_pct != null ? stat("Top 10 wallets hold", Math.round(sf.top10_pct) + "%") : ""}
+        ${snap.age_h != null ? stat("Age when bought", dur(snap.age_h * 3600)) : ""}${snap.buy_ratio_1h != null ? stat("Buys vs sells (1h)", Math.round(snap.buy_ratio_1h * 100) + "% buys") : ""}
+        ${snap.buyers_6h != null ? stat("Buyers (6h)", fmtNum(snap.buyers_6h)) : ""}${sf.lp_locked_pct != null ? stat("Liquidity locked", Math.round(sf.lp_locked_pct) + "%") : ""}</div>
+      <p class="muted small" style="margin:12px 0 0">Market cap and liquidity ${esc(liveNote || "from when it was bought")}. Holders, top 10, buyers and liquidity locked are from when it was bought.</p>
+      <div class="addr"><span>${esc(p.token)}</span><button class="btn" id="copy-addr">Copy</button></div>
+      <div class="links"><a href="${safeUrl(p.dexscreener)}" target="_blank" rel="noopener">DexScreener ↗</a>
+        ${sites[0] ? `<a href="${safeUrl(sites[0])}" target="_blank" rel="noopener">Website ↗</a>` : ""}
+        ${socials.twitter ? `<a href="${safeUrl(socials.twitter)}" target="_blank" rel="noopener">X ↗</a>` : ""}
+        ${socials.telegram ? `<a href="${safeUrl(socials.telegram)}" target="_blank" rel="noopener">Telegram ↗</a>` : ""}</div></section>
+
+    <section class="block"><h2>Activity</h2>${sales.length ? sales.map(x => `<div class="act">
+      <span class="what">${x.kind === "partial" ? "Sold " + Math.round(x.fraction * 100) + "%" : "Sold the rest"}</span>
+      <span class="amt ${cls(x.pnl)}">${signed$(x.pnl)}</span>
+      <span class="meta">${esc(x.detail)} · ${mult(x.mult)} · ${when(x.t)}</span><span class="sub2">${fmt$(x.proceeds)} received</span></div>`).join("")
+      : `<div class="act"><span class="what">Bought</span><span class="amt">${fmt$(p.stake)}</span><span class="meta">at ${fmtPrice(p.entry_price)} · ${when(p.picked_at)}</span><span></span></div>`}</section>`;
+  $("#copy-addr").addEventListener("click", e => { navigator.clipboard?.writeText(p.token).then(() => e.target.textContent = "Copied", () => {}); });
+  setCoinHero(px);
+  loadSpark(p).then(pts => { if (COIN === p) { COIN_PTS = pts.slice(); drawCoinChart(); } });
+}
+const retHtml = p => signed$(p.pnl) + ` <span class="small">(${pct(p.pnl / p.stake * 100)})</span>`;
+function setCoinHero(px, label) {
+  const p = COIN; if (!p || !px) return;
+  const ch = (px / p.entry_price - 1) * 100;
+  $("#coin-price").textContent = fmtPrice(px);
+  $("#coin-delta").innerHTML = `<span class="${cls(ch)}">${arrow(ch)} ${pct(ch)}</span><span class="when">${esc(label ?? "since we bought")}</span>`;
+}
+function drawCoinChart() {
+  const el = $("#coin-chart"), p = COIN; if (!el || !p) return;
+  const pts = COIN_PTS.filter(q => q[1] > 0);
+  if (pts.length < 2) { el.innerHTML = '<div class="empty">No price history available for this coin.</div>'; return; }
+  const W = el.clientWidth || 700, H = 240, pad = 10, t0 = pts[0][0], t1 = pts[pts.length - 1][0], entry = p.entry_price;
+  let lo = Math.min(entry, ...pts.map(q => q[1])), hi = Math.max(entry, ...pts.map(q => q[1])); if (hi <= lo) hi = lo * 1.01;
+  const x = t => (t - t0) / Math.max(1, t1 - t0) * W, y = v => pad + (hi - v) / (hi - lo) * (H - 2 * pad);
+  const up = pts[pts.length - 1][1] >= entry, color = up ? "var(--up-line)" : "var(--down-line)";
+  const bx = Math.min(Math.max(x(p.picked_at), 0), W);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.symbol)} price since it was bought">
+    <line x1="0" x2="${W}" y1="${y(entry)}" y2="${y(entry)}" stroke="var(--cross)" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round"/>
+    <line x1="${bx}" x2="${bx}" y1="0" y2="${H}" stroke="var(--cross)" stroke-width="1" stroke-dasharray="2 4"/>
+    <path d="${pts.map((q, i) => (i ? "L" : "M") + x(q[0]).toFixed(1) + "," + y(q[1]).toFixed(1)).join("")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+    <line id="cxh" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--cross)" visibility="hidden"/><circle id="cxd" r="5" fill="${color}" stroke="var(--bg)" stroke-width="2" visibility="hidden"/>
+    </svg><div class="timelabel" style="left:${Math.min(Math.max(bx / W * 100, 8), 92)}%">Bought</div><div class="timelabel" id="ctl" hidden></div>`;
+  const svg = el.querySelector("svg"), live = () => COIN.live_price || COIN.last_price;
+  const move = e => { const r = svg.getBoundingClientRect(), cx = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * W;
+    let best = pts[0]; for (const q of pts) if (Math.abs(x(q[0]) - cx) < Math.abs(x(best[0]) - cx)) best = q;
+    for (const [id, a, v] of [["#cxh", "x1", x(best[0])], ["#cxh", "x2", x(best[0])], ["#cxd", "cx", x(best[0])], ["#cxd", "cy", y(best[1])]]) $(id).setAttribute(a, v);
+    $("#cxh").setAttribute("visibility", "visible"); $("#cxd").setAttribute("visibility", "visible");
+    const tl = $("#ctl"); tl.hidden = false; tl.textContent = when(best[0]); tl.style.left = Math.min(Math.max(x(best[0]) / W * r.width, 55), r.width - 55) + "px";
+    setCoinHero(best[1], ""); };
+  const leave = () => { $("#cxh").setAttribute("visibility", "hidden"); $("#cxd").setAttribute("visibility", "hidden"); $("#ctl").hidden = true; setCoinHero(live()); };
+  svg.addEventListener("mousemove", move); svg.addEventListener("touchmove", move, {passive: true});
+  svg.addEventListener("mouseleave", leave); svg.addEventListener("touchend", leave);
 }
 
 /* ---------------- learning tab ---------------- */
@@ -571,7 +748,7 @@ async function loadCeo() {
 /* ---------------- live feed: reprice open picks every 5s ---------------- */
 let lastLiveVal = null, liveTimer = null;
 async function tick() {
-  const visible = document.visibilityState === "visible" && !$("#tab-trencher").hidden;
+  const visible = document.visibilityState === "visible" && (!$("#tab-trencher").hidden || !$("#tab-coin").hidden);
   if (!visible || !Object.keys(OPEN).length) { $("#live").classList.add("off"); return; }
   try {
     const L = await API.live();
@@ -584,12 +761,25 @@ async function tick() {
       try { localStorage.setItem("trencher-live", JSON.stringify(LIVEPTS)); } catch {}
     }
     for (const q of L.picks) {
-      const row = document.querySelector(`#open .row[data-token="${CSS.escape(q.token)}"]`), p = OPEN[q.token];
-      if (!row || !p) continue;
-      const ch = (q.mult - 1) * 100, pill = row.querySelector("[data-pill]");
-      pill.className = "pill " + (ch > 0 ? "up" : ch < 0 ? "down" : "flat"); pill.textContent = pct(ch);
-      const sp = SPARK[q.token + ""] || SPARK[p.chain + p.token];
-      if (sp && sp.points.length) { sp.points.push([L.t, q.price]); row.querySelector(".spark").innerHTML = sparkSvg(sp.points, p.entry_price, q.mult >= 1); }
+      const p = OPEN[q.token]; if (!p) continue;
+      p.live_price = q.price; p.mult_now = q.mult; if (q.mcap) p.info = {...(p.info || {}), mcap: q.mcap, t: L.t};
+      p.value_now = q.value; p.pnl = q.value - p.stake;
+      const row = document.querySelector(`#holdings .hold[data-token="${CSS.escape(q.token)}"]`);
+      if (row) {
+        const ch = (q.mult - 1) * 100;
+        row.querySelector(".px").textContent = fmtPrice(q.price);
+        const c = row.querySelector(".chg"); c.className = "chg " + cls(ch); c.textContent = pct(ch);
+        row.querySelector(".mc").textContent = "MC " + fmtBig(mcapOf(p));
+        const sp = SPARK[p.chain + p.token];
+        if (sp && sp.points.length) { sp.points.push([L.t, q.price]); row.querySelector(".spark").innerHTML = sparkSvg(sp.points, p.entry_price, q.mult >= 1); }
+      }
+      if (COIN && COIN.token === q.token && !$("#tab-coin").hidden) {   // coin page: live price, and extend its chart
+        COIN.live_price = q.price;
+        $("#coin-value").textContent = fmt$(COIN.value_now);
+        const r = $("#coin-ret"); r.className = "v " + cls(COIN.pnl); r.innerHTML = retHtml(COIN);
+        if (COIN_PTS.length) COIN_PTS.push([L.t, q.price]);
+        if ($("#ctl")?.hidden !== false) { drawCoinChart(); setCoinHero(q.price); }
+      }
     }
     if (!SCRUB) {
       drawChart();
@@ -609,19 +799,36 @@ document.addEventListener("visibilitychange", () => {   // reopening the app fro
 let lastLoad = 0;
 function load() {
   lastLoad = Date.now();
-  loadTrencher().catch(e => { $("#hero").textContent = "—"; $("#delta").innerHTML = `<span class="down">Couldn't load data: ${esc(e.message)}</span>`; });
+  loadTrencher().then(() => { if (!$("#tab-coin").hidden && COIN_ID != null) renderCoin(COIN_ID); }).catch(e => { $("#hero").textContent = "—"; $("#delta").innerHTML = `<span class="down">Couldn't load data: ${esc(e.message)}</span>`; });
   loadCeo().catch(() => {});
 }
+/* ---------------- views: tabs, and #coin-<id> for a coin page ---------------- */
+let COIN_ID = null, CAME_FROM = null;
+function show(view) {
+  ["trencher", "learning", "ceo", "coin"].forEach(n => $("#tab-" + n).hidden = n !== view);
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === view));
+  if (view === "trencher") drawChart();
+}
+function route() {
+  const h = location.hash.slice(1), m = h.match(/^coin-(\d+)$/);
+  if (m) { COIN_ID = +m[1]; show("coin"); renderCoin(COIN_ID); scrollTo(0, 0); tick(); return; }
+  COIN_ID = null; COIN = null;
+  const tab = ["trencher", "learning", "ceo"].includes(h) && (h !== "ceo" || API.ceo) ? h : "trencher";
+  show(tab);
+  if (CAME_FROM) { const y = CAME_FROM.y; CAME_FROM = null; requestAnimationFrame(() => scrollTo(0, y)); }
+}
+addEventListener("hashchange", route);
+document.addEventListener("click", e => {   // remember where we were, so Back returns to the same spot
+  const a = e.target.closest?.('a[href^="#coin-"]'); if (a) CAME_FROM = {hash: location.hash || "#trencher", y: scrollY};
+});
+$("#coin-back").addEventListener("click", () => { if (CAME_FROM) history.back(); else location.hash = "trencher"; });
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
-  ["trencher", "learning", "ceo"].forEach(n => $("#tab-" + n).hidden = b.dataset.tab !== n);
-  if (b.dataset.tab === "trencher") drawChart();
-  history.replaceState(null, "", "#" + b.dataset.tab);
+  history.replaceState(null, "", "#" + b.dataset.tab); route();
 }));
 $("#refresh").addEventListener("click", load);
 if (!API.ceo) document.querySelector('.tabs button[data-tab="ceo"]').hidden = true;
 if (REPO && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-const startTab = document.querySelector(`.tabs button[data-tab="${location.hash.slice(1)}"]`); if (startTab) startTab.click();
+route();
 load(); setInterval(load, 60000); startLive();
 </script>
 </body>
