@@ -527,12 +527,15 @@ const sparkKey = p => p.chain + p.token + (p.status === "open" ? "" : ":" + Math
 async function loadSpark(p) {
   const key = sparkKey(p), hit = SPARK[key], sold = p.status !== "open";
   if (hit && (sold || Date.now() - hit.at < 300000)) return hit.points;
-  if (sold) try { const c = JSON.parse(localStorage.getItem("trencher-spark:" + key)); if (c?.length) { SPARK[key] = {at: Date.now(), points: c}; return c; } } catch {}
+  if (sold) try { const c = JSON.parse(localStorage.getItem("trencher-spark2:" + key)); if (c?.length) { SPARK[key] = {at: Date.now(), points: c}; return c; } } catch {}
   try {
     loadSpark.fetched = true;
-    const w = sparkWindow(p), pts = await API.spark(p, w);
+    // GeckoTerminal stamps a candle with its start time; its close happened a candle later. Plot it there, or the line
+    // runs a candle ahead of reality (a crash looks like it came before the sale that reacted to it).
+    const w = sparkWindow(p), sec = {minute: 60, hour: 3600, day: 86400}[w.tf] * w.agg, nowS = Date.now() / 1000;
+    const pts = (await API.spark(p, w)).map(([t, c]) => [Math.min(t + sec, nowS), c]);
     SPARK[key] = {at: Date.now(), points: pts};
-    if (sold && pts.length > 1 && Date.now() / 1000 > w.to + 60) try { localStorage.setItem("trencher-spark:" + key, JSON.stringify(pts)); } catch {}   // history is final
+    if (sold && pts.length > 1 && Date.now() / 1000 > w.to + 60) try { localStorage.setItem("trencher-spark2:" + key, JSON.stringify(pts)); } catch {}   // history is final
     return pts;
   } catch { return []; }
 }
