@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exit watcher: checks open paper picks every ~30s and fires ladder sells / stops immediately.
+"""Exit watcher: checks open paper picks every few seconds (config watch_tick_s) and fires ladder sells / stops immediately.
 
 Runs inside a GitHub Actions job for up to WATCH_MINUTES, then exits (the next scheduled run picks up).
 It never writes the main data branch. Sells go to the `exits` branch (events.jsonl + heartbeat.json);
@@ -11,9 +11,12 @@ EXITS = os.environ["EXITS_DIR"]
 REPO = os.environ["GITHUB_REPOSITORY"]
 TOKEN = os.environ["GITHUB_TOKEN"]
 RUN_FOR = float(os.environ.get("WATCH_MINUTES", "345")) * 60
-TICK = 30
 
 import scanner as S   # shared config + decide_exit + ntfy (scanner opens its own DB copy; we don't write it)
+
+# Seconds between price checks. Each check is one DexScreener request per chain with open picks (their limit is
+# 300/min), so 5s is ~24/min at most; the floor keeps a bad config value from hammering the API.
+TICK = max(2.0, float(S.CFG.get("watch_tick_s", 5)))
 
 def gh_raw(path, ref):
     req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/contents/{path}?ref={ref}",
@@ -47,7 +50,7 @@ def main():
     S.log("watcher started")
     while time.time() - start < RUN_FOR:
         now = time.time()
-        if now - last_sync > 120:   # refresh the pick list (new picks, closes applied by the scanner)
+        if now - last_sync > 30:   # refresh the pick list (new picks, closes applied by the scanner); ~120 API calls/hour
             try:
                 picks = [p for p in gh_raw("dashboard.json", "data").get("picks", []) if p["status"] == "open"]
                 last_sync = now
