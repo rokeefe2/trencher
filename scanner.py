@@ -376,6 +376,8 @@ def apply_watcher_events():
     for line in open(fp):
         try: e = json.loads(line)
         except ValueError: continue
+        if e["kind"] == "close" and e.get("peak_price"):   # the watcher's peak at close is the peak while held; undoes post-exit drift
+            DB.execute("UPDATE picks SET peak=? WHERE id=? AND status='closed'", (e["peak_price"], e["pick_id"]))
         if DB.execute("SELECT 1 FROM applied_events WHERE id=?", (e["id"],)).fetchone():
             if e["kind"] == "ladder" and not DB.execute("SELECT 1 FROM sales WHERE id=?", (e["id"],)).fetchone():   # backfill
                 tk0 = DB.execute("SELECT tokens0 FROM picks WHERE id=?", (e["pick_id"],)).fetchone()
@@ -389,25 +391,26 @@ def apply_watcher_events():
         DB.execute("INSERT INTO applied_events VALUES (?)", (e["id"],))
     try:   # watcher's 30-second peaks feed the trailing stop
         for pid, pk in json.load(open(os.path.join(d, "heartbeat.json"))).get("peaks", {}).items():
-            DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=?", (pk, int(pid)))
+            DB.execute("UPDATE picks SET peak=MAX(COALESCE(peak,0), ?) WHERE id=? AND status='open'", (pk, int(pid)))
     except Exception: pass
     DB.commit()
 
 def cmd_track():
     apply_watcher_events()
     watcher_on = watcher_healthy()
-    rows = DB.execute("SELECT id,chain,token,symbol,picked_at,entry_price,stake,tokens_left,realized,took_stake,peak,p1h,p6h,p24h,p72h "
+    rows = DB.execute("SELECT id,chain,token,symbol,picked_at,entry_price,stake,tokens_left,realized,took_stake,peak,p1h,p6h,p24h,p72h,status "
                       "FROM picks WHERE status='open' OR p72h IS NULL").fetchall()
     by_chain = {}
     for r in rows: by_chain.setdefault(r[1], []).append(r[2])
     prices = {}
     for chain, toks in by_chain.items():
         for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]
-    for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72) in rows:
+    for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status) in rows:
         px = prices.get((chain, tok))
         if not px: continue  # no price = pool gone; handled at 72h
         age_h = (NOW - t0) / 3600; mult = px / entry
-        upd = {"last_price": px, "peak": max(peak or px, px)}
+        upd = {"last_price": px}
+        if status == "open": upd["peak"] = max(peak or px, px)   # closed picks are still priced for p6h..p72h, but their peak is frozen
         for col, h, cur in (("p1h", 1, p1), ("p6h", 6, p6), ("p24h", 24, p24), ("p72h", 72, p72)):
             if cur is None and age_h >= h: upd[col] = mult
         sets = ",".join(f"{k}=?" for k in upd)
