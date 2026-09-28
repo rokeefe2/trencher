@@ -192,6 +192,11 @@ details[open] > summary::before { transform: rotate(90deg); }
 .links a { font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 16px; border: 1px solid var(--border); }
 .links a:hover { background: var(--raised); }
 .why { font-size: 15px; line-height: 1.55; margin: 0; }
+.hold .px.up { color: var(--up); } .hold .px.down { color: var(--down); } .hold .chg.muted { color: var(--text-2); font-weight: 500; }
+.more { all: unset; cursor: pointer; display: block; width: 100%; text-align: center; padding: 14px 0 4px; font-weight: 600; font-size: 14px; color: var(--up); }
+.mk { position: absolute; bottom: -22px; font-size: 12px; font-weight: 600; color: var(--text-2); transform: translateX(-50%); white-space: nowrap; pointer-events: none; }
+.legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); margin: 30px 0 0; align-items: center; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 </style>
 </head>
 <body>
@@ -227,6 +232,10 @@ details[open] > summary::before { transform: rotate(90deg); }
           <div class="watcher small" id="watcher"></div></div>
         <div id="holdings" style="margin-top:8px"></div>
       </section>
+      <section class="block">
+        <h2 style="margin:0">Past holdings <small class="muted small" id="pastcount" style="font-weight:500"></small></h2>
+        <div id="past" style="margin-top:8px"></div>
+      </section>
 
       <section class="block" style="border-top:0">
         <h2>Key statistics</h2>
@@ -235,7 +244,6 @@ details[open] > summary::before { transform: rotate(90deg); }
       <section class="block"><h2>Activity</h2>
         <p class="muted small" style="margin-top:-8px">Every sale, including partial profit-taking. Profit = what the sale brought in, after fees, minus what that part cost.</p>
         <div id="activity"></div></section>
-      <section class="block"><h2>Closed positions</h2><div class="tbl" id="closed"></div></section>
       <section class="block"><h2>Weekly report</h2><div id="weekly" class="md"></div></section>
       <section class="block"><h2>Recently scanned</h2><div class="tbl" id="recent"></div></section>
       <section class="block"><details><summary>Latest scan log</summary><pre class="log" id="log"></pre></details>
@@ -389,17 +397,17 @@ const API = REPO ? {
     return {t: Date.now() / 1000, value: picks.reduce((a, p) => a + (p.status === "open" ? lv[p.token] ?? p.value_now : p.value_now), 0),
             staked: picks.reduce((a, p) => a + p.stake, 0), picks: out};
   },
-  async spark(p) {
-    const pair = (await dexPrices(p.chain, [p.token]))[p.token]?.pair; if (!pair) return [];
-    const hrs = (Date.now() / 1000 - p.picked_at) / 3600, [tf, agg] = hrs <= 24 ? ["minute", 15] : ["hour", 1];
-    const d = await getJSON(`https://api.geckoterminal.com/api/v2/networks/${p.chain}/pools/${pair}/ohlcv/${tf}?aggregate=${agg}&limit=300`);
-    return d.data.attributes.ohlcv_list.filter(c => c[0] >= p.picked_at - 3600).map(c => [c[0], c[4]]).sort((a, b) => a[0] - b[0]);
+  async spark(p, w) {
+    const pair = p.info?.pair || (await dexPrices(p.chain, [p.token]))[p.token]?.pair; if (!pair) return [];
+    const d = await getJSON(`https://api.geckoterminal.com/api/v2/networks/${p.chain}/pools/${pair}/ohlcv/${w.tf}?aggregate=${w.agg}&limit=300${w.before ? "&before_timestamp=" + w.before : ""}`);
+    return d.data.attributes.ohlcv_list.filter(c => c[0] >= w.from).map(c => [c[0], c[4]]).sort((a, b) => a[0] - b[0]);
   },
   ceo: null,   // reads files on the Mac, so there is no CEO Watcher tab on the phone
 } : {
   trencher: () => getJSON("/api/trencher"),
   live: () => getJSON("/api/live"),
-  spark: async p => (await getJSON(`/api/spark?chain=${p.chain}&token=${encodeURIComponent(p.token)}&since=${Math.floor(p.picked_at)}`)).points || [],
+  spark: async (p, w) => (await getJSON(`/api/spark?chain=${p.chain}&token=${encodeURIComponent(p.token)}&since=${Math.floor(w.from)}&tf=${w.tf}&agg=${w.agg}`
+    + (w.before ? "&before=" + w.before : "") + (p.info?.pair ? "&pair=" + encodeURIComponent(p.info.pair) : ""))).points || [],
   ceo: () => getJSON("/api/ceo"),
 };
 
@@ -505,11 +513,45 @@ function sparkSvg(points, entry, up) {
   return `<svg viewBox="0 0 84 34" aria-hidden="true"><line x1="0" x2="84" y1="${y(entry)}" y2="${y(entry)}" stroke="var(--cross)" stroke-dasharray="1 3"/>
     <path d="${points.map((p, i) => (i ? "L" : "M") + x(p[0]).toFixed(1) + "," + y(p[1]).toFixed(1)).join("")}" fill="none" stroke="${up ? "var(--up-line)" : "var(--down-line)"}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 }
-async function loadSpark(p) {
-  const key = p.chain + p.token, hit = SPARK[key];
-  if (hit && Date.now() - hit.at < 300000) return hit.points;
-  try { SPARK[key] = {at: Date.now(), points: await API.spark(p)}; return SPARK[key].points; } catch { return []; }
+// Held coins: since the buy. Sold coins: zoomed on the trade (a little before the buy to a little after the last sale),
+// at the finest candles that fit in 300, so a 5-minute trade is still readable.
+function sparkWindow(p) {
+  const now = Date.now() / 1000;
+  if (p.status === "open" || !p.closed_at) return (now - p.picked_at) / 3600 <= 24 ? {tf: "minute", agg: 15, from: p.picked_at - 3600} : {tf: "hour", agg: 1, from: p.picked_at - 3600};
+  const pad = Math.max(900, (p.closed_at - p.picked_at) * 0.5), from = p.picked_at - pad, to = Math.min(now, p.closed_at + pad);
+  const [tf, agg] = [["minute", 1, 60], ["minute", 5, 300], ["minute", 15, 900], ["hour", 1, 3600], ["hour", 4, 14400], ["hour", 12, 43200]]
+    .find(([, , sec]) => (to - from) / sec <= 300) || ["day", 1];
+  return {tf, agg, from, to, before: Math.ceil(to)};
 }
+const sparkKey = p => p.chain + p.token + (p.status === "open" ? "" : ":" + Math.round(p.closed_at || 0));
+async function loadSpark(p) {
+  const key = sparkKey(p), hit = SPARK[key], sold = p.status !== "open";
+  if (hit && (sold || Date.now() - hit.at < 300000)) return hit.points;
+  if (sold) try { const c = JSON.parse(localStorage.getItem("trencher-spark:" + key)); if (c?.length) { SPARK[key] = {at: Date.now(), points: c}; return c; } } catch {}
+  try {
+    loadSpark.fetched = true;
+    const w = sparkWindow(p), pts = await API.spark(p, w);
+    SPARK[key] = {at: Date.now(), points: pts};
+    if (sold && pts.length > 1 && Date.now() / 1000 > w.to + 60) try { localStorage.setItem("trencher-spark:" + key, JSON.stringify(pts)); } catch {}   // history is final
+    return pts;
+  } catch { return []; }
+}
+// Past-holding sparklines load one at a time as rows scroll into view (GeckoTerminal allows ~30 requests a minute).
+const SPARK_Q = []; let sparkBusy = false;
+async function pumpSparks() {
+  if (sparkBusy) return; sparkBusy = true;
+  while (SPARK_Q.length) {
+    const [p, done] = SPARK_Q.shift();
+    loadSpark.fetched = false; done(await loadSpark(p));
+    if (loadSpark.fetched) await new Promise(r => setTimeout(r, 2200));   // went to the network: space out the next one
+  }
+  sparkBusy = false;
+}
+const sparkObs = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; sparkObs.unobserve(e.target);
+  const p = (DATA?.picks || []).find(x => x.id === +e.target.dataset.id); if (!p) return;
+  SPARK_Q.push([p, pts => { const c = e.target.querySelector(".spark"); if (c) c.innerHTML = sparkSvg(pts, p.entry_price, p.pnl >= 0); }]); pumpSparks();
+}), {rootMargin: "200px"}) : null;
 
 /* ---------------- meme coins tab ---------------- */
 async function loadTrencher() {
@@ -544,15 +586,11 @@ async function loadTrencher() {
     : `<span class="live off" style="font-size:10px"><i></i></span><span>Exit watcher off · the 15-min scanner handles exits</span>`;
   $("#holdings").innerHTML = open.length ? open.map(p => { OPEN[p.token] = p; return holdRow(p); }).join("")
     : `<div class="empty">No coins held right now. Trencher buys when a coin passes every check (up to ${(d.config || {}).max_picks_per_day || 5} a day).
-       Tap any closed position below to see why it was bought.</div>`;
+       Tap a past holding below to see why it was bought.</div>`;
   open.forEach(async p => { const pts = await loadSpark(p), cell = document.querySelector(`#holdings .hold[data-token="${CSS.escape(p.token)}"] .spark`);
     if (cell) cell.innerHTML = sparkSvg(pts, p.entry_price, p.mult_now >= 1); });
 
-  $("#closed").innerHTML = closed.length ? `<table><tr><th>Coin</th><th class="num">1h</th><th class="num">6h</th><th class="num">24h</th><th class="num">Total profit</th><th>Final exit</th></tr>` +
-    closed.map(p => `<tr><td><a class="link" href="#coin-${p.id}">${esc(p.symbol)}</a> <span class="chip">${esc(p.chain)}</span>
-      <div class="reason">${esc(p.reason)}</div></td><td class="num">${mult(p.p1h)}</td><td class="num">${mult(p.p6h)}</td><td class="num">${mult(p.p24h)}</td>
-      <td class="num ${cls(p.pnl)}">${signed$(p.pnl)}</td><td><span class="chip">${esc(p.close_reason)}</span></td></tr>`).join("") + "</table>"
-    : '<div class="empty">No fully closed positions yet. Partial sales show in Activity above.</div>';
+  renderPast(closed);
 
   const total = s.scanned || 0, rej = o.REJECT || 0, reviewed = (o.PASS || 0) + (o.PICK || 0);
   bars($("#funnel"), [["Scanned", total], ["Passed safety checks", total - rej], ["Reviewed by Claude", reviewed], ["Picked", o.PICK || 0]]);
@@ -575,6 +613,24 @@ function holdRow(p) {
     <div style="min-width:0"><div class="sym">${esc(p.symbol)}</div><div class="sub"><span class="mc">MC ${fmtBig(mcapOf(p))}</span> · ${esc(p.name || p.chain)}</div></div>
     <span class="spark">${sparkSvg(null)}</span>
     <div><div class="px">${fmtPrice(p.live_price || p.last_price)}</div><div class="chg ${cls(ch)}">${pct(ch)}</div></div></a>`;
+}
+
+/* ---------------- past holdings ---------------- */
+const shortDate = ts => new Date(ts * 1000).toLocaleDateString(undefined, {month: "short", day: "numeric"});
+let PAST_ALL = false;
+function pastRow(p) {
+  return `<a class="hold" href="#coin-${p.id}" data-id="${p.id}">${logo(p)}
+    <div style="min-width:0"><div class="sym">${esc(p.symbol)}</div><div class="sub">Sold ${shortDate(p.closed_at || p.picked_at)} · ${esc(p.name || p.chain)}</div></div>
+    <span class="spark">${sparkSvg(SPARK[sparkKey(p)]?.points, p.entry_price, p.pnl >= 0)}</span>
+    <div><div class="px ${cls(p.pnl)}">${signed$(p.pnl)}</div><div class="chg muted">${esc(p.close_reason || "")}</div></div></a>`;
+}
+function renderPast(closed) {
+  const list = closed.slice().sort((a, b) => (b.closed_at || b.picked_at) - (a.closed_at || a.picked_at)), shown = PAST_ALL ? list : list.slice(0, 10);
+  $("#pastcount").textContent = list.length ? `· ${list.length}` : "";
+  $("#past").innerHTML = list.length ? shown.map(pastRow).join("") + (list.length > shown.length ? `<button class="more" id="past-more">Show all ${list.length}</button>` : "")
+    : '<div class="empty">Nothing sold yet.</div>';
+  $("#past-more")?.addEventListener("click", () => { PAST_ALL = true; renderPast(closed); });
+  document.querySelectorAll("#past .hold").forEach(el => { if (!SPARK[sparkKey(list.find(p => p.id === +el.dataset.id))]) sparkObs?.observe(el); });
 }
 
 /* ---------------- coin page ---------------- */
@@ -605,6 +661,7 @@ function renderCoin(id) {
     <div class="hero" id="coin-price" style="margin-top:14px">${fmtPrice(px)}</div>
     <div class="delta" id="coin-delta"></div>
     <div class="chart" id="coin-chart" style="height:240px"><div class="empty">Loading price history…</div></div>
+    <div class="legend" id="coin-legend" hidden></div>
 
     <section class="block"><h2>Your position</h2><div class="stats">
       ${stat(isOpen ? "Current value" : "Final value", fmt$(p.value_now), "", "coin-value")}
@@ -614,7 +671,9 @@ function renderCoin(id) {
                : stat("Exit", esc(p.close_reason || "—")) + stat("Sold", when(p.closed_at))}
       ${stat("Bought", when(p.picked_at))}${stat(isOpen ? "Holding for" : "Held for", dur(heldFor))}</div>
       <div class="ladder" style="margin-top:16px" title="Profit-taking ladder">${ladder.map((l, j) =>
-        `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">Sell ${Math.round(l[1] * 100)}% at ${l[0]}×</span>`).join("")}</div></section>
+        `<span class="${(p.ladder_hit || 0) > j ? "hit" : ""}">Sell ${Math.round(l[1] * 100)}% at ${l[0]}×</span>`).join("")}</div>
+      ${[p.p1h, p.p6h, p.p24h, p.p72h].some(v => v != null) ? `<p class="muted small" style="margin:14px 0 0">Price vs. our buy price, after:
+        ${[["1h", p.p1h], ["6h", p.p6h], ["24h", p.p24h], ["72h", p.p72h]].map(([k, v]) => `${k} <b class="${v == null ? "" : cls(v - 1)}">${mult(v)}</b>`).join(" · ")}</p>` : ""}</section>
 
     <section class="block"><h2>Why we bought it</h2><p class="why">${esc(p.reason)}</p>
       <p class="muted small" style="margin:10px 0 0">Claude's review, ${when(p.picked_at)}.</p></section>
@@ -649,7 +708,15 @@ function renderCoin(id) {
 }
 const retHtml = p => signed$(p.pnl) + ` <span class="small">(${pct(p.pnl / p.stake * 100)})</span>`;
 function setCoinHero(px, label) {
-  const p = COIN; if (!p || !px) return;
+  const p = COIN; if (!p) return;
+  if (p.status !== "open" && label == null) {   // sold: lead with our result (as in the list); the chart shows prices
+    const now = p.live_price || p.last_price;
+    $("#coin-price").textContent = signed$(p.pnl); $("#coin-price").className = "hero " + cls(p.pnl);
+    $("#coin-delta").innerHTML = `<span class="${cls(p.pnl)}">${pct(p.pnl / p.stake * 100)}</span><span class="when">return · sold ${shortDate(p.closed_at)}${now ? ` · price now ${fmtPrice(now)}` : ""}</span>`;
+    return;
+  }
+  if (!px) return;
+  $("#coin-price").className = "hero";
   const ch = (px / p.entry_price - 1) * 100;
   $("#coin-price").textContent = fmtPrice(px);
   $("#coin-delta").innerHTML = `<span class="${cls(ch)}">${arrow(ch)} ${pct(ch)}</span><span class="when">${esc(label ?? "since we bought")}</span>`;
@@ -657,25 +724,43 @@ function setCoinHero(px, label) {
 function drawCoinChart() {
   const el = $("#coin-chart"), p = COIN; if (!el || !p) return;
   const pts = COIN_PTS.filter(q => q[1] > 0);
-  if (pts.length < 2) { el.innerHTML = '<div class="empty">No price history available for this coin.</div>'; return; }
-  const W = el.clientWidth || 700, H = 240, pad = 10, t0 = pts[0][0], t1 = pts[pts.length - 1][0], entry = p.entry_price;
-  let lo = Math.min(entry, ...pts.map(q => q[1])), hi = Math.max(entry, ...pts.map(q => q[1])); if (hi <= lo) hi = lo * 1.01;
+  if (pts.length < 2) { el.innerHTML = '<div class="empty">No price history available for this coin.</div>'; $("#coin-legend").hidden = true; return; }
+  const sales = (DATA?.sales || []).filter(x => x.pick_id === p.id).sort((a, b) => a.t - b.t);
+  const W = el.clientWidth || 700, H = 240, pad = 12, entry = p.entry_price;
+  const t0 = Math.min(pts[0][0], p.picked_at), t1 = Math.max(pts[pts.length - 1][0], ...sales.map(x => x.t));
+  const vals = [entry, ...pts.map(q => q[1]), ...sales.map(x => x.price)];
+  let lo = Math.min(...vals), hi = Math.max(...vals); if (hi <= lo) hi = lo * 1.01;
   const x = t => (t - t0) / Math.max(1, t1 - t0) * W, y = v => pad + (hi - v) / (hi - lo) * (H - 2 * pad);
-  const up = pts[pts.length - 1][1] >= entry, color = up ? "var(--up-line)" : "var(--down-line)";
-  const bx = Math.min(Math.max(x(p.picked_at), 0), W);
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.symbol)} price since it was bought">
+  const up = (p.status === "open" ? pts[pts.length - 1][1] >= entry : p.pnl >= 0), color = up ? "var(--up-line)" : "var(--down-line)";
+  const bx = x(p.picked_at), last = sales[sales.length - 1], sx = p.status !== "open" && last ? x(last.t) : null;
+  const dot = (cx, cy, fill) => `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5.5" fill="${fill}" stroke="var(--bg)" stroke-width="2"/>`;
+  // labels under the chart; merged when the buy and the sale are too close to read apart
+  const px = v => Math.min(Math.max(v / W * 100, 7), 93) + "%";
+  const labels = sx == null ? `<div class="mk" style="left:${px(bx)}">Bought</div>`
+    : (sx - bx) / W * (el.clientWidth || W) < 70 ? `<div class="mk" style="left:${px((bx + sx) / 2)}">Bought · Sold</div>`
+    : `<div class="mk" style="left:${px(bx)}">Bought</div><div class="mk" style="left:${px(sx)}">Sold</div>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.symbol)} price around our trade, with the buy and each sale marked">
     <line x1="0" x2="${W}" y1="${y(entry)}" y2="${y(entry)}" stroke="var(--cross)" stroke-width="1.5" stroke-dasharray="1 5" stroke-linecap="round"/>
     <line x1="${bx}" x2="${bx}" y1="0" y2="${H}" stroke="var(--cross)" stroke-width="1" stroke-dasharray="2 4"/>
+    ${sx != null ? `<line x1="${sx}" x2="${sx}" y1="0" y2="${H}" stroke="var(--cross)" stroke-width="1" stroke-dasharray="2 4"/>` : ""}
     <path d="${pts.map((q, i) => (i ? "L" : "M") + x(q[0]).toFixed(1) + "," + y(q[1]).toFixed(1)).join("")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+    ${dot(bx, y(entry), "var(--text)")}${sales.map(sl => dot(x(sl.t), y(sl.price), sl.pnl >= 0 ? "var(--up-line)" : "var(--down-line)")).join("")}
     <line id="cxh" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--cross)" visibility="hidden"/><circle id="cxd" r="5" fill="${color}" stroke="var(--bg)" stroke-width="2" visibility="hidden"/>
-    </svg><div class="timelabel" style="left:${Math.min(Math.max(bx / W * 100, 8), 92)}%">Bought</div><div class="timelabel" id="ctl" hidden></div>`;
+    </svg>${labels}<div class="timelabel" id="ctl" hidden></div>`;
+  const kinds = new Set(sales.map(sl => sl.pnl >= 0));
+  $("#coin-legend").hidden = false;
+  $("#coin-legend").innerHTML = `<span><i style="background:var(--text)"></i>Bought at ${fmtPrice(entry)}</span>` +
+    (kinds.has(true) ? `<span><i style="background:var(--up-line)"></i>Sold at a profit</span>` : "") +
+    (kinds.has(false) ? `<span><i style="background:var(--down-line)"></i>Sold at a loss</span>` : "");
   const svg = el.querySelector("svg"), live = () => COIN.live_price || COIN.last_price;
   const move = e => { const r = svg.getBoundingClientRect(), cx = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * W;
     let best = pts[0]; for (const q of pts) if (Math.abs(x(q[0]) - cx) < Math.abs(x(best[0]) - cx)) best = q;
+    const near = sales.find(sl => Math.abs(x(sl.t) - cx) < 10);   // over a sale: show what we sold
     for (const [id, a, v] of [["#cxh", "x1", x(best[0])], ["#cxh", "x2", x(best[0])], ["#cxd", "cx", x(best[0])], ["#cxd", "cy", y(best[1])]]) $(id).setAttribute(a, v);
     $("#cxh").setAttribute("visibility", "visible"); $("#cxd").setAttribute("visibility", "visible");
-    const tl = $("#ctl"); tl.hidden = false; tl.textContent = when(best[0]); tl.style.left = Math.min(Math.max(x(best[0]) / W * r.width, 55), r.width - 55) + "px";
-    setCoinHero(best[1], ""); };
+    const tl = $("#ctl"); tl.hidden = false; tl.style.left = Math.min(Math.max(x(best[0]) / W * r.width, 70), r.width - 70) + "px";
+    tl.textContent = near ? `Sold ${near.kind === "partial" ? Math.round(near.fraction * 100) + "%" : "the rest"} · ${signed$(near.pnl)}` : when(best[0]);
+    setCoinHero(near ? near.price : best[1], ""); };
   const leave = () => { $("#cxh").setAttribute("visibility", "hidden"); $("#cxd").setAttribute("visibility", "hidden"); $("#ctl").hidden = true; setCoinHero(live()); };
   svg.addEventListener("mousemove", move); svg.addEventListener("touchmove", move, {passive: true});
   svg.addEventListener("mouseleave", leave); svg.addEventListener("touchend", leave);
