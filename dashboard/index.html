@@ -2,8 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Trencher</title>
+<meta name="description" content="Paper-trading meme-coin scanner">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trencher">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <style>
 :root {
   color-scheme: light;
@@ -37,7 +47,8 @@ a { color: inherit; text-decoration: none; }
 [hidden] { display: none !important; }
 
 /* nav */
-nav { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border); }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 nav .in { max-width: 1120px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 28px; }
 .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
 .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--up-line); }
@@ -49,11 +60,12 @@ nav .in { max-width: 1120px; margin: 0 auto; padding: 0 24px; height: 60px; disp
 .iconbtn { all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--text-2); }
 .iconbtn:hover { background: var(--raised); color: var(--text); }
 .stale { color: var(--crit); font-weight: 600; }
-@media (max-width: 600px) { nav .in { gap: 14px; } .tabs { gap: 14px; } .navright #updated { display: none; } }
+@media (max-width: 600px) { nav .in { gap: 14px; padding: 0 16px; } .tabs { gap: 14px; } .navright #updated { display: none; }
+  .wrap { padding: 0 16px calc(60px + env(safe-area-inset-bottom)); } .hero { font-size: 34px; } }
 
 /* layout */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; padding-top: 32px; }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 28px; } }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
 .side { position: sticky; top: 84px; align-self: start; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 @media (max-width: 900px) { .side { position: static; } }
 .side h3 { margin: 0; padding: 18px 20px 12px; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; }
@@ -63,7 +75,7 @@ section.block > h2, .side-section h2 { font-size: 20px; font-weight: 700; margin
 .muted { color: var(--text-2); } .small { font-size: 13px; }
 
 /* hero */
-.eyebrow { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 14px; font-weight: 500; }
+.eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--text-2); font-size: 14px; font-weight: 500; }
 .tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--raised); color: var(--text-2); }
 .hero { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
 .delta { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 20px; }
@@ -255,6 +267,71 @@ const arrow = v => v > 0 ? "▲" : v < 0 ? "▼" : "";
 const safeUrl = u => /^https:\/\//.test(u || "") ? u : "#";
 const when = ts => new Date(ts * 1000).toLocaleString(undefined, {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"});
 
+/* ---------------- data source ----------------
+   On the Mac, server.py serves /api/*. As the phone web app (GitHub Pages) there is no server, so the page reads the
+   same public files straight from GitHub and prices open picks from DexScreener itself. ?repo=owner/name forces that mode. */
+const REPO = new URLSearchParams(location.search).get("repo") || (() => {
+  const m = location.hostname.match(/^([\w-]+)\.github\.io$/); if (!m) return null;
+  return m[1] + "/" + (location.pathname.split("/")[1] || m[1] + ".github.io"); })();
+const getJSON = async (u, opt) => { const r = await fetch(u, opt); if (!r.ok) throw new Error(`${new URL(u, location).hostname} said ${r.status}`); return r.json(); };
+const RAW = (branch, file) => `https://raw.githubusercontent.com/${REPO}/${branch}/${file}`;
+async function dexPrices(chain, toks) {   // token -> {price, pair} from its deepest pool
+  const best = {};
+  for (const pr of await getJSON(`https://api.dexscreener.com/tokens/v1/${chain}/${toks.slice(0, 30).join(",")}`)) {
+    const t = pr.baseToken?.address, liq = +(pr.liquidity?.usd || 0);
+    if (t && liq >= (best[t]?.liq ?? -1)) best[t] = {liq, price: +(pr.priceUsd || 0), pair: pr.pairAddress};
+  }
+  return best;
+}
+let BASE = null;   // last trencher payload, reused by the 5-second live feed
+const API = REPO ? {
+  async trencher() {
+    let d;
+    try { d = await getJSON(RAW("data", "dashboard.json"), {cache: "no-store"}); }
+    catch (e) { throw new Error(`couldn't reach GitHub (${e.message})`); }
+    d.source = `github.com/${REPO}`; d.stale = false;
+    try { d.watcher = await getJSON(RAW("exits", "heartbeat.json"), {cache: "no-store"}); } catch { d.watcher = null; }
+    const open = (d.picks || []).filter(p => p.status === "open");
+    for (const chain of new Set(open.map(p => p.chain))) {
+      try {
+        const best = await dexPrices(chain, open.filter(p => p.chain === chain).map(p => p.token));
+        for (const p of open) if (p.chain === chain && best[p.token]?.price) {
+          const px = best[p.token].price;
+          p.live_price = px; p.mult_now = +(px / p.entry_price).toFixed(3);
+          p.value_now = +(p.realized + (p.tokens_left || 0) * px).toFixed(2); p.pnl = +(p.value_now - p.stake).toFixed(2);
+        }
+      } catch {}   // keep the scanner's last prices
+    }
+    if (open.length) { const s = d.summary; s.value = +d.picks.reduce((a, p) => a + p.value_now, 0).toFixed(2); s.pnl = +(s.value - (s.staked || 0)).toFixed(2); }
+    return BASE = d;
+  },
+  async live() {
+    const picks = (BASE || await this.trencher()).picks || [], open = picks.filter(p => p.status === "open"), out = [];
+    for (const chain of new Set(open.map(p => p.chain))) {
+      const best = await dexPrices(chain, open.filter(p => p.chain === chain).map(p => p.token));
+      for (const p of open) if (p.chain === chain && best[p.token]?.price) {
+        const px = best[p.token].price;
+        out.push({token: p.token, price: px, mult: px / p.entry_price, value: p.realized + (p.tokens_left || 0) * px});
+      }
+    }
+    const lv = Object.fromEntries(out.map(o => [o.token, o.value]));
+    return {t: Date.now() / 1000, value: picks.reduce((a, p) => a + (p.status === "open" ? lv[p.token] ?? p.value_now : p.value_now), 0),
+            staked: picks.reduce((a, p) => a + p.stake, 0), picks: out};
+  },
+  async spark(p) {
+    const pair = (await dexPrices(p.chain, [p.token]))[p.token]?.pair; if (!pair) return [];
+    const hrs = (Date.now() / 1000 - p.picked_at) / 3600, [tf, agg] = hrs <= 24 ? ["minute", 15] : ["hour", 1];
+    const d = await getJSON(`https://api.geckoterminal.com/api/v2/networks/${p.chain}/pools/${pair}/ohlcv/${tf}?aggregate=${agg}&limit=300`);
+    return d.data.attributes.ohlcv_list.filter(c => c[0] >= p.picked_at - 3600).map(c => [c[0], c[4]]).sort((a, b) => a[0] - b[0]);
+  },
+  ceo: null,   // reads files on the Mac, so there is no CEO Watcher tab on the phone
+} : {
+  trencher: () => getJSON("/api/trencher"),
+  live: () => getJSON("/api/live"),
+  spark: async p => (await getJSON(`/api/spark?chain=${p.chain}&token=${encodeURIComponent(p.token)}&since=${Math.floor(p.picked_at)}`)).points || [],
+  ceo: () => getJSON("/api/ceo"),
+};
+
 // markdown (input escaped first — coin names are untrusted)
 function md(src) {
   const lines = esc(src || "").split("\n"); let html = "", inList = false, table = [];
@@ -353,13 +430,12 @@ function sparkSvg(points, entry, up) {
 async function loadSpark(p) {
   const key = p.chain + p.token, hit = SPARK[key];
   if (hit && Date.now() - hit.at < 300000) return hit.points;
-  try { const r = await (await fetch(`/api/spark?chain=${p.chain}&token=${encodeURIComponent(p.token)}&since=${Math.floor(p.picked_at)}`)).json();
-    SPARK[key] = {at: Date.now(), points: r.points || []}; return SPARK[key].points; } catch { return []; }
+  try { SPARK[key] = {at: Date.now(), points: await API.spark(p)}; return SPARK[key].points; } catch { return []; }
 }
 
 /* ---------------- meme coins tab ---------------- */
 async function loadTrencher() {
-  const d = await (await fetch("/api/trencher")).json();
+  const d = await API.trencher();
   const s = d.summary || {}, o = s.outcomes || {}, picks = d.picks || [];
   $("#updated").innerHTML = d.stale ? `<span class="stale">Showing old data</span>` : (d.updated_at ? "Last scan " + ago(d.updated_at) : "");
   $("#source").innerHTML = d.source ? `Data: <span class="${d.stale ? "stale" : ""}">${esc(d.source)}</span>` : "";
@@ -466,7 +542,8 @@ function renderLearning(d) {
 
 /* ---------------- CEO watcher tab ---------------- */
 async function loadCeo() {
-  const d = await (await fetch("/api/ceo")).json(), st = d.state;
+  if (!API.ceo) return;
+  const d = await API.ceo(), st = d.state;
   if (!st) { $("#ceo-head").textContent = "Not set up on this Mac"; return; }
   const pos = Object.entries(st.our_positions || {});
   const invested = pos.reduce((a, [, p]) => a + parseFloat(p.dollar_amount || 0), 0);
@@ -489,7 +566,7 @@ async function tick() {
   const visible = document.visibilityState === "visible" && !$("#tab-trencher").hidden;
   if (!visible || !Object.keys(OPEN).length) { $("#live").classList.add("off"); return; }
   try {
-    const L = await (await fetch("/api/live")).json();
+    const L = await API.live();
     if (L.error) throw new Error(L.error);
     $("#live").classList.remove("off");
     const lastPt = LIVEPTS[LIVEPTS.length - 1];
@@ -517,9 +594,13 @@ async function tick() {
   } catch { $("#live").classList.add("off"); }
 }
 function startLive() { clearInterval(liveTimer); liveTimer = setInterval(tick, 5000); tick(); }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") tick(); });
+document.addEventListener("visibilitychange", () => {   // reopening the app from the home screen: refresh if it's been a while
+  if (document.visibilityState !== "visible") return;
+  if (Date.now() - lastLoad > 30000) load(); else tick(); });
 
+let lastLoad = 0;
 function load() {
+  lastLoad = Date.now();
   loadTrencher().catch(e => { $("#hero").textContent = "—"; $("#delta").innerHTML = `<span class="down">Couldn't load data: ${esc(e.message)}</span>`; });
   loadCeo().catch(() => {});
 }
@@ -530,6 +611,8 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
   history.replaceState(null, "", "#" + b.dataset.tab);
 }));
 $("#refresh").addEventListener("click", load);
+if (!API.ceo) document.querySelector('.tabs button[data-tab="ceo"]').hidden = true;
+if (REPO && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 const startTab = document.querySelector(`.tabs button[data-tab="${location.hash.slice(1)}"]`); if (startTab) startTab.click();
 load(); setInterval(load, 60000); startLive();
 </script>
