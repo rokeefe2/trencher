@@ -216,6 +216,9 @@ details[open] > summary::before { transform: rotate(90deg); }
         <h2 style="font-size:20px;margin:24px 0 12px">Outcome by score</h2><div class="tbl" id="buckets"></div></div>
       <div><h2 style="font-size:20px;margin:0 0 12px">Which score factors predict winners?</h2><div class="tbl" id="comps"></div></div>
     </section>
+    <section class="block"><h2>Entry signals being watched</h2>
+      <p class="muted small" style="margin-top:-8px">Not used for picking yet. For coins that scored high enough to pick: did the ones showing the signal crash more often in their first hour?</p>
+      <div class="tbl" id="signals"></div></section>
     <section class="block"><h2>Agent's notebook</h2><div id="notebook" class="md"></div></section>
   </div>
 </section>
@@ -441,8 +444,14 @@ function renderLearning(d) {
     $("#comps").innerHTML = comps.length ? `<table><tr><th>Factor</th><th></th>${OUT_HEAD}</tr>` + comps.map(([k, c]) =>
       `<tr><td rowspan="2">${esc(k.replace("_", " "))}</td><td>high</td>${outCells(c.high)}</tr><tr><td>low</td>${outCells(c.low)}</tr>`).join("") + "</table>"
       : '<div class="empty">Needs at least 6 scored coins with results.</div>';
+    const sigs = a.entry_signals || [], pct = v => v == null ? "—" : v + "%";
+    const sigCells = s => !s || !s.n_1h ? `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`
+      : `<td class="num">${s.n_1h}</td><td class="num">${pct(s.down40_1h_pct)}</td><td class="num">${pct(s.up50_1h_pct)}</td><td class="num">${s.n ? s.median_24h + "×" : "—"}</td>`;
+    $("#signals").innerHTML = sigs.length ? `<table><tr><th>Signal</th><th></th><th class="num">Tracked</th><th class="num">Down 40% at 1h</th><th class="num">Up 50% at 1h</th><th class="num">Median 24h</th></tr>` +
+      sigs.map(g => `<tr><td rowspan="2">${esc(g.signal)}</td><td>yes</td>${sigCells(g.yes)}</tr><tr><td>no</td>${sigCells(g.no)}</tr>`).join("") + "</table>"
+      : '<div class="empty">Collecting data.</div>';
   } else {
-    ["#golive", "#rules", "#stages", "#buckets", "#comps"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data.</div>');
+    ["#golive", "#rules", "#stages", "#buckets", "#comps", "#signals"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data.</div>');
   }
   const pend = tu.pending || [];
   $("#pending").innerHTML = pend.length ? pend.map(p => `<div class="check"><b>${esc(p.key)}</b><span style="flex:1" class="muted">${p.from} → ${p.to}<div class="reason">${esc(p.reason)} (${p.evidence_n} outcomes)</div></span></div>`).join("") +

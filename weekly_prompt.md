@@ -20,6 +20,9 @@ Definitions: rug = 24h price < 0.2× or liquidity gone. doubled = hit ≥2× at 
    or too tight (blocked many winners and few rugs). Say when n is too small to judge (< 20).
 4. **Scoring** — do higher score buckets beat lower ones? Which components separate winners from losers
    (high vs low)? Are Claude's PICKs beating PASSes (is the Stage 3 review adding value)?
+   **Entry signals** (ANALYSIS.entry_signals) are tracked but not used by the code yet. For each, compare
+   yes vs no (down 40% / up 50% at the 1h check, median 24h). You can't turn one on yourself: if one
+   clearly separates crashes from winners with ≥ 40 coins on each side, recommend it in the notebook.
 5. **Exits** — actual exit rules vs simple hold-24h/72h.
 6. **Go-live checklist** — each check, pass/fail, what's missing.
 7. **Changes this week** — what you're changing and why, or why you're holding steady.

@@ -461,6 +461,20 @@ def _stats(rows):
             "doubled_pct": round(100 * sum(r[1] >= 2 for r in rows) / len(rows)),
             "up50_pct": round(100 * sum(r[1] >= 1.5 for r in rows) / len(rows))}
 
+def _m5(m): return (m.get("price_change") or {}).get("m5")
+
+ENTRY_SIGNALS = [   # (name, metrics -> True/False, or None when the data is missing)
+    ("5-min spike over 20%", lambda m: None if _m5(m) is None else _m5(m) > 20),
+]
+
+def _signal_stats(recs):
+    """_stats plus the 1h checkpoint: how often the coin was already down 40% (our stop) or up 50% (first ladder rung)."""
+    out = _stats([(r["p24"], r["best"], r["rug"]) for r in recs])
+    h1 = [r["p1"] for r in recs if r["p1"] is not None]
+    if h1: out.update({"n_1h": len(h1), "down40_1h_pct": round(100 * sum(x <= 0.6 for x in h1) / len(h1)),
+                       "up50_1h_pct": round(100 * sum(x >= 1.5 for x in h1) / len(h1))})
+    return out
+
 def cmd_analyze():
     import re
     rows = DB.execute("SELECT stage,reason,score,parts,metrics,p1h,p6h,p24h,p72h,liq24,t0 FROM shadow").fetchall()
@@ -470,7 +484,7 @@ def cmd_analyze():
         best = max(ms) if ms else None
         rug = int(p24 is not None and (p24 < 0.2 or (liq24 is not None and liq24 < 2000)))
         recs.append({"stage": stage, "reason": reason or "", "score": sc, "parts": json.loads(parts or "{}"),
-                     "metrics": json.loads(metrics or "{}"), "p24": p24, "best": best or 0, "rug": rug, "t0": t0})
+                     "metrics": json.loads(metrics or "{}"), "p1": p1, "p24": p24, "best": best or 0, "rug": rug, "t0": t0})
     out = {"generated_at": NOW, "tracked": len(recs), "with_24h_outcome": sum(r["p24"] is not None for r in recs)}
     # safety rules: did each rule block scams, or winners?
     by_rule = {}
@@ -496,6 +510,16 @@ def cmd_analyze():
         comps[k] = {"high": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] > med]),
                     "low": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] <= med]), "split_at": med}
     out["score_components"] = comps
+    # entry signals: tracked only, not used by scoring yet. Do coins that show the signal when scored do worse?
+    pickable = [r for r in scored if r["score"] >= CFG["min_score"]]
+    sigs = []
+    for name, test in ENTRY_SIGNALS:
+        yes, no = [], []
+        for r in pickable:
+            hit = test(r["metrics"])
+            if hit is not None: (yes if hit else no).append(r)
+        sigs.append({"signal": name, "yes": _signal_stats(yes), "no": _signal_stats(no)})
+    out["entry_signals"] = sigs
     # exits: compare the live exit rules with simple alternatives on actual picks (checkpoint approximation)
     picks = DB.execute("SELECT pnl_x, p24h, p72h, stake FROM (SELECT (realized + tokens_left*last_price)/stake AS pnl_x, p24h, p72h, stake FROM picks WHERE status='closed')").fetchall()
     if picks:
