@@ -9,7 +9,7 @@ on:
         type: boolean
         default: false
       approve:
-        description: "Approve a pending safety change (setting name, or 'all')"
+        description: "Approve a pending safety change (setting name, or 'all'), or set values: key=value,key=value"
         type: string
         default: ""
 concurrency:
@@ -48,7 +48,9 @@ jobs:
           [ "$R" = "OK" ]
       - name: Approve pending change
         if: ${{ inputs.approve != '' && inputs.approve != null }}
-        run: python3 scanner.py approve "${{ inputs.approve }}"
+        env:
+          APPROVE: ${{ inputs.approve }}   # via env, not pasted into the script
+        run: python3 scanner.py approve "$APPROVE"
       - name: Track open paper trades
         if: ${{ !inputs.selftest }}
         run: python3 scanner.py track
