@@ -516,9 +516,13 @@ def cmd_analyze():
     for k in ("momentum", "holders", "liquidity", "buyer_breadth", "social", "survival"):
         vals = [r for r in scored if k in r["parts"]]
         if len(vals) < 6: continue
-        med = sorted(r["parts"][k] for r in vals)[len(vals) // 2]
-        comps[k] = {"high": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] > med]),
-                    "low": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if r["parts"][k] <= med]), "split_at": med}
+        med = sorted(r["parts"][k] for r in vals)[len(vals) // 2]; top = max(r["parts"][k] for r in vals)
+        at_max = round(100 * sum(r["parts"][k] == top for r in vals) / len(vals))
+        # most coins get full marks (median = max): "above the median" would be empty, so compare full marks vs the rest
+        hi_ = (lambda v: v == top) if med == top else (lambda v: v > med)
+        comps[k] = {"high": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if hi_(r["parts"][k])]),
+                    "low": _stats([(r["p24"], r["best"], r["rug"]) for r in vals if not hi_(r["parts"][k])]), "split_at": med,
+                    "split": f"full marks ({top}) vs less" if med == top else f"above {med} vs {med} or less", "at_max_pct": at_max}
     out["score_components"] = comps
     # entry signals: tracked only, not used by scoring yet. Do coins that show the signal when scored do worse?
     pickable = [r for r in scored if r["score"] >= CFG["min_score"]]
@@ -686,8 +690,9 @@ def cmd_tune():
         lo, hi, step, sdir = TUNABLE[key]; cur = f(_get(key)); new = f(ch.get("value"))
         if n < MIN_EVIDENCE: refused.append(f"{key}: only {n} outcomes (need {MIN_EVIDENCE})"); continue
         new = max(lo, min(hi, new)); new = cur + max(-step, min(step, new - cur))   # clamp to bounds and weekly step
+        # whole-number settings (picks/day, holders...) stay whole; weights step by 0.25 and must not be rounded back to 1
+        if isinstance(step, int) and isinstance(_get(key), int) and key != "min_age_h": new = int(round(new))
         if new == cur: refused.append(f"{key}: already at its limit ({cur})"); continue
-        if isinstance(_get(key), int) and key != "min_age_h": new = int(round(new))
         entry = {"date": datetime.now().strftime("%Y-%m-%d"), "key": key, "from": cur, "to": new, "reason": reason, "evidence_n": n}
         loosening = sdir and ((sdir == "down" and new > cur) or (sdir == "up" and new < cur))
         if loosening: pending.append(entry); continue
@@ -702,8 +707,22 @@ def cmd_tune():
     print(msg)
 
 def cmd_approve():
-    """scanner.py approve <key|all> — apply a pending safety change that Ray approved."""
-    want = sys.argv[2]
+    """scanner.py approve <key|all> — apply a pending safety change that Ray approved.
+    scanner.py approve "key=value[,key=value]" — Ray sets tunable settings directly (within their bounds, any step)."""
+    want = sys.argv[2].strip()
+    if "=" in want:
+        for item in want.split(","):
+            key, _, val = (x.strip() for x in item.partition("="))
+            if key not in TUNABLE: print("not tunable:", key); continue
+            lo, hi, step, _ = TUNABLE[key]; cur = f(_get(key)); new = max(lo, min(hi, f(val)))
+            if isinstance(step, int) and isinstance(_get(key), int) and key != "min_age_h": new = int(round(new))
+            if new == cur: print(key, "already", cur); continue
+            _set_override(key, new)
+            TUNING.setdefault("changelog", []).append({"date": datetime.now().strftime("%Y-%m-%d"), "key": key, "from": cur, "to": new,
+                                                       "reason": "Set by Ray", "evidence_n": 0, "approved_by": "Ray"})
+            TUNING["pending"] = [p for p in TUNING.get("pending", []) if p["key"] != key]
+            print("set", key, cur, "->", new)
+        json.dump(TUNING, open(TUNING_PATH, "w"), indent=1); return
     keep = []
     for p in TUNING.get("pending", []):
         if want in ("all", p["key"]):

@@ -151,7 +151,7 @@ details > summary { cursor: pointer; font-weight: 600; list-style: none; padding
 details > summary::-webkit-details-marker { display: none; }
 details > summary::before { content: "›"; display: inline-block; margin-right: 8px; transition: transform .15s; color: var(--text-2); }
 details[open] > summary::before { transform: rotate(90deg); }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; } @media (max-width: 800px) { .two { grid-template-columns: minmax(0, 1fr); } }
 .check { display: flex; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .check .st { font-weight: 700; min-width: 70px; font-size: 13px; }
 
@@ -791,7 +791,8 @@ function renderLearning(d) {
     $("#buckets").innerHTML = `<table><tr><th>Score</th>${OUT_HEAD}</tr>` + Object.entries(a.score_buckets).map(([k, s]) => `<tr><td>${k}</td>${outCells(s)}</tr>`).join("") + "</table>";
     const comps = Object.entries(a.score_components || {});
     $("#comps").innerHTML = comps.length ? `<table><tr><th>Factor</th><th></th>${OUT_HEAD}</tr>` + comps.map(([k, c]) =>
-      `<tr><td rowspan="2">${esc(k.replace("_", " "))}</td><td>high</td>${outCells(c.high)}</tr><tr><td>low</td>${outCells(c.low)}</tr>`).join("") + "</table>"
+      `<tr><td rowspan="2">${esc(k.replace("_", " "))}${c.at_max_pct != null ? `<div class="reason">${c.at_max_pct}% get full marks</div>` : ""}</td>
+        <td>${c.split?.startsWith("full") ? "full marks" : "high"}</td>${outCells(c.high)}</tr><tr><td>${c.split?.startsWith("full") ? "less" : "low"}</td>${outCells(c.low)}</tr>`).join("") + "</table>"
       : '<div class="empty">Needs at least 6 scored coins with results.</div>';
     const sigs = a.entry_signals || [], pct = v => v == null ? "—" : v + "%";
     const sigCells = s => !s || !s.n_1h ? `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`
