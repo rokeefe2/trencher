@@ -1,0 +1,45 @@
+{
+ "overrides": {
+  "weights": {
+   "momentum": 0.75,
+   "holders": 0.75
+  }
+ },
+ "changelog": [
+  {
+   "date": "2026-09-28",
+   "key": "weights.momentum",
+   "from": 1.0,
+   "to": 1,
+   "reason": "High-momentum-scored candidates underperformed low-momentum ones (doubled 11% vs 18%, up50 14% vs 26%); likely chasing already-pumped coins near local tops. Lowering weight should favor less-extended entries.",
+   "evidence_n": 274
+  },
+  {
+   "date": "2026-09-28",
+   "key": "weights.holders",
+   "from": 1.0,
+   "to": 1,
+   "reason": "High-holders-scored candidates rugged far more than low-holders ones (90% vs 49% rug rate); component likely rewards inflated/bot-driven holder counts. Lowering weight should reduce exposure to this trap.",
+   "evidence_n": 274
+  },
+  {
+   "date": "2026-09-30",
+   "key": "weights.momentum",
+   "from": 1.0,
+   "to": 0.75,
+   "reason": "Set by Ray",
+   "evidence_n": 0,
+   "approved_by": "Ray"
+  },
+  {
+   "date": "2026-09-30",
+   "key": "weights.holders",
+   "from": 1.0,
+   "to": 0.75,
+   "reason": "Set by Ray",
+   "evidence_n": 0,
+   "approved_by": "Ray"
+  }
+ ],
+ "pending": []
+}

@@ -1,0 +1,139 @@
+# Trencher Weekly Review — Week of Sep 22–28, 2026
+
+## 1. Headline
+
+**17 closed picks, 8 wins / 9 losses (47% win rate), P&L −$21.71 on $850 staked (−2.6%).** Not closer to real money yet on the hard numbers, but the *mechanism* that matters most — exits — is working: actual exits averaged 0.97× stake vs. 0.44× if we'd naively held to 24h and 0.09× at 72h. The problem this week isn't exit discipline, it's entry quality (too many picks that needed the stop-loss at all) and a scoring model that may be over-weighting the wrong signals.
+
+## 2. Pick table
+
+| Symbol | Chain | Score | 1h | 6h | 24h | 72h | P&L | Exit reason |
+|---|---|---|---|---|---|---|---|---|
+| PUMPPO | sol | 90 | 1.19 | 1.15 | 0.93 | 0.03 | +7.26 | no move 12h |
+| UPTOBER | sol | 88 | 1.45 | 0.86 | 1.51 | 0.90 | +10.02 | trailing stop |
+| PIPEJEAN | sol | 88 | 1.46 | 0.01 | 0.01 | – | −0.78 | trailing stop |
+| AI | sol | 78 | 0.93 | 0.34 | 0.11 | 0.07 | +13.48 | trailing stop |
+| UPTOBER | sol | 79 | 1.14 | 0.77 | 0.98 | 0.59 | −13.36 | no move 12h |
+| BOARDCAT | sol | 96 | 0.20 | 0.01 | 0.01 | 0.01 | +17.86 | trailing stop |
+| NUVEX | sol | 92 | 1.54 | 0.12 | 0.06 | – | +12.84 | trailing stop |
+| OnlyJeans | sol | 88 | 1.03 | 0.01 | 0.01 | – | −21.56 | stop loss |
+| LESTER | sol | 76 | 0.97 | 0.75 | 0.52 | – | −21.39 | stop loss |
+| DELREY | sol | 76 | 0.68 | 0.77 | 1.60 | – | +11.57 | trailing stop |
+| 7 | sol | 89 | 1.71 | 1.34 | 1.70 | – | +41.60 | trailing stop |
+| SPLIT | sol | 85 | 2.32 | 0.52 | 0.09 | – | −21.59 | stop loss |
+| CATSTR | sol | 88 | 0.93 | 0.26 | – | – | −22.89 | stop loss |
+| KARDASHEV | sol | 80 | 0.53 | 0.61 | – | – | −21.63 | stop loss |
+| x/acc | sol | 92 | 0.02 | 0.02 | – | – | −23.17 | stop loss |
+| MM | sol | 78 | 0.33 | – | – | – | −22.05 | stop loss |
+| MAGACOIN | sol | 72 | 0.01 | – | – | – | +32.08 | trailing stop |
+
+Notable: SPLIT was up 2.3× at 1h but still ended a stop-loss loser — we have no way to lock in a fast early spike (see notebook).
+
+## 3. Rule report card
+
+| Rule | n | rug% | doubled% | verdict |
+|---|---|---|---|---|
+| too few holders | 1403 | 71 | 1 | working well — blocks almost nothing but rugs |
+| owner can mint new coins | 232 | 78 | 0 | working well |
+| creator/owner holds X% | 194 | 84 | 1 | working well |
+| Single/Top10/High ownership rules | 55/42/41 | 90–91 | 2 | working well |
+| creator holds X% | 57 | 88 | 9 | good |
+| Low Liquidity | 77 | 84 | 10 | good |
+| many linked wallets | 115 | 77 | 9 | good |
+| Large Amount of LP Unlocked | 263 | **94** | 30 | high doubled%, but rug% so extreme it's clearly earning its keep |
+| only X% liquidity locked/burned | 371 | 83 | 24 | same pattern — high rug%, keep as-is |
+| top 10 wallets hold X% | 245 | 86 | 27 | same pattern — keep as-is |
+| contract not verified | 42 | **45** | 12 | weakest rug rate of any n≥20 rule — closest thing to "too tight," but not strong enough (still blocks ~half rugs) to propose loosening |
+| Mint/Freeze authority, honeypot, sell tax, etc. | ≤10 each | — | — | **n < 20, not judgeable yet** |
+
+No rule this week clears the bar for a loosening proposal (would need low rug% *and* high doubled% together — closest is "contract not verified" but 45% rug is still too costly to touch).
+
+## 4. Scoring
+
+**Score buckets** (candidates that passed safety, by score):
+
+| Bucket | n | median 24h | rug% | doubled% |
+|---|---|---|---|---|
+| 50–59 | 37 | 0.00 | 84 | 11 |
+| 60–69 | 50 | 0.07 | 66 | 18 |
+| **70–79** | 88 | **0.22** | **48** | 18 |
+| 80+ | 93 | 0.03 | 81 | 13 |
+
+Score is **not monotonic** — 70–79 clearly beats both 60–69 and 80+. The 80+ bucket looks almost as bad as 50–59. min_score=60 still clears the worst bucket, so no change there, but something in how the top scores are composed is dragging them down.
+
+**Components** (n=274 scored candidates, high vs low half):
+
+| Component | high n | high rug%/doubled% | low n | low rug%/doubled% |
+|---|---|---|---|---|
+| momentum | 90 | 73% / 11% | 184 | 65% / **18%** |
+| holders | 124 | **90%** / 16% | 150 | 49% / 15% |
+| liquidity | 0 | — | 274 | 68% / 16% (no discrimination — everything fell in "low") |
+| buyer_breadth | 0 | — | 274 | 68% / 16% (identical to liquidity — looks like these two aren't actually separating candidates) |
+| social | 141 | 67% / 16% | 133 | 69% / 16% (no signal either way) |
+| survival | 21 | 62% / 10% | 253 | 68% / 16% (n=21 barely meets threshold, weak signal) |
+
+Two findings stand out with solid n (≥90 each side):
+- **Momentum is inverted**: high-momentum-scored coins double *less* often (11% vs 18%) and hit +50% less often (14% vs 26%) than low-momentum ones. Classic "buying the local top" pattern.
+- **Holders is inverted more sharply**: high-holders-score coins rug 90% of the time vs. 49% for low. Whatever this component measures (likely holder growth rate, not raw count), it looks like it's picking up bot/wash-traded holder counts that precede rugs.
+
+This is a plausible explanation for why the 80+ score bucket underperforms 70–79 — the top bucket is likely stacked with coins that scored well on momentum/holders for the wrong reasons.
+
+**Stage funnel**: pick (n=10) median 24h 0.11 vs pass (n=28) 0.09 — Claude's picks edge out its passes, consistent with the go-live check, but n=10 for picks is too small to trust fully.
+
+**Entry signal — "5-min spike over 20%"**: yes (n=32) and no (n=198) have essentially identical median_24h (0.08 both) and down40@1h (51% vs 49%). No separation, and the yes-side n is under the 40-per-side bar anyway. **Not recommending this signal for use.**
+
+## 5. Exits
+
+| | avg x | 
+|---|---|
+| Actual exits (n=17) | **0.974** |
+| Hold to 24h | 0.442 |
+| Hold to 72h | 0.094 |
+
+Exit logic (stop-loss/trailing/no-move) is clearly adding value — more than doubling average outcome vs. a naive 24h hold, and 10× vs a 72h hold. This is the strongest working part of the system right now.
+
+## 6. Go-live checklist
+
+| Check | Pass? | Value |
+|---|---|---|
+| ≥30 closed paper picks | ❌ | 17 |
+| Total paper P&L positive | ❌ | −21.72 |
+| Win rate ≥35% | ✅ | 47% |
+| Profitable 2 of last 3 weeks | ❌ | −32 / +10 (and this week negative) |
+| Picks beat passes (median 24h) | ✅ | 0.11 vs 0.09 |
+
+Missing: more volume, and a positive-P&L week. The entry side (score composition) is the more likely lever than the exit side.
+
+## 7. Changes this week
+
+Two changes, both backed by n≥90-per-side signal from the score-component breakdown, both small steps within range, both directly testable next week:
+
+1. **weights.momentum 1.0 → 0.7** — high-momentum-scored candidates underperformed low-momentum ones (doubled 11% vs 18%, up50 14% vs 26%, n=90/184). Hypothesis: the momentum component is currently rewarding coins that have already spiked (buying near a local top). Lowering its weight should shift picks toward less-extended entries. **Confirms if**: next week's picks show higher median 24h / up50 rate and momentum's high/low split narrows or flips.
+
+2. **weights.holders 1.0 → 0.7** — high-holders-scored candidates rugged far more than low (90% vs 49%, n=124/150). Hypothesis: this component is picking up inflated/bot-driven holder counts that precede rugs rather than genuine distribution. **Confirms if**: rug_pct among picks/passes drops and the holders high/low rug gap narrows next week.
+
+Holding steady on min_score, stop_loss_pct, and all safety-rule thresholds — none showed a strong enough loosening case, and the exit config is already outperforming a naive hold by a wide margin, so no reason to touch it yet.
+
+---
+
+## Notebook (rewritten)
+
+**Week 1 findings:**
+- Exit logic (stop-loss 40% / trailing 30% / no-move 12h) is working well: actual avg exit 0.97× vs hold-24h 0.44× vs hold-72h 0.09×. Don't touch these yet — they're the strongest part of the system.
+- Score is **not monotonic**: 70–79 bucket (median 24h 0.22, rug 48%) beats 80+ (median 0.03, rug 81%). Root cause hypothesis: momentum and holders components are inversely predictive at the high end (see below). **Changed both weights 1.0→0.7 this week — watch if the 80+ bucket improves relative to 70–79 next week.**
+- `liquidity` and `buyer_breadth` score components show **identical stats (n=274 "low", n=0 "high")** — suspicious, looks like they may not be computing distinct values or the split threshold is broken. Can't fix from tuning — flag to owner to check the scoring code.
+- `social` and `survival` components show no discriminating power so far (survival n=21 is borderline, worth re-checking with more data before concluding).
+- "5-min spike over 20%" entry signal shows zero separation (yes vs no nearly identical on median_24h and down40@1h) — not worth enabling even once n grows, unless the picture changes.
+- SPLIT hit 2.3× at 1h then got stopped out for a loss — no mechanism exists to lock in fast early spikes. **Idea for owner**: a partial take-profit rule (e.g., sell 50% if price ≥2× within first hour) isn't in the current tunable list; worth building.
+- `contract not verified` rule has the weakest rug rate of any n≥20 safety rule (45%) — watchlist for a future loosening proposal, but not yet (still blocks real rugs half the time).
+- Go-live blockers: need 13 more closed picks to hit 30, and a P&L-positive week. Entry quality (not exits) is the lever — see weight changes above.
+- Next week: check whether momentum/holders weight cuts shift the score-bucket ordering back toward monotonic and reduce stop-loss frequency without hurting win rate.
+
+Paper trading only — not financial advice.
+
+```json
+{"changes": [
+  {"key": "weights.momentum", "value": 0.7, "reason": "High-momentum-scored candidates underperformed low-momentum ones (doubled 11% vs 18%, up50 14% vs 26%); likely chasing already-pumped coins near local tops. Lowering weight should favor less-extended entries.", "evidence_n": 274},
+  {"key": "weights.holders", "value": 0.7, "reason": "High-holders-scored candidates rugged far more than low-holders ones (90% vs 49% rug rate); component likely rewards inflated/bot-driven holder counts. Lowering weight should reduce exposure to this trap.", "evidence_n": 274}
+],
+ "notebook": "**Week 1 findings:**\n- Exit logic (stop-loss 40% / trailing 30% / no-move 12h) is working well: actual avg exit 0.97x vs hold-24h 0.44x vs hold-72h 0.09x. Don't touch these yet - they're the strongest part of the system.\n- Score is not monotonic: 70-79 bucket (median 24h 0.22, rug 48%) beats 80+ (median 0.03, rug 81%). Root cause hypothesis: momentum and holders components are inversely predictive at the high end (see below). Changed both weights 1.0->0.7 this week - watch if the 80+ bucket improves relative to 70-79 next week.\n- liquidity and buyer_breadth score components show identical stats (n=274 'low', n=0 'high') - suspicious, looks like they may not be computing distinct values or the split threshold is broken. Can't fix from tuning - flag to owner to check the scoring code.\n- social and survival components show no discriminating power so far (survival n=21 is borderline, worth re-checking with more data before concluding).\n- '5-min spike over 20%' entry signal shows zero separation (yes vs no nearly identical on median_24h and down40@1h) - not worth enabling even once n grows, unless the picture changes.\n- SPLIT hit 2.3x at 1h then got stopped out for a loss - no mechanism exists to lock in fast early spikes. Idea for owner: a partial take-profit rule (e.g., sell 50% if price >=2x within first hour) isn't in the current tunable list; worth building.\n- 'contract not verified' rule has the weakest rug rate of any n>=20 safety rule (45%) - watchlist for a future loosening proposal, but not yet (still blocks real rugs half the time).\n- Go-live blockers: need 13 more closed picks to hit 30, and a P&L-positive week. Entry quality (not exits) is the lever - see weight changes above.\n- Next week: check whether momentum/holders weight cuts shift the score-bucket ordering back toward monotonic and reduce stop-loss frequency without hurting win rate."}
+```

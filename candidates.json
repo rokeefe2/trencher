@@ -1,0 +1,154 @@
+{
+ "slots_left_today": 2,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "Bf9i7oG8We16XBtgeAnNB9rDBnmCZPW37P7b6a9Hpump",
+   "symbol": "KIN",
+   "name": "KIN",
+   "score": 83.7,
+   "score_parts": {
+    "momentum": 15,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 10
+   },
+   "age_h": 3.4,
+   "liquidity_usd": 32592,
+   "mcap_usd": 127629,
+   "price_usd": 0.0001104,
+   "safety": {
+    "top10_pct": 18.8,
+    "creator_pct": 0.34,
+    "insider_pct": 0,
+    "linked_wallets": 5,
+    "lp_locked_pct": 100.0,
+    "holders": 2552,
+    "rugcheck_score": 29
+   },
+   "metrics": {
+    "turnover_1h": 2.94,
+    "buy_ratio_1h": 0.52,
+    "price_change": {
+     "m5": -3.346,
+     "m15": 4.926,
+     "m30": -18.307,
+     "h1": -32.792,
+     "h6": 158.255,
+     "h24": 158.255
+    },
+    "buyers_6h": 2392,
+    "liq_to_mcap": 0.255
+   },
+   "socials": {
+    "twitter": "https://x.com/kinfamily_"
+   },
+   "websites": [
+    "https://joinkin.family/"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/cbzkghstui4uwb5gwkuhz53vwa1vdwwoxjzbuzk7mgvq",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "2BcRevrDhP4MgCw2KyqByFZ4S7mpsi1vY8ZypXwepump",
+   "symbol": "CAREBOND",
+   "name": "Care Bond",
+   "score": 79.4,
+   "score_parts": {
+    "momentum": 10,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 10
+   },
+   "age_h": 5.5,
+   "liquidity_usd": 22026,
+   "mcap_usd": 65728,
+   "price_usd": 6.563e-05,
+   "safety": {
+    "top10_pct": 18.1,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 0,
+    "lp_locked_pct": 100.0,
+    "holders": 1500,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 1.73,
+    "buy_ratio_1h": 0.49,
+    "price_change": {
+     "m5": 0.853,
+     "m15": 4.816,
+     "m30": -12.499,
+     "h1": -19.512,
+     "h6": 31.357,
+     "h24": 31.357
+    },
+    "buyers_6h": 1506,
+    "liq_to_mcap": 0.335
+   },
+   "socials": {
+    "twitter": "https://x.com/i/communities/2029850781239697609"
+   },
+   "websites": [
+    "https://x.com/veryvanya/status/2106348403051356489?s=20"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/6mcvg9asw4zib85nfojsbbx2oyczjgeucvp96rbsb2hv",
+   "paid_boosts": 10
+  },
+  {
+   "chain": "solana",
+   "token": "FPUDkQBAMYVzbg7Rmfr83bVTUKoZ7yoGHLQZLvMvfsC7",
+   "symbol": "Milly",
+   "name": "Milly",
+   "score": 76.9,
+   "score_parts": {
+    "momentum": 15,
+    "holders": 20,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 6
+   },
+   "age_h": 2.0,
+   "liquidity_usd": 27994,
+   "mcap_usd": 93390,
+   "price_usd": 9.354e-05,
+   "safety": {
+    "top10_pct": 14.2,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 5,
+    "lp_locked_pct": 100.0,
+    "holders": 4328,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 12.85,
+    "buy_ratio_1h": 0.52,
+    "price_change": {
+     "m5": 7.908,
+     "m15": -26.85,
+     "m30": -49.639,
+     "h1": -42.32,
+     "h6": 96.425,
+     "h24": 96.425
+    },
+    "buyers_6h": 4375,
+    "liq_to_mcap": 0.3
+   },
+   "socials": {
+    "twitter": "https://x.com/patchsol/status/2106363965416595695",
+    "tiktok": "https://www.tiktok.com/@chanel_maddy/photo/7691098591959485748"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/av7vukuh3ybdrswj2sndgasqnzw1ac5cmfedhxgkpqjn",
+   "paid_boosts": 0
+  }
+ ]
+}

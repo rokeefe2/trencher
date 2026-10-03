@@ -1,0 +1,13 @@
+I'm passing on all three. All three are falling after a spike, and the track record (45% win rate, -$95 PnL) argues against forcing a pick.
+
+- **KIN:** Down 33% over the last hour and 18% over the last 30 minutes, after a +158% run. Buy ratio is 0.52, and it has 5 linked wallets and a rugcheck score of 29. That looks like a post-pump fade.
+- **CAREBOND:** Down 19% over the last hour with a buy ratio of 0.49, so sellers have the edge. It has 10 paid boosts on weak organic momentum. The only social is an X community, and the "website" is a tweet link.
+- **Milly:** Down 42% over the last hour and 50% over the last 30 minutes. Turnover is 12.85x, which points to heavy churn, and it has 5 linked wallets. It is only 2 hours old with thin socials, and the volume is easy to manipulate.
+
+```json
+{"verdicts": [
+{"token": "Bf9i7oG8We16XBtgeAnNB9rDBnmCZPW37P7b6a9Hpump", "verdict": "PASS", "reason": "Down 33% over 1h and 18% over 30m after a +158% run, with a buy ratio of only 0.52, 5 linked wallets and a rugcheck score of 29. Looks like a post-pump fade, not a steady climb."},
+{"token": "2BcRevrDhP4MgCw2KyqByFZ4S7mpsi1vY8ZypXwepump", "verdict": "PASS", "reason": "Down 19% over 1h with a buy ratio of 0.49, so sellers are in control. 10 paid boosts on weak organic momentum, and the only socials are an X community and a tweet link."},
+{"token": "FPUDkQBAMYVzbg7Rmfr83bVTUKoZ7yoGHLQZLvMvfsC7", "verdict": "PASS", "reason": "Down 42% over 1h and 50% over 30m, with 12.85x turnover that suggests churn and manipulation. It is only 2 hours old, has 5 linked wallets and has thin socials."}
+]}
+```

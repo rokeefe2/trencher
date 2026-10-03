@@ -1,0 +1,10 @@
+**Week 1 findings:**
+- Exit logic (stop-loss 40% / trailing 30% / no-move 12h) is working well: actual avg exit 0.97x vs hold-24h 0.44x vs hold-72h 0.09x. Don't touch these yet - they're the strongest part of the system.
+- Score is not monotonic: 70-79 bucket (median 24h 0.22, rug 48%) beats 80+ (median 0.03, rug 81%). Root cause hypothesis: momentum and holders components are inversely predictive at the high end (see below). Changed both weights 1.0->0.7 this week - watch if the 80+ bucket improves relative to 70-79 next week.
+- liquidity and buyer_breadth score components show identical stats (n=274 'low', n=0 'high') - suspicious, looks like they may not be computing distinct values or the split threshold is broken. Can't fix from tuning - flag to owner to check the scoring code.
+- social and survival components show no discriminating power so far (survival n=21 is borderline, worth re-checking with more data before concluding).
+- '5-min spike over 20%' entry signal shows zero separation (yes vs no nearly identical on median_24h and down40@1h) - not worth enabling even once n grows, unless the picture changes.
+- SPLIT hit 2.3x at 1h then got stopped out for a loss - no mechanism exists to lock in fast early spikes. Idea for owner: a partial take-profit rule (e.g., sell 50% if price >=2x within first hour) isn't in the current tunable list; worth building.
+- 'contract not verified' rule has the weakest rug rate of any n>=20 safety rule (45%) - watchlist for a future loosening proposal, but not yet (still blocks real rugs half the time).
+- Go-live blockers: need 13 more closed picks to hit 30, and a P&L-positive week. Entry quality (not exits) is the lever - see weight changes above.
+- Next week: check whether momentum/holders weight cuts shift the score-bucket ordering back toward monotonic and reduce stop-loss frequency without hurting win rate.
