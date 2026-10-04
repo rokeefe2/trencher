@@ -50,5 +50,6 @@
  ],
  "trail_pct": 30,
  "breakeven_x": 1.0,
- "watch_tick_s": 5
+ "watch_tick_s": 5,
+ "scan_stale_min": 22
 }

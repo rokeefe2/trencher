@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: false
 permissions:
   contents: write
+  actions: write   # lets the watcher start a scan when GitHub skips a scheduled one
 jobs:
   watch:
     runs-on: ubuntu-latest
