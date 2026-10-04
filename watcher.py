@@ -17,6 +17,11 @@ import scanner as S   # shared config + decide_exit + ntfy (scanner opens its ow
 # Seconds between price checks. Each check is one DexScreener request per chain with open picks (their limit is
 # 300/min), so 5s is ~24/min at most; the floor keeps a bad config value from hammering the API.
 TICK = max(2.0, float(S.CFG.get("watch_tick_s", 5)))
+# GitHub skips scheduled runs when it's busy (Oct 3: 39 of 96 scans ran, with gaps up to 7.5h). The watcher runs
+# around the clock, so it starts a scan itself when the data is older than this. Normal cron cadence keeps data
+# under ~20 min old, so this only fires when a scheduled run was dropped.
+SCAN_STALE = float(S.CFG.get("scan_stale_min", 22)) * 60
+KICK_COOLDOWN = 10 * 60
 
 def gh_raw(path, ref):
     req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/contents/{path}?ref={ref}",
@@ -24,6 +29,25 @@ def gh_raw(path, ref):
                                           "User-Agent": "trencher-watcher"})
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.loads(r.read())
+
+def gh_api(method, path, body=None):
+    req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/{path}", method=method,
+                                 data=json.dumps(body).encode() if body is not None else None,
+                                 headers={"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json",
+                                          "User-Agent": "trencher-watcher"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        raw = r.read()
+    return json.loads(raw) if raw else None
+
+def kick_scan(age_s):
+    """Start the scan workflow unless one is already queued or running. True if it dispatched one."""
+    for status in ("in_progress", "queued", "pending", "waiting"):
+        if gh_api("GET", f"actions/workflows/scan.yml/runs?status={status}&per_page=1").get("total_count"):
+            return False
+    # workflow_dispatch is one of the two events a GITHUB_TOKEN may trigger (needs actions: write in watch.yml)
+    gh_api("POST", "actions/workflows/scan.yml/dispatches", {"ref": os.environ.get("GITHUB_REF_NAME") or "main"})
+    S.log(f"watcher started a scan: data was {age_s / 60:.0f} min old (scheduled run skipped)")
+    return True
 
 def git(*a):
     subprocess.run(["git", "-C", EXITS, *a], check=True, capture_output=True)
@@ -46,14 +70,19 @@ def main():
     applied = set()          # (pick_id, level) / (pick_id, "close") already fired by any watcher run
     for e in events:
         applied.add((e["pick_id"], e["level"]) if e["kind"] == "ladder" else (e["pick_id"], "close"))
-    peaks, picks, last_sync, last_push, start = {}, [], 0, 0, time.time()
+    peaks, picks, last_sync, last_push, last_kick, start = {}, [], 0, 0, 0, time.time()
     S.log("watcher started")
     while time.time() - start < RUN_FOR:
         now = time.time()
         if now - last_sync > 30:   # refresh the pick list (new picks, closes applied by the scanner); ~120 API calls/hour
             try:
-                picks = [p for p in gh_raw("dashboard.json", "data").get("picks", []) if p["status"] == "open"]
+                dash = gh_raw("dashboard.json", "data")
+                picks = [p for p in dash.get("picks", []) if p["status"] == "open"]
                 last_sync = now
+                age = now - (dash.get("updated_at") or now)
+                if age > SCAN_STALE and now - last_kick > KICK_COOLDOWN:
+                    last_kick = now   # also after a failed or skipped attempt, so we don't retry every 30s
+                    print("data", round(age / 60), "min old; scan started:", kick_scan(age))
             except Exception as ex:
                 print("sync failed:", ex)
         new_events = []
