@@ -77,7 +77,7 @@ def main():
         if now - last_sync > 30:   # refresh the pick list (new picks, closes applied by the scanner); ~120 API calls/hour
             try:
                 dash = gh_raw("dashboard.json", "data")
-                picks = [p for p in dash.get("picks", []) if p["status"] == "open"]
+                picks = [p for p in dash.get("picks", []) + dash.get("controls", []) if p["status"] == "open"]   # controls trade too
                 last_sync = now
                 age = now - (dash.get("updated_at") or now)
                 if age > SCAN_STALE and now - last_kick > KICK_COOLDOWN:
@@ -102,13 +102,13 @@ def main():
                     new_events.append({"id": uuid.uuid4().hex, "t": now, "pick_id": p["id"], "kind": "ladder", "level": lvl,
                                        "price": px, "peak_price": pk})
                     lx, frac = S.CFG["ladder"][lvl]
-                    S.ntfy(f"{p['symbol']} hit {lx}x - sold {int(frac*100)}% (paper)",
+                    if p.get("kind") != "random": S.ntfy(f"{p['symbol']} hit {lx}x - sold {int(frac*100)}% (paper)",
                            f"Now {px/p['entry_price']:.2f}x. Locked in profit; the rest keeps riding.", p.get("dexscreener"), "high")
                 if close:
                     applied.add((p["id"], "close"))
                     new_events.append({"id": uuid.uuid4().hex, "t": now, "pick_id": p["id"], "kind": "close", "reason": close,
                                        "price": px, "peak_price": pk})
-                    S.ntfy(f"{p['symbol']} closed (paper): {close}", f"Exited at {px/p['entry_price']:.2f}x "
+                    if p.get("kind") != "random": S.ntfy(f"{p['symbol']} closed (paper): {close}", f"Exited at {px/p['entry_price']:.2f}x "
                            f"(peak {pk/p['entry_price']:.2f}x).", p.get("dexscreener"), "high")
         if new_events:
             with open(os.path.join(EXITS, "events.jsonl"), "a") as f:

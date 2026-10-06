@@ -277,6 +277,9 @@ details[open] > summary::before { transform: rotate(90deg); }
         <h2 style="font-size:20px;margin:24px 0 12px">Outcome by score</h2><div class="tbl" id="buckets"></div></div>
       <div><h2 style="font-size:20px;margin:0 0 12px">Which score factors predict winners?</h2><div class="tbl" id="comps"></div></div>
     </section>
+    <section class="block"><h2>Claude vs. chance</h2>
+      <p class="muted small" style="margin-top:-8px">Every time Claude buys a coin, Trencher also buys one at random from the same shortlist, with the same stake and the same sell rules. The random trades don't count toward the main P&amp;L or the daily limit and send no alerts. If chance does as well, Claude's review isn't adding value.</p>
+      <div class="tbl" id="control"></div></section>
     <section class="block"><h2>Entry signals being watched</h2>
       <p class="muted small" style="margin-top:-8px">Not used for picking yet. For coins that scored high enough to pick: did the ones showing the signal crash more often in their first hour?</p>
       <div class="tbl" id="signals"></div></section>
@@ -794,6 +797,14 @@ function renderLearning(d) {
       `<tr><td rowspan="2">${esc(k.replace("_", " "))}${c.at_max_pct != null ? `<div class="reason">${c.at_max_pct}% get full marks</div>` : ""}</td>
         <td>${c.split?.startsWith("full") ? "full marks" : "high"}</td>${outCells(c.high)}</tr><tr><td>${c.split?.startsWith("full") ? "less" : "low"}</td>${outCells(c.low)}</tr>`).join("") + "</table>"
       : '<div class="empty">Needs at least 6 scored coins with results.</div>';
+    const ctl = a.control, cp = v => v == null ? "—" : v + "%";
+    $("#control").innerHTML = !ctl ? '<div class="empty">Starts with Claude\'s next pick.</div>'
+      : `<table><tr><th></th><th class="num">Trades</th><th class="num">Total profit</th><th class="num">Avg return</th><th class="num">Winners</th><th class="num">Reached first sale</th><th class="num">Stop losses</th></tr>` +
+        [["claude", "Claude's picks"], ["random", "Random picks"]].map(([k, label]) => { const r = ctl[k];
+          return `<tr><td>${label}</td><td class="num">${r.closed}${r.open ? ` <span class="muted small">+${r.open} open</span>` : ""}</td>
+            <td class="num ${cls(r.pnl)}">${r.closed ? signed$(r.pnl) : "—"}</td><td class="num">${mult(r.avg_x)}</td><td class="num">${cp(r.win_pct)}</td>
+            <td class="num">${cp(r.reached_first_sale_pct)}</td><td class="num">${cp(r.stop_loss_pct)}</td></tr>`; }).join("") +
+        `</table><p class="muted small">Since ${when(ctl.since)}. ${Math.min(ctl.claude.closed, ctl.random.closed) < 20 ? "Too few closed trades to judge yet (aim for 20+ each)." : ""}</p>`;
     const sigs = a.entry_signals || [], pct = v => v == null ? "—" : v + "%";
     const sigCells = s => !s || !s.n_1h ? `<td class="num">0</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>`
       : `<td class="num">${s.n_1h}</td><td class="num">${pct(s.down40_1h_pct)}</td><td class="num">${pct(s.up50_1h_pct)}</td><td class="num">${s.n ? s.median_24h + "×" : "—"}</td>`;
@@ -801,7 +812,7 @@ function renderLearning(d) {
       sigs.map(g => `<tr><td rowspan="2">${esc(g.signal)}</td><td>yes</td>${sigCells(g.yes)}</tr><tr><td>no</td>${sigCells(g.no)}</tr>`).join("") + "</table>"
       : '<div class="empty">Collecting data.</div>';
   } else {
-    ["#golive", "#rules", "#stages", "#buckets", "#comps", "#signals"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data.</div>');
+    ["#golive", "#rules", "#stages", "#buckets", "#comps", "#signals", "#control"].forEach(s => $(s).innerHTML = '<div class="empty">Collecting data.</div>');
   }
   const pend = tu.pending || [];
   $("#pending").innerHTML = pend.length ? pend.map(p => `<div class="check"><b>${esc(p.key)}</b><span style="flex:1" class="muted">${p.from} → ${p.to}<div class="reason">${esc(p.reason)} (${p.evidence_n} outcomes)</div></span></div>`).join("") +
