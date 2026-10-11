@@ -1,0 +1,8 @@
+Both candidates are PASS. Zero PICKs is fine, especially given the track record: 46% win rate and -$155 on $2,850 staked.
+
+- **Tesselai** is a vertical pump. It's up about 283% in 1h and about 2,560% in 6h, with the 5m and 15m changes already negative. That's the late-entry pattern, not a steady climb. It also has 17 linked wallets and a thin story (a Twitch link and one tweet). At $87k mcap it looks like it has peaked.
+- **67cat** is only 1.5h old. Its 1h change is -13%, and a 52% 5m bounce doesn't offset that. Its buy ratio of 0.53 is below the 0.55 bar, and turnover is weak. It's a "67" meme copycat, and the website link is just an X search, so there's no real narrative.
+
+```json
+{"verdicts": [{"token": "HZL2ga4kXjZp8377B5TcWBuqvBTtxqK2KZb6mjcnpump", "verdict": "PASS", "reason": "Vertical pump (+283% 1h, +2560% 6h) with 5m/15m already turning negative, so entry would be late. 17 linked wallets and a thin Twitch/one-tweet story add to the risk."}, {"token": "9stanqrVUsQ2j7KxdEUXCN1EWes2eXi7hSQYJHRBpump", "verdict": "PASS", "reason": "Only 1.5h old, 1h change is -13%, and buy ratio of 0.53 is below the 0.55 bar. It's a generic '67' meme copycat with no real socials or narrative."}]}
+```

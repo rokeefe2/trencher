@@ -1,0 +1,103 @@
+{
+ "slots_left_today": 2,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "HZL2ga4kXjZp8377B5TcWBuqvBTtxqK2KZb6mjcnpump",
+   "symbol": "Tesselai",
+   "name": "Tesselai",
+   "score": 82.8,
+   "score_parts": {
+    "momentum": 18,
+    "holders": 12,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 10
+   },
+   "age_h": 19.9,
+   "liquidity_usd": 25065,
+   "mcap_usd": 87630,
+   "price_usd": 0.0001237,
+   "safety": {
+    "top10_pct": 25.4,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 17,
+    "lp_locked_pct": 100.0,
+    "holders": 2526,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 4.14,
+    "buy_ratio_1h": 0.6,
+    "price_change": {
+     "m5": -3.375,
+     "m15": -6.582,
+     "m30": 139.87,
+     "h1": 282.796,
+     "h6": 2559.934,
+     "h24": 78.149
+    },
+    "buyers_6h": 1436,
+    "liq_to_mcap": 0.286
+   },
+   "socials": {
+    "twitter": "https://x.com/OnchainPeasant/status/2108819132212998575"
+   },
+   "websites": [
+    "https://www.twitch.tv/tesselai"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/g9hs1hqodlccxhvbcg5ae6za7abq49p25qck4txzgduz",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "9stanqrVUsQ2j7KxdEUXCN1EWes2eXi7hSQYJHRBpump",
+   "symbol": "67cat",
+   "name": "67cat",
+   "score": 75.8,
+   "score_parts": {
+    "momentum": 15,
+    "holders": 12,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 6
+   },
+   "age_h": 1.5,
+   "liquidity_usd": 25733,
+   "mcap_usd": 59056,
+   "price_usd": 6.54e-05,
+   "safety": {
+    "top10_pct": 23.9,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 6,
+    "lp_locked_pct": 100.0,
+    "holders": 1858,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 1.31,
+    "buy_ratio_1h": 0.53,
+    "price_change": {
+     "m5": 52.68,
+     "h1": -13.09,
+     "h6": 29.31,
+     "h24": 29.31
+    },
+    "buyers_6h": 809,
+    "liq_to_mcap": 0.436
+   },
+   "socials": {
+    "twitter": "https://x.com/RealDesertDoge/status/2109107202107621624"
+   },
+   "websites": [
+    "https://x.com/search?q=2108436160964136985&src=typed_query"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/gewjcts9hw5kp7n4mkovngrjcesznttb7czmhtxbrrck",
+   "paid_boosts": 0
+  }
+ ]
+}

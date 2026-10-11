@@ -1,0 +1,480 @@
+00:01:25 base: 8 pools in window, 3 not seen in 24h
+00:01:35 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1B8A6D196e2A24F8Bf8fFcA880417a9D5DeE87Ce&chainID=8453: HTTP Error 404: Not Found
+00:01:46 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x5a7a50BDEdCc82D446E152a084de763d1848F3FB&chainID=8453: HTTP Error 404: Not Found
+00:01:56 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc5a4B9F9F77108C9Ba70130D701F0aCa78bA163F&chainID=8453: HTTP Error 404: Not Found
+00:01:57 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+00:12:14 solana: 17 pools in window, 2 not seen in 24h
+00:14:52 base: 7 pools in window, 2 not seen in 24h
+00:15:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2D8EEf80a3254A44a1Dae514bb7086686fEA9a0c&chainID=8453: HTTP Error 404: Not Found
+00:15:13 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x403E799dee5adf3d3d8b77b86729B8d6bdf44c75&chainID=8453: HTTP Error 404: Not Found
+00:15:14 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+00:31:27 solana: 15 pools in window, 3 not seen in 24h
+00:33:05 base: 7 pools in window, 3 not seen in 24h
+00:33:16 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x11cd81e76f6c0ba241748C3c61c1b5cca9e654Fd&chainID=8453: HTTP Error 404: Not Found
+00:33:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2bc3f44Ec49D0989E4aE59BE61e1C9E5A0300Fc8&chainID=8453: HTTP Error 404: Not Found
+00:33:31 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+00:54:30 solana: 17 pools in window, 2 not seen in 24h
+00:56:37 base: 4 pools in window, 0 not seen in 24h
+00:56:37 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+01:07:14 solana: 15 pools in window, 1 not seen in 24h
+01:08:50 base: 2 pools in window, 1 not seen in 24h
+01:08:51 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+01:30:11 solana: 19 pools in window, 3 not seen in 24h
+01:32:50 base: 7 pools in window, 6 not seen in 24h
+01:33:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1434779e77efc76dA33ADF859413d578aB7cE1eE&chainID=8453: HTTP Error 404: Not Found
+01:33:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2024cEfD574f205B3b959d615B96417919ec9C28&chainID=8453: HTTP Error 404: Not Found
+01:33:21 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2B1777E2e8DA55c4E30426e5d084A025C31502F0&chainID=8453: HTTP Error 404: Not Found
+01:33:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x79e218Cf6411C3B97e3a7207B19F6C2dbB438e30&chainID=8453: HTTP Error 404: Not Found
+01:33:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xE6C73fA5ac2c9A8Ca4658D1CF5AF3EAc9Bc821FC&chainID=8453: HTTP Error 404: Not Found
+01:33:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xea9E8E74515Be863a1911a9A64A3Cd1AA9aB3F6f&chainID=8453: HTTP Error 404: Not Found
+01:33:55 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+01:47:14 solana: 18 pools in window, 1 not seen in 24h
+01:49:21 base: 7 pools in window, 4 not seen in 24h
+01:49:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0967f70FE4Ac00A189AbC5a667781ADE584C2695&chainID=8453: HTTP Error 404: Not Found
+01:49:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0bA823B9Dc628219e8FE03D1463c740BB7B2b783&chainID=8453: HTTP Error 404: Not Found
+01:49:52 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xbF00646FbB3B6435c87d0eA0526Ff26c7037Dc1D&chainID=8453: HTTP Error 404: Not Found
+01:50:03 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf4f5f7657209E0886f7a31B3D1Edd8aeB9B2B431&chainID=8453: HTTP Error 404: Not Found
+01:50:04 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+02:06:30 solana: 19 pools in window, 0 not seen in 24h
+02:08:04 base: 6 pools in window, 2 not seen in 24h
+02:08:14 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0DD947d547622016D84DB9102C695692adF7333d&chainID=8453: HTTP Error 404: Not Found
+02:08:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x79084eBfB0EE527EcFFa7605da8A60BE1F7d5A0b&chainID=8453: HTTP Error 404: Not Found
+02:08:27 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+02:28:34 solana: 19 pools in window, 3 not seen in 24h
+02:30:43 base: 4 pools in window, 3 not seen in 24h
+02:30:53 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0FF231ce9721eF2Dd91223A9A76B8612F8f503CC&chainID=8453: HTTP Error 404: Not Found
+02:31:04 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x36ee01110A3e12bBFb9131c73eEfCaC9435eB758&chainID=8453: HTTP Error 404: Not Found
+02:31:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd1B7b7a02EE7C9C1D4100F86EacF2792D8593b07&chainID=8453: HTTP Error 404: Not Found
+02:31:16 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+02:44:41 solana: 21 pools in window, 2 not seen in 24h
+02:47:18 base: 6 pools in window, 3 not seen in 24h
+02:47:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0ef4EA5Be855839E289f880724b6604567A05F2A&chainID=8453: HTTP Error 404: Not Found
+02:47:40 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc3B2c1045c3E9D34EeC1e291c4d91Fd58406f189&chainID=8453: HTTP Error 404: Not Found
+02:47:51 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xfEeeb2b6AcFC71BeF3a151e95Ad017080d74fF73&chainID=8453: HTTP Error 404: Not Found
+02:47:52 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+02:59:33 solana: 21 pools in window, 0 not seen in 24h
+03:01:07 base: 6 pools in window, 0 not seen in 24h
+03:01:07 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+03:12:23 solana: 18 pools in window, 1 not seen in 24h
+03:14:59 base: 4 pools in window, 0 not seen in 24h
+03:14:59 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+03:30:25 solana: 17 pools in window, 1 not seen in 24h
+03:32:00 base: 8 pools in window, 6 not seen in 24h
+03:32:11 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x056cC1C885e2C72c805965E26Ab6D790DfC5d54e&chainID=8453: HTTP Error 404: Not Found
+03:32:22 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x15C8f8235a4Aca67b5FeA7F70D6A0f1625192F23&chainID=8453: HTTP Error 404: Not Found
+03:32:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xa1D9A4DD5391a254cEb17610cf371dfDB028EC0f&chainID=8453: HTTP Error 404: Not Found
+03:32:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC373f7b5DF00cF3311079C32f9469af88dfB62b9&chainID=8453: HTTP Error 404: Not Found
+03:32:56 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xF563A2338848ce1660067B7FD3F6Abc17F24a212&chainID=8453: HTTP Error 404: Not Found
+03:32:57 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+03:45:23 solana: 17 pools in window, 1 not seen in 24h
+03:47:28 base: 8 pools in window, 2 not seen in 24h
+03:47:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x06852B8b6B6Bb345C9f1201512caDb9fBAE6250a&chainID=8453: HTTP Error 404: Not Found
+03:47:51 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x549bB87A9463D3895eE6860CE2C88efDbA7F65BA&chainID=8453: HTTP Error 404: Not Found
+03:47:52 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+03:58:31 solana: 17 pools in window, 1 not seen in 24h
+04:00:36 base: 6 pools in window, 1 not seen in 24h
+04:00:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0Af45aFFf3aDFFb4CF2C52AACe99dcb8E0159587&chainID=8453: HTTP Error 404: Not Found
+04:00:48 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+04:10:32 solana: 18 pools in window, 1 not seen in 24h
+04:13:08 base: 5 pools in window, 1 not seen in 24h
+04:13:09 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+04:27:29 solana: 19 pools in window, 2 not seen in 24h
+04:29:07 base: 6 pools in window, 4 not seen in 24h
+04:29:17 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x25DFBF28738a96F7bCE578691bcA4476dA8301Ba&chainID=8453: HTTP Error 404: Not Found
+04:29:30 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3E06FED8BB82fC62A873477248bDA7a7955f12f1&chainID=8453: HTTP Error 404: Not Found
+04:29:32 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+04:41:21 solana: 18 pools in window, 1 not seen in 24h
+04:42:57 base: 7 pools in window, 2 not seen in 24h
+04:43:00 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+04:54:49 solana: 19 pools in window, 0 not seen in 24h
+04:56:23 base: 6 pools in window, 0 not seen in 24h
+04:56:23 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+05:07:25 solana: 16 pools in window, 0 not seen in 24h
+05:09:59 base: 6 pools in window, 5 not seen in 24h
+05:10:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x05104AABfbF01cb19217507Ae8C38e1A00985Fd2&chainID=8453: HTTP Error 404: Not Found
+05:10:19 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x11EFefBBDd12C87Af35114153E1C9F220c308f93&chainID=8453: HTTP Error 404: Not Found
+05:10:30 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x31A4d27b4233eDE65e8d113BE17739edC8e69722&chainID=8453: HTTP Error 404: Not Found
+05:10:41 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x4B63d925754df454E86aBfC3c309ED37813E0a4C&chainID=8453: HTTP Error 404: Not Found
+05:10:52 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xF1DB166817028E2861E8c26be76d58c7E8D4Ecf8&chainID=8453: HTTP Error 404: Not Found
+05:10:53 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+05:34:23 solana: 17 pools in window, 1 not seen in 24h
+05:35:58 base: 4 pools in window, 2 not seen in 24h
+05:36:08 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x02B5E3A4119b5eb43B2C58f5d4075909759602C0&chainID=8453: HTTP Error 404: Not Found
+05:36:11 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+05:37:22 solana: 16 pools in window, 0 not seen in 24h
+05:39:26 base: 2 pools in window, 0 not seen in 24h
+05:39:26 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+06:02:22 solana: 16 pools in window, 2 not seen in 24h
+06:04:29 base: 4 pools in window, 2 not seen in 24h
+06:04:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0f0Ac650cB6812819E6C6b1C00A2c014E3E359c2&chainID=8453: HTTP Error 404: Not Found
+06:04:50 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3ac264d2B43d7fA79AF82dFD2D1E5316167230B5&chainID=8453: HTTP Error 404: Not Found
+06:04:51 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+06:27:57 solana: 23 pools in window, 8 not seen in 24h
+06:29:20 base: 12 pools in window, 10 not seen in 24h
+06:29:30 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x12682A26de578E93deeCF83971fB7d2Ef2e7a941&chainID=8453: HTTP Error 404: Not Found
+06:29:41 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x148F273e90dec804f4e0A1A2e3A2c7EcbC52aBAC&chainID=8453: HTTP Error 404: Not Found
+06:29:52 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1816C95B355CAc00E481653F16a4B0Ce44B8fAFc&chainID=8453: HTTP Error 404: Not Found
+06:30:05 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x53a022a12f0bf0eC463f017Bb39B77ABfD919B1c&chainID=8453: HTTP Error 404: Not Found
+06:30:18 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7b19b9E406FD544f24edbFbDdF7982A0973b0AB7&chainID=8453: HTTP Error 404: Not Found
+06:30:29 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x980395F781f8738F938E2e632B368564a4A34798&chainID=8453: HTTP Error 404: Not Found
+06:30:40 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xb01380a5DECfb18270445dF77E1295486b096603&chainID=8453: HTTP Error 404: Not Found
+06:30:43 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+06:31:41 solana: 21 pools in window, 0 not seen in 24h
+06:34:19 base: 3 pools in window, 1 not seen in 24h
+06:34:29 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3dD163921Fe29CC8E1EC081eE796299326B28feC&chainID=8453: HTTP Error 404: Not Found
+06:34:30 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+06:45:32 solana: 24 pools in window, 4 not seen in 24h
+06:47:43 base: 9 pools in window, 8 not seen in 24h
+06:47:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x27594F6b28A86a18BEF985551Af28Adda48571C9&chainID=8453: HTTP Error 404: Not Found
+06:48:04 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2b373936cd8f9eAe669E993E487bDA527f6410Ae&chainID=8453: HTTP Error 404: Not Found
+06:48:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x320910BBEb623D8fCd432e40Eb3d5DA699Adb811&chainID=8453: HTTP Error 404: Not Found
+06:48:27 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x488c2755f65291460c627275035F918e70291B07&chainID=8453: HTTP Error 404: Not Found
+06:48:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x80E81509DF28e116a65Eb58e7676865992E0B446&chainID=8453: HTTP Error 404: Not Found
+06:48:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xBC4aE62471Bc9582e2baaC7a29D13c12da0E5C60&chainID=8453: HTTP Error 404: Not Found
+06:48:59 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xEe261130C2514b4DBb2B6400667B935288BBB07a&chainID=8453: HTTP Error 404: Not Found
+06:49:00 scan done: 3 scored >= 60, 2 pick slots left, sending 3 to review
+06:49:12 PICK GOMOCAT F6DPzjeqR75mqVLZVAACtD4JSUM2oJKqL7DKtwt1pump @ 0.000434
+06:59:33 solana: 24 pools in window, 1 not seen in 24h
+07:00:40 base: 4 pools in window, 3 not seen in 24h
+07:00:50 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x51028f05b5438Fd54653EE46e3e3aCb56428Efc5&chainID=8453: HTTP Error 404: Not Found
+07:01:03 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6C54EF7508DE5D01897FCfa9392055392db6273f&chainID=8453: HTTP Error 404: Not Found
+07:01:04 scan done: 0 scored >= 60, 1 pick slots left, sending 0 to review
+07:13:21 GET failed https://api.dexscreener.com/tokens/v1/solana/EFF9HZqrN5p7gTB8MjKKnaup4ptpaWSePQCcWhP66zzu,EHZF3dZmgRyLbe6cXYnor4nH94pkRgE9CNntxcinpump,F6EDRhRzXGmkBabhSHdAnqx26XLhG6NCa83wwuqFpump,FeAWY9L9hr82TvTuEyi328V9FP7GxVuGLx7xNg6kzWVa,GVFofLXFQ2WkjrMuBavEi6jgbJb7rqNLhqRpFXTopump,GZ9nrSjVVx7ggjgnc3c566UsoSsugSbDewiqfqBhkekJ,GkJcDzFqrBt6NjvsndGPPYPWtfBZRr1hj1h11bp2pump,H9pPKejchJ9LCWpb1P8p4BmrjzCFARUmA7XtJK4pVhCZ,HANUR9TrUDaBKWufPNKdAEfZ1PBUq44RcUKCNniLpump,czqfPyT7FEn8w78TArpZKehfg3TLyGmueJu8rdGpump,hjZLsNgC45ay8h3zNRrkiyrEwKJj5ryJ7SWmD8796uz,https://dexscreener.com/solana/6NSvJoFdUiskaQ6jcXgeTECci2gn243m9yM5hyNffm6t: HTTP Error 404: Not Found
+07:13:21 solana: 19 pools in window, 1 not seen in 24h
+07:14:26 base: 6 pools in window, 5 not seen in 24h
+07:14:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3D4C78C944300C0bdCc23f268258Bb69E2A09462&chainID=8453: HTTP Error 404: Not Found
+07:14:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7B5221FBBAbC04F4202dd3a8C5d6905E43C950C5&chainID=8453: HTTP Error 404: Not Found
+07:14:59 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x95d18D2AAd5c041bAEfd60C0BcC8129d78fc0E75&chainID=8453: HTTP Error 404: Not Found
+07:15:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf338C978c5e5417aBeF0D90141Fd9B17100EeAC5&chainID=8453: HTTP Error 404: Not Found
+07:15:21 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xfE15a26051dBBb96591217B3B2038ff71CD0D03C&chainID=8453: HTTP Error 404: Not Found
+07:15:22 scan done: 1 scored >= 60, 1 pick slots left, sending 1 to review
+07:31:36 GET failed https://api.dexscreener.com/tokens/v1/solana/EFF9HZqrN5p7gTB8MjKKnaup4ptpaWSePQCcWhP66zzu,EYGattNCJ32P7PjTb1nJBHozsE7X5sho9tQSyu2Mpump,EnXgLwQ8JhZokjoo53jcVowHeGa2tNxb94pueSh4pump,EzeTaUgHSE7iCc6mzHcFctt3UCJn3yVqzXPqpq7ipump,F4t8dh8uUs22aiUJriavfG1ZpsSq97LqLJYrzPbxpump,F6EDRhRzXGmkBabhSHdAnqx26XLhG6NCa83wwuqFpump,F6h6za43GmME3jJ5ccSGkivk8XKb29ZhrR93NNHuFeS2,F7urpadiibgCWCJwr3yX9QousEiEK3vze5XUikCSpump,FR2fpPR6tof4MbyfKUu9ghYq1HDqhmrPnGutfKtCg3xk,FUxswvLyu56SXzZNnjTcvBEhvdE1txbfepttePw9dCZ2,FbiZknTew5dVhZUdPhZUXhcWPKR8EPR2aqCkySFgdoom,FeAWY9L9hr82TvTuEyi328V9FP7GxVuGLx7xNg6kzWVa,GkJcDzFqrBt6NjvsndGPPYPWtfBZRr1hj1h11bp2pump,GoyKjBfikVsNfR5iMfjGFfVKrcRzQXgiX5pqLMLdta9M,H9pPKejchJ9LCWpb1P8p4BmrjzCFARUmA7XtJK4pVhCZ,HANUR9TrUDaBKWufPNKdAEfZ1PBUq44RcUKCNniLpump,LVc6hA5iAYcsn15sRGqJrrEWJMfUHxig4LbTtEZpump,PRAv9Uv4JGff9nra74tLaoHVtQB51Tt3apLRTrRpump,Qr76Vfu4iEiddAq2aVeKwNUwNrrrexVXoLJsu57pump,czqfPyT7FEn8w78TArpZKehfg3TLyGmueJu8rdGpump,https://dexscreener.com/solana/6NSvJoFdUiskaQ6jcXgeTECci2gn243m9yM5hyNffm6t,jN1D39nzgqYRFMzJauEDGyBM5EaJnAsXk8GuxNGaopa,nxTFfdkDXYWKW2NSNyg5XPeGW4WP8tLJaiGNFRBpump,yLR6XZ8sbw7kSg1gqEyQzT1fvWnrSMkvZoVK4okpump: HTTP Error 404: Not Found
+07:31:36 solana: 20 pools in window, 2 not seen in 24h
+07:33:46 base: 5 pools in window, 4 not seen in 24h
+07:33:56 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x270FB4cDa1F97Ac72FC6F50ab5F1aB9958a4CB07&chainID=8453: HTTP Error 404: Not Found
+07:34:08 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xB719D01486C5978a25ed766F7536C4C2c8350Ca5&chainID=8453: HTTP Error 404: Not Found
+07:34:19 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe2796133ADeab41eBD2a0f48f5aBd9f0c2d7dC07&chainID=8453: HTTP Error 404: Not Found
+07:34:20 scan done: 0 scored >= 60, 1 pick slots left, sending 0 to review
+07:55:28 solana: 21 pools in window, 5 not seen in 24h
+07:57:10 base: 8 pools in window, 7 not seen in 24h
+07:57:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x453Aa4aFbBA160A79A734f20D76224C3390042Eb&chainID=8453: HTTP Error 404: Not Found
+07:57:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x464F74D228335FfEcB37F4d242afF8386995Bb77&chainID=8453: HTTP Error 404: Not Found
+07:57:41 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x49A955da77e06741F9A1486CF2148Dbc42002dCb&chainID=8453: HTTP Error 404: Not Found
+07:57:55 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe01eCDe8084f721799fb08C308C68BEB57650DCe&chainID=8453: HTTP Error 404: Not Found
+07:58:05 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xEFd76A5570E73370A4E97A8995AEd01CE5C10E87&chainID=8453: HTTP Error 404: Not Found
+07:58:06 scan done: 1 scored >= 60, 1 pick slots left, sending 1 to review
+08:38:32 solana: 21 pools in window, 3 not seen in 24h
+08:40:44 base: 15 pools in window, 13 not seen in 24h
+08:40:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x15Ab5184a6FD56192bb17db73b14bb28ede84a67&chainID=8453: HTTP Error 404: Not Found
+08:41:06 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x572Db9d53FD2955f3f305A3Ea130Ce1b4A17eB07&chainID=8453: HTTP Error 404: Not Found
+08:41:16 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x62BE6859c9d978E71bB708817d5f907a61D3Db07&chainID=8453: HTTP Error 404: Not Found
+08:41:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x65e1F027A51Cd1a172F2c46B910B6E90B24dbeB9&chainID=8453: HTTP Error 404: Not Found
+08:41:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x95F93eAe069994693D318484fE40fcd54dBc5869&chainID=8453: HTTP Error 404: Not Found
+08:41:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xBd04f50cEC0b4e82d00BE7803B11B3fAb55aFee1&chainID=8453: HTTP Error 404: Not Found
+08:42:06 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xea877196a5f4E1b39dBAA9460E8D96ad891d3cfB&chainID=8453: HTTP Error 404: Not Found
+08:42:07 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+08:59:02 solana: 19 pools in window, 0 not seen in 24h
+09:00:06 base: 7 pools in window, 5 not seen in 24h
+09:00:17 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1695E53A7FdD30648E1bc3186342a55644076cD4&chainID=8453: HTTP Error 404: Not Found
+09:00:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x61B42aBF176165Df54Ad8f375fA7D0EA0786850F&chainID=8453: HTTP Error 404: Not Found
+09:00:33 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+09:14:36 solana: 17 pools in window, 1 not seen in 24h
+09:16:12 base: 6 pools in window, 3 not seen in 24h
+09:16:22 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1FaFD31BDD40A3A85Ca11B246ABFAFe166CEde06&chainID=8453: HTTP Error 404: Not Found
+09:16:33 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x64c5FcAcE808aAb9a29231eD357C3e25eF67971A&chainID=8453: HTTP Error 404: Not Found
+09:16:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd492bAD7d12c8fA3897D3648058096d2ebAC6d18&chainID=8453: HTTP Error 404: Not Found
+09:16:46 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+09:34:17 solana: 18 pools in window, 0 not seen in 24h
+09:36:52 base: 8 pools in window, 6 not seen in 24h
+09:37:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1Bb9C38Bf9C6B1CF6b6a6648BB1A7c6DE8FbAAa4&chainID=8453: HTTP Error 404: Not Found
+09:37:13 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x37Ab3399A0075aC88a688A25E78d03e4BEB5C4b1&chainID=8453: HTTP Error 404: Not Found
+09:37:25 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x59Dda3e903A1682f719fd259c517aB07Fd17F99D&chainID=8453: HTTP Error 404: Not Found
+09:37:36 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7cF5CAbd2160171d3078B808a0e36277F0513521&chainID=8453: HTTP Error 404: Not Found
+09:37:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xbDDC4543Ce1719594a6E07c2e349b57238053DE2&chainID=8453: HTTP Error 404: Not Found
+09:37:48 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+10:03:07 LADDER GOMOCAT: sold 30% at level 1
+10:04:21 solana: 17 pools in window, 1 not seen in 24h
+10:06:27 base: 10 pools in window, 7 not seen in 24h
+10:06:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x00A6e8E41e41b93d473F84A65587b62B03D0F17e&chainID=8453: HTTP Error 404: Not Found
+10:06:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x02F2e95d6D55983012f6Dadc6C0b074c45376a21&chainID=8453: HTTP Error 404: Not Found
+10:06:59 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x08BA7bE96eeb398284cD46279ebb91F0Ab7007ac&chainID=8453: HTTP Error 404: Not Found
+10:07:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x71a35F16274f75E0F36C5473A0F3f25dD9fA8b07&chainID=8453: HTTP Error 404: Not Found
+10:07:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xaa46D5048401D7349d3382559D589061f766C157&chainID=8453: HTTP Error 404: Not Found
+10:07:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xD98aceE13EF1d55f886F7eF204c04e5B0D923196&chainID=8453: HTTP Error 404: Not Found
+10:07:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf9cDf67Dd3dde76a72F37cE4F0A27325Ba25F4D9&chainID=8453: HTTP Error 404: Not Found
+10:07:43 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+10:28:29 solana: 17 pools in window, 2 not seen in 24h
+10:31:07 base: 12 pools in window, 11 not seen in 24h
+10:31:17 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf9cdf67dd3dde76a72f37ce4f0a27325ba25f4d9&chainID=8453: HTTP Error 404: Not Found
+10:31:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc5c3ed6117eada5430458d2b21095089ad11bba3&chainID=8453: HTTP Error 404: Not Found
+10:31:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0C4fe67511F484189450cD08de52EfA17cbaeEEC&chainID=8453: HTTP Error 404: Not Found
+10:31:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x4017BE9BcBD9dce47137101D312fA5b8Aa1Ca3C8&chainID=8453: HTTP Error 404: Not Found
+10:32:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x44fC3E67B504bE85eB280107812037b0b03f0E13&chainID=8453: HTTP Error 404: Not Found
+10:32:11 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x4b0161A4d1DDa3821A544209ce3bE15e766e2B07&chainID=8453: HTTP Error 404: Not Found
+10:32:22 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x60686975F7578F070B254EF95C78f27bEA29cB07&chainID=8453: HTTP Error 404: Not Found
+10:32:33 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x757acB56d16A7dCc6E5Fce565463CFeB0430c9c6&chainID=8453: HTTP Error 404: Not Found
+10:32:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xF0c2d8FB40e858FCf7653912665D727fCd073B07&chainID=8453: HTTP Error 404: Not Found
+10:32:48 scan done: 2 scored >= 60, 2 pick slots left, sending 2 to review
+10:43:30 solana: 19 pools in window, 2 not seen in 24h
+10:44:38 base: 7 pools in window, 5 not seen in 24h
+10:44:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0Bd9f9c5949179f2cB758dF79B761305274F1FB5&chainID=8453: HTTP Error 404: Not Found
+10:45:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8cfEb7fDF2B2941B8a74a37A1BBC32998A6A7b07&chainID=8453: HTTP Error 404: Not Found
+10:45:11 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x90712A79CC446242f2ec80e87b47FB83A30F3beB&chainID=8453: HTTP Error 404: Not Found
+10:45:22 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC5c3ed6117eADa5430458D2B21095089AD11bbA3&chainID=8453: HTTP Error 404: Not Found
+10:45:33 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xCc397b14B796573030d60aEEb20f9FE974803520&chainID=8453: HTTP Error 404: Not Found
+10:45:34 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+10:56:26 CLOSE GOMOCAT: trailing stop
+10:57:09 solana: 19 pools in window, 0 not seen in 24h
+10:59:13 base: 5 pools in window, 4 not seen in 24h
+10:59:23 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2efa842E7b5066C95d58fe88F5d4730e699f7488&chainID=8453: HTTP Error 404: Not Found
+10:59:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x5B3e91CdD2d9842d703607C9B22a9DB8327f2B07&chainID=8453: HTTP Error 404: Not Found
+10:59:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xB56Ce75fE9ca3495fBB130DcEf66b0bA8219Db07&chainID=8453: HTTP Error 404: Not Found
+10:59:56 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xEB5EeDA4D20B492475a5140B36206233636dfb07&chainID=8453: HTTP Error 404: Not Found
+10:59:57 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+11:09:23 solana: 17 pools in window, 1 not seen in 24h
+11:11:28 base: 5 pools in window, 3 not seen in 24h
+11:11:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0d19CA9fec1813eF69D92dc3FAc47Ede22fD3857&chainID=8453: HTTP Error 404: Not Found
+11:11:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x589F98b8CdeC53DB759E80F512A2f26C85c2683F&chainID=8453: HTTP Error 404: Not Found
+11:12:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x98CE024e3F3e248f3DD02B1cBf0D0eE8381Cc5d9&chainID=8453: HTTP Error 404: Not Found
+11:12:01 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+11:31:11 solana: 17 pools in window, 1 not seen in 24h
+11:32:47 base: 7 pools in window, 5 not seen in 24h
+11:32:59 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2E790a66dc040E12467C6590d7dA9730c802d944&chainID=8453: HTTP Error 404: Not Found
+11:33:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x66b20ec1816b3D7A58F038fb1ee4BE9b387F493d&chainID=8453: HTTP Error 404: Not Found
+11:33:21 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7109ec88022e9E906e628371C188d7f5B1FaADdc&chainID=8453: HTTP Error 404: Not Found
+11:33:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8D04208BBe85D088a2ADbE95208348FCd57D8bDf&chainID=8453: HTTP Error 404: Not Found
+11:33:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf326BC5946a96AD5ce17341E5Be09A970B8F4C70&chainID=8453: HTTP Error 404: Not Found
+11:33:44 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+11:58:26 solana: 18 pools in window, 1 not seen in 24h
+12:00:32 base: 6 pools in window, 5 not seen in 24h
+12:00:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1452f6fDaE7A903c79400d33Ece817FC7B55aD46&chainID=8453: HTTP Error 404: Not Found
+12:00:53 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1752125f1Cf5A8AAD35165016E996C6Ee8FEBbed&chainID=8453: HTTP Error 404: Not Found
+12:01:04 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1b1E57abd6c03Dc5BEE0DFd4b8e058abb81DBB0E&chainID=8453: HTTP Error 404: Not Found
+12:01:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1dec43390a185923F4DA5cDeB6B96b8441020a41&chainID=8453: HTTP Error 404: Not Found
+12:01:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xfa7E031d6B08919Ed0C23baFE0FDa3cc9d937517&chainID=8453: HTTP Error 404: Not Found
+12:01:27 scan done: 1 scored >= 60, 2 pick slots left, sending 1 to review
+12:11:23 solana: 19 pools in window, 1 not seen in 24h
+12:13:30 base: 2 pools in window, 1 not seen in 24h
+12:13:40 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3d115b4b38D8D0D1c4284fA4f6a7030D74d3793a&chainID=8453: HTTP Error 404: Not Found
+12:13:41 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+12:28:30 solana: 17 pools in window, 2 not seen in 24h
+12:30:08 base: 7 pools in window, 6 not seen in 24h
+12:30:21 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7E2e1cB83e3254B6E8610d5dc62a769b1Abc636F&chainID=8453: HTTP Error 404: Not Found
+12:30:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xD7677E8C9F0Ad1A5773ed5c39E1B8DEB6b7CeB07&chainID=8453: HTTP Error 404: Not Found
+12:30:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xfb0A13C7447BdBE9d2C533f0BeAE979050B596B9&chainID=8453: HTTP Error 404: Not Found
+12:30:46 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+12:41:26 solana: 18 pools in window, 2 not seen in 24h
+12:42:34 base: 3 pools in window, 2 not seen in 24h
+12:42:44 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x343Ee5d502557063CD7cBe719dfC4EbA882d0FCb&chainID=8453: HTTP Error 404: Not Found
+12:42:55 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x66487b461407bBbED344AC3307C7Df10B4ddb599&chainID=8453: HTTP Error 404: Not Found
+12:42:56 scan done: 0 scored >= 60, 2 pick slots left, sending 0 to review
+12:52:40 solana: 17 pools in window, 0 not seen in 24h
+12:55:16 base: 2 pools in window, 1 not seen in 24h
+12:55:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2Bcaa3aBCC8A583Ee7aF2519e6f759BF58f5f6ED&chainID=8453: HTTP Error 404: Not Found
+12:55:27 scan done: 0 scored >= 60, 3 pick slots left, sending 0 to review
+13:04:24 solana: 14 pools in window, 1 not seen in 24h
+13:07:01 base: 0 pools in window, 0 not seen in 24h
+13:07:01 scan done: 0 scored >= 60, 3 pick slots left, sending 0 to review
+13:27:31 solana: 16 pools in window, 3 not seen in 24h
+13:30:10 base: 0 pools in window, 0 not seen in 24h
+13:30:10 scan done: 1 scored >= 60, 3 pick slots left, sending 1 to review
+13:41:37 solana: 15 pools in window, 1 not seen in 24h
+13:44:12 base: 0 pools in window, 0 not seen in 24h
+13:44:12 scan done: 1 scored >= 60, 3 pick slots left, sending 1 to review
+13:54:45 solana: 12 pools in window, 1 not seen in 24h
+13:56:50 base: 0 pools in window, 0 not seen in 24h
+13:56:50 scan done: 1 scored >= 60, 3 pick slots left, sending 1 to review
+14:05:21 solana: 14 pools in window, 1 not seen in 24h
+14:06:57 base: 4 pools in window, 3 not seen in 24h
+14:07:07 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1528CA3224EeB8D2A390E6d6F25eb2052DB653b3&chainID=8453: HTTP Error 404: Not Found
+14:07:18 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x655EDA4e4CAe4EF347766b7d0914E4579b3d33DB&chainID=8453: HTTP Error 404: Not Found
+14:07:29 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xb55410DdaAA82BA92eD9BD440b0c1BfBf8c21656&chainID=8453: HTTP Error 404: Not Found
+14:07:30 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+14:27:03 solana: 13 pools in window, 1 not seen in 24h
+14:28:10 base: 6 pools in window, 6 not seen in 24h
+14:28:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0A38f030Ed8420fB275F4d6Ba35414761b97C3Dd&chainID=8453: HTTP Error 404: Not Found
+14:28:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x11bA28068B831C1972802742e10C425F22745F59&chainID=8453: HTTP Error 404: Not Found
+14:28:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1883F7e1D56F1b56ef3704b876159A968a56E552&chainID=8453: HTTP Error 404: Not Found
+14:28:53 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x572107326A4Fd40959721C5d79bfDCe3D649Bb07&chainID=8453: HTTP Error 404: Not Found
+14:29:04 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x70Dd5eCF8bDe0D3731Fc744Be1b81f8d27acF656&chainID=8453: HTTP Error 404: Not Found
+14:29:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc7F0c9182a4644B4A4D534eAe58f4d467D18Da47&chainID=8453: HTTP Error 404: Not Found
+14:29:16 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+14:41:41 solana: 15 pools in window, 3 not seen in 24h
+14:44:21 base: 4 pools in window, 4 not seen in 24h
+14:44:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x077af3983FA178c8EEB30d7f8ee6eD5E0A82146b&chainID=8453: HTTP Error 404: Not Found
+14:44:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x313c9B2DA6bD365fb8DB3036271B4a56cC82c416&chainID=8453: HTTP Error 404: Not Found
+14:44:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3602C8AB16F852Ef26c075c8F5e53883314dCb2a&chainID=8453: HTTP Error 404: Not Found
+14:44:56 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+14:55:12 solana: 16 pools in window, 0 not seen in 24h
+14:57:16 base: 3 pools in window, 2 not seen in 24h
+14:57:27 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0f2278422AF1aEEdca33ebFf27d6f380165C660D&chainID=8453: HTTP Error 404: Not Found
+14:57:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x29f18a24e31A207bdc1E7f4c9FfaF854F9034e73&chainID=8453: HTTP Error 404: Not Found
+14:57:38 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+15:04:34 solana: 18 pools in window, 3 not seen in 24h
+15:06:43 base: 1 pools in window, 0 not seen in 24h
+15:06:43 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+15:24:30 solana: 19 pools in window, 4 not seen in 24h
+15:26:12 base: 1 pools in window, 1 not seen in 24h
+15:26:23 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xE81Fb380F3502588c725A1B2b33361034e01D243&chainID=8453: HTTP Error 404: Not Found
+15:26:24 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+15:39:33 solana: 17 pools in window, 1 not seen in 24h
+15:41:10 base: 3 pools in window, 3 not seen in 24h
+15:41:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1A45b156A27B95D58aA045780baA2891e1441C18&chainID=8453: HTTP Error 404: Not Found
+15:41:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x467de0D02D5B4f60967F459869E559Bb21B83d27&chainID=8453: HTTP Error 404: Not Found
+15:41:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8101749e079dDbAec7a72cF1f48aeA0927060813&chainID=8453: HTTP Error 404: Not Found
+15:41:43 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+15:53:31 solana: 18 pools in window, 0 not seen in 24h
+15:55:05 base: 4 pools in window, 2 not seen in 24h
+15:55:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0F9B8f978850CCA164128C1eaC2B2e2cA850C503&chainID=8453: HTTP Error 404: Not Found
+15:55:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x38F737Aed06bfCC71B9BCBb9F60240e959448312&chainID=8453: HTTP Error 404: Not Found
+15:55:27 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+16:03:26 solana: 21 pools in window, 2 not seen in 24h
+16:06:03 base: 5 pools in window, 2 not seen in 24h
+16:06:13 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3ff1C9f4A89612Ce4D676B97f64891951171FF85&chainID=8453: HTTP Error 404: Not Found
+16:06:24 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xdE9aE91bE81e13ec8BC1b22c29873C11007B37f0&chainID=8453: HTTP Error 404: Not Found
+16:06:25 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+16:23:32 solana: 18 pools in window, 0 not seen in 24h
+16:25:06 base: 3 pools in window, 2 not seen in 24h
+16:25:16 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0Cb901FCB6D99693908aF2c0BEccd04e78E1f230&chainID=8453: HTTP Error 404: Not Found
+16:25:27 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6221E2637A7510e5419BC2f5D1521E4E78A3964e&chainID=8453: HTTP Error 404: Not Found
+16:25:28 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+16:37:36 solana: 18 pools in window, 2 not seen in 24h
+16:40:13 base: 3 pools in window, 2 not seen in 24h
+16:40:23 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x50B80F9274CBAfe96e6C78645e3a7D89fF6972A8&chainID=8453: HTTP Error 404: Not Found
+16:40:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC472e7923F1d52406b611cE69104f835efd3c619&chainID=8453: HTTP Error 404: Not Found
+16:40:35 scan done: 2 scored >= 60, 4 pick slots left, sending 2 to review
+16:51:41 solana: 16 pools in window, 0 not seen in 24h
+16:54:16 base: 4 pools in window, 2 not seen in 24h
+16:54:27 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x4514ABA71eB6Fe0135556268CC828943F55F4e85&chainID=8453: HTTP Error 404: Not Found
+16:54:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xaFa6B4d2d5671b70e5409Dc8A0241568aaA4dC3d&chainID=8453: HTTP Error 404: Not Found
+16:54:38 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+17:04:44 solana: 17 pools in window, 1 not seen in 24h
+17:06:57 base: 2 pools in window, 2 not seen in 24h
+17:07:08 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2B2Cf62458288fF6587c4963620937524CA96dC4&chainID=8453: HTTP Error 404: Not Found
+17:07:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3CBeaC82A5d30001b9378670458296415c992c5f&chainID=8453: HTTP Error 404: Not Found
+17:07:21 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+17:36:26 solana: 20 pools in window, 3 not seen in 24h
+17:38:04 base: 1 pools in window, 1 not seen in 24h
+17:38:14 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc3b05232D728172897c21916fedC8c387fe28CAF&chainID=8453: HTTP Error 404: Not Found
+17:38:15 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+18:01:31 solana: 20 pools in window, 2 not seen in 24h
+18:04:08 base: 3 pools in window, 3 not seen in 24h
+18:04:18 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x194a277a4D4917F823fa741a8225E8f34b4a99C0&chainID=8453: HTTP Error 404: Not Found
+18:04:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x22aC5dd228FEb47Da72CC6b2Ce03108A421679f0&chainID=8453: HTTP Error 404: Not Found
+18:04:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xdCD89341D243741640026e085D12d9a0110aDB07&chainID=8453: HTTP Error 404: Not Found
+18:04:40 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+18:27:01 solana: 22 pools in window, 3 not seen in 24h
+18:29:10 base: 8 pools in window, 8 not seen in 24h
+18:29:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0E3cA052349c06c5B777a899b895b5b14244D2C8&chainID=8453: HTTP Error 404: Not Found
+18:29:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2916f5d2BFd62DE4C54827DFb6623f8B00FE81cb&chainID=8453: HTTP Error 404: Not Found
+18:29:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x41185b1babaF3780bbbF0B16F8BCb531378F6D78&chainID=8453: HTTP Error 404: Not Found
+18:29:56 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x87209193c42A10abA6FF08f17d2c619C4D0D35b0&chainID=8453: HTTP Error 404: Not Found
+18:30:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xD7cEc019cef7DCAeD4DA2163B71e50af3abDab50&chainID=8453: HTTP Error 404: Not Found
+18:30:10 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+18:42:17 solana: 21 pools in window, 2 not seen in 24h
+18:44:24 base: 11 pools in window, 8 not seen in 24h
+18:44:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0241181E8b15466d75B8665Ee7a17B786848117E&chainID=8453: HTTP Error 404: Not Found
+18:44:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1354C6585906b9f2E4E2b435FDe39A5B9cAC17D0&chainID=8453: HTTP Error 404: Not Found
+18:44:57 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6F53250Be608446181bf324118ED692D56FC31aA&chainID=8453: HTTP Error 404: Not Found
+18:45:11 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC265117242e25ceec7825E740C5614e2eBd7bFCF&chainID=8453: HTTP Error 404: Not Found
+18:45:13 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+18:56:13 solana: 20 pools in window, 0 not seen in 24h
+18:58:17 base: 12 pools in window, 5 not seen in 24h
+18:58:27 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x119F55AAE85167bB90d3a074FAa34E8036dc520c&chainID=8453: HTTP Error 404: Not Found
+18:58:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x37720814655d3b7330396ee1a8245fC8E99B4D18&chainID=8453: HTTP Error 404: Not Found
+18:58:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x5aa0aD7abDCb45B09f95BFbAEf9b37f5FFA7550c&chainID=8453: HTTP Error 404: Not Found
+18:58:59 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xaB11eF1D0faAc1d7858ca44a9E42Bf0159CEa34E&chainID=8453: HTTP Error 404: Not Found
+18:59:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC26118afDaA2898A3DCaF52454CBcF330adcb893&chainID=8453: HTTP Error 404: Not Found
+18:59:11 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+19:06:21 solana: 23 pools in window, 4 not seen in 24h
+19:08:31 base: 7 pools in window, 1 not seen in 24h
+19:08:42 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x694a2931Eb05326A3f11b9AA33B04797D7A744aC&chainID=8453: HTTP Error 404: Not Found
+19:08:43 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+19:25:21 solana: 18 pools in window, 1 not seen in 24h
+19:27:57 base: 6 pools in window, 4 not seen in 24h
+19:28:07 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x29c609cf56a38d0a789061608b63d1f69b1041e8&chainID=8453: HTTP Error 404: Not Found
+19:28:17 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2E7396b722b636E004DBcbD974EeFb649a8E9B14&chainID=8453: HTTP Error 404: Not Found
+19:28:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7B37E7F72e6D2781aB0d4F13D19c4ddFCa2ba7E4&chainID=8453: HTTP Error 404: Not Found
+19:28:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xeA936e62d8d85e93446F245fF1D66A8CFEF60270&chainID=8453: HTTP Error 404: Not Found
+19:28:40 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+19:39:10 solana: 17 pools in window, 1 not seen in 24h
+19:41:16 base: 4 pools in window, 2 not seen in 24h
+19:41:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x40bb15D164E8Bf69583fcdaC73055247dE3d9308&chainID=8453: HTTP Error 404: Not Found
+19:41:29 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+19:54:36 solana: 17 pools in window, 0 not seen in 24h
+19:56:11 base: 0 pools in window, 0 not seen in 24h
+19:56:11 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+20:05:30 solana: 22 pools in window, 6 not seen in 24h
+20:07:45 base: 0 pools in window, 0 not seen in 24h
+20:07:45 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+20:27:37 solana: 20 pools in window, 3 not seen in 24h
+20:29:16 base: 6 pools in window, 6 not seen in 24h
+20:29:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x124075e9cc24F941242278283f0Ca227950059bB&chainID=8453: HTTP Error 404: Not Found
+20:29:36 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x4114E7377bEea5Aab4734bcf59C73895dEc42ED5&chainID=8453: HTTP Error 404: Not Found
+20:29:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8366BaE1a4188f32Cd5733c12d9F2e1C369b09c4&chainID=8453: HTTP Error 404: Not Found
+20:29:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xBD8b38fEd97e7dbeF4e38649E7cBC4ef783D0D7C&chainID=8453: HTTP Error 404: Not Found
+20:30:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc6A3384414E001ABF0591E2EDd8dA647DCaD82c5&chainID=8453: HTTP Error 404: Not Found
+20:30:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xcabBedBDA85f2c74E3cc215fe58E06cf13DafB71&chainID=8453: HTTP Error 404: Not Found
+20:30:21 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+20:44:19 solana: 23 pools in window, 4 not seen in 24h
+20:46:28 base: 6 pools in window, 6 not seen in 24h
+20:46:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3aB9f2d73b25d93dfa68add5300A4b83Bc76635e&chainID=8453: HTTP Error 404: Not Found
+20:46:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x80500B20689af1b93244Bd6E4B67605aBA08E8E0&chainID=8453: HTTP Error 404: Not Found
+20:47:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8e2646324B85F3BF07b2Ad5E8f1533C41bA4FE1F&chainID=8453: HTTP Error 404: Not Found
+20:47:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xa81E3b18C6295f566096C4A57207733B6c5982Bf&chainID=8453: HTTP Error 404: Not Found
+20:47:21 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd3f475d221B09F7CcB7560cfbA0d38521078f0c4&chainID=8453: HTTP Error 404: Not Found
+20:47:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xD43011997a2006D8379C337e4681f5cB7DeE93f3&chainID=8453: HTTP Error 404: Not Found
+20:47:33 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+20:57:46 solana: 21 pools in window, 1 not seen in 24h
+20:59:22 base: 2 pools in window, 2 not seen in 24h
+20:59:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x094B8Ea54CE86e5A18CdFE0999c7043B33b2a5a8&chainID=8453: HTTP Error 404: Not Found
+20:59:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x280a422ACd8F93136a7699b33d2b929B315fBc5B&chainID=8453: HTTP Error 404: Not Found
+20:59:44 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+21:09:41 solana: 20 pools in window, 2 not seen in 24h
+21:12:23 base: 9 pools in window, 7 not seen in 24h
+21:12:33 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x05e12F9eBc46A912469E28Cf46C8d9065d2C41A6&chainID=8453: HTTP Error 404: Not Found
+21:12:46 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0b58565f13C57554385d794e5A62DD674d1A9E3f&chainID=8453: HTTP Error 404: Not Found
+21:12:57 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x189154642BeB0bE560b9b377Bc1a9ddE87393182&chainID=8453: HTTP Error 404: Not Found
+21:13:08 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x23732E5589b03C3658941DD5CfcfCD87c0E97778&chainID=8453: HTTP Error 404: Not Found
+21:13:19 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x301884219BFc71f1aB6C48fd6A654583a813F6F8&chainID=8453: HTTP Error 404: Not Found
+21:13:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xA43EBEF264A8600430926DC5cccb510350252A09&chainID=8453: HTTP Error 404: Not Found
+21:13:32 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+21:28:18 solana: 20 pools in window, 2 not seen in 24h
+21:30:26 base: 8 pools in window, 4 not seen in 24h
+21:30:36 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0b19e573e06f7992E8F8D70A36Bef1B155621cdd&chainID=8453: HTTP Error 404: Not Found
+21:30:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2c5227c8989ED0EfBFc8EACC0D122ad7FBAe10F1&chainID=8453: HTTP Error 404: Not Found
+21:30:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6E9Bf30eeC47711C479a19BcEfbF0660B273a77a&chainID=8453: HTTP Error 404: Not Found
+21:31:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xA7f4DA0Eb2Bb4F3a8CBB3d2D9731461186e299F8&chainID=8453: HTTP Error 404: Not Found
+21:31:10 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+21:44:17 solana: 17 pools in window, 0 not seen in 24h
+21:46:52 base: 2 pools in window, 1 not seen in 24h
+21:47:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1242fdF309b6b7C64c89E17A58A3e7bCE1582D64&chainID=8453: HTTP Error 404: Not Found
+21:47:03 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+21:57:41 solana: 17 pools in window, 1 not seen in 24h
+22:00:18 base: 4 pools in window, 3 not seen in 24h
+22:00:28 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x10c577F80De7eA720986F38A3f3B135DA1d0EeC9&chainID=8453: HTTP Error 404: Not Found
+22:00:39 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3094f8E8C077E2226A72AF6afD6d0C9DfeeBaBA0&chainID=8453: HTTP Error 404: Not Found
+22:00:50 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xc5E3ddB0f7cF33bE762109EB35C6AD5Ec0417dbb&chainID=8453: HTTP Error 404: Not Found
+22:00:51 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+22:09:35 solana: 20 pools in window, 3 not seen in 24h
+22:11:43 base: 4 pools in window, 0 not seen in 24h
+22:11:43 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+22:27:21 solana: 19 pools in window, 1 not seen in 24h
+22:29:58 base: 1 pools in window, 1 not seen in 24h
+22:30:04 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+22:42:27 solana: 19 pools in window, 0 not seen in 24h
+22:44:31 base: 0 pools in window, 0 not seen in 24h
+22:44:31 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
+22:55:38 solana: 21 pools in window, 1 not seen in 24h
+22:58:14 base: 2 pools in window, 2 not seen in 24h
+22:58:17 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+23:06:40 solana: 26 pools in window, 3 not seen in 24h
+23:09:18 base: 3 pools in window, 0 not seen in 24h
+23:09:18 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+23:34:15 solana: 23 pools in window, 2 not seen in 24h
+23:36:24 base: 5 pools in window, 5 not seen in 24h
+23:36:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3054b8273A50B9A267F490A9aFbCd244De28643E&chainID=8453: HTTP Error 404: Not Found
+23:36:50 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x8bA57E68afc00AE4E29514EC2726ED84Bd791f37&chainID=8453: HTTP Error 404: Not Found
+23:37:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xa5F41f9f299b698AF4263f7E05f31C517954dc66&chainID=8453: HTTP Error 404: Not Found
+23:37:13 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe0bdF8C05A5Aaf19a905BD5FF79a5744eF4A467a&chainID=8453: HTTP Error 404: Not Found
+23:37:14 scan done: 0 scored >= 60, 4 pick slots left, sending 0 to review
