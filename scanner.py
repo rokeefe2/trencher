@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT
   status TEXT DEFAULT 'open', tokens_left REAL, realized REAL DEFAULT 0, took_stake INTEGER DEFAULT 0,
   p1h REAL, p6h REAL, p24h REAL, p72h REAL, last_price REAL, peak REAL, closed_at REAL, close_reason TEXT);
 """)
-for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0"), ("parts", "TEXT"), ("snapshot", "TEXT"), ("info", "TEXT")):
+for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0"), ("parts", "TEXT"), ("snapshot", "TEXT"), ("info", "TEXT"),
+                   ("kind", "TEXT DEFAULT 'claude'")):   # kind: 'claude' (real paper pick) or 'random' (control, see cmd_record)
     try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
     except sqlite3.OperationalError: pass
 DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
@@ -280,7 +281,7 @@ def cmd_scan():
                               "dexscreener": d.get("url"), "paid_boosts": d.get("boosts")})
     DB.commit()
     cands.sort(key=lambda x: -x["score"])
-    picks_today = DB.execute("SELECT COUNT(*) FROM picks WHERE picked_at>?", (NOW - 24 * 3600,)).fetchone()[0]
+    picks_today = DB.execute("SELECT COUNT(*) FROM picks WHERE picked_at>? AND kind='claude'", (NOW - 24 * 3600,)).fetchone()[0]
     slots = max(0, CFG["max_picks_per_day"] - picks_today)
     out = {"slots_left_today": slots, "candidates": cands[:CFG["max_reviews_per_run"]] if slots else []}
     json.dump(out, open(os.path.join(HERE, "candidates.json"), "w"), indent=1)
@@ -305,6 +306,7 @@ def cmd_record():
     rv = json.loads(blocks[-1], strict=False)
     cands = {c["token"]: c for c in json.load(open(os.path.join(HERE, "candidates.json")))["candidates"]}
     slots = json.load(open(os.path.join(HERE, "candidates.json")))["slots_left_today"]
+    picked = 0
     for v in rv.get("verdicts", []):
         c = cands.get(v.get("token"))
         if not c: continue
@@ -322,7 +324,17 @@ def cmd_record():
         ntfy(f"PAPER PICK: {c['symbol']} ({c['chain']}) score {c['score']}",
              f"{v.get('reason','')[:300]}\nMcap ${c['mcap_usd']:,} | Liq ${c['liquidity_usd']:,} | Age {c['age_h']}h\n"
              f"Paper entry ${price:.8g} x ${stake}", c.get("dexscreener"), "high")
-        log(f"PICK {c['symbol']} {c['token']} @ {price}")
+        log(f"PICK {c['symbol']} {c['token']} @ {price}"); picked += 1
+    # Control portfolio: for every coin Claude buys, buy one at random from the same shortlist (same stake, same exits,
+    # no alerts, not counted in the main P&L or the daily limit). If chance does as well, the review isn't adding value.
+    import random
+    for c in random.sample(list(cands.values()), min(picked, len(cands))):
+        price = c["price_usd"]; stake = CFG["paper_stake"]; tokens = stake * (1 - COST) / price
+        DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak,tokens0,ladder_hit,parts,kind) "
+                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,'random')", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
+                   c["score"], f"Random control pick: drawn by chance from the {len(cands)} coins Claude reviewed this run.",
+                   tokens, price, price, tokens, json.dumps(c["score_parts"])))
+        log(f"CONTROL (random) {c['symbol']} {c['token']} @ {price}")
     DB.commit()
 
 # ---------------------------------------------------------------- exits: profit-taking ladder (shared with watcher.py)
@@ -406,14 +418,15 @@ def apply_watcher_events():
 def cmd_track():
     apply_watcher_events()
     watcher_on = watcher_healthy()
-    rows = DB.execute("SELECT id,chain,token,symbol,picked_at,entry_price,stake,tokens_left,realized,took_stake,peak,p1h,p6h,p24h,p72h,status "
+    rows = DB.execute("SELECT id,chain,token,symbol,picked_at,entry_price,stake,tokens_left,realized,took_stake,peak,p1h,p6h,p24h,p72h,status,kind "
                       "FROM picks WHERE status='open' OR p72h IS NULL").fetchall()
     by_chain = {}
     for r in rows: by_chain.setdefault(r[1], []).append(r[2])
     prices, infos = {}, {}
     for chain, toks in by_chain.items():
         for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]; infos[(chain, t)] = d
-    for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status) in rows:
+    for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status, kind) in rows:
+        say = ntfy if kind != "random" else (lambda *a, **k: None)   # control picks trade silently
         px = prices.get((chain, tok))
         if not px: continue  # no price = pool gone; handled at 72h
         age_h = (NOW - t0) / 3600; mult = px / entry
@@ -430,8 +443,8 @@ def cmd_track():
             sells, close, _ = decide_exit({"entry_price": entry, "ladder_hit": prow[1], "peak_x": (prow[2] or px) / entry,
                                            "picked_at": t0}, px, NOW, CFG)
             for lvl in sells:
-                if apply_ladder(pid, lvl, px): ntfy(f"{sym} hit {CFG['ladder'][lvl][0]}x (paper)", f"Sold {int(CFG['ladder'][lvl][1]*100)}% of the position.")
-            if close and apply_close(pid, px, close): ntfy(f"{sym} closed (paper): {close}", f"Exited at {mult:.2f}x.")
+                if apply_ladder(pid, lvl, px): say(f"{sym} hit {CFG['ladder'][lvl][0]}x (paper)", f"Sold {int(CFG['ladder'][lvl][1]*100)}% of the position.")
+            if close and apply_close(pid, px, close): say(f"{sym} closed (paper): {close}", f"Exited at {mult:.2f}x.")
     # pools that vanished for >6h after 72h window: count as total loss
     DB.execute("UPDATE picks SET status='closed', close_reason='no price (pool gone)', closed_at=?, tokens_left=0 "
                "WHERE status='open' AND picked_at<? AND (last_price IS NULL OR last_price=entry_price)", (NOW, NOW - 78 * 3600))
@@ -535,13 +548,13 @@ def cmd_analyze():
         sigs.append({"signal": name, "yes": _signal_stats(yes), "no": _signal_stats(no)})
     out["entry_signals"] = sigs
     # exits: compare the live exit rules with simple alternatives on actual picks (checkpoint approximation)
-    picks = DB.execute("SELECT pnl_x, p24h, p72h, stake FROM (SELECT (realized + tokens_left*last_price)/stake AS pnl_x, p24h, p72h, stake FROM picks WHERE status='closed')").fetchall()
+    picks = DB.execute("SELECT pnl_x, p24h, p72h, stake FROM (SELECT (realized + tokens_left*last_price)/stake AS pnl_x, p24h, p72h, stake FROM picks WHERE status='closed' AND kind='claude')").fetchall()
     if picks:
         out["exits"] = {"n": len(picks), "actual_avg_x": round(sum(p[0] for p in picks) / len(picks), 3),
                         "hold_24h_avg_x": round(sum((p[1] or 0) for p in picks) / len(picks), 3),
                         "hold_72h_avg_x": round(sum((p[2] or 0) for p in picks) / len(picks), 3)}
     # go-live readiness
-    closed = DB.execute("SELECT stake, realized + tokens_left*COALESCE(last_price,0), picked_at FROM picks WHERE status='closed'").fetchall()
+    closed = DB.execute("SELECT stake, realized + tokens_left*COALESCE(last_price,0), picked_at FROM picks WHERE status='closed' AND kind='claude'").fetchall()
     n = len(closed); pnl = sum(v - s for s, v, _ in closed)
     wins = sum(v > s for s, v, _ in closed)
     weeks = {}
@@ -556,12 +569,29 @@ def cmd_analyze():
         {"check": "Claude's picks beat its passes (median 24h)", "ok": (out["by_stage"]["pick"].get("median_24h") or 0) >
          (out["by_stage"]["pass"].get("median_24h") or 0) and out["by_stage"]["pick"].get("n", 0) >= 10,
          "value": f'{out["by_stage"]["pick"].get("median_24h", "-")} vs {out["by_stage"]["pass"].get("median_24h", "-")}'}]
+    out["control"] = control_stats()
     json.dump(out, open(os.path.join(HERE, "analysis.json"), "w"), indent=1, default=str)
     print(json.dumps(out, indent=1, default=str))
 
+def control_stats():
+    """Claude's picks vs. random picks from the same shortlists, both counted from the first random pick on."""
+    t0 = DB.execute("SELECT MIN(picked_at) FROM picks WHERE kind='random'").fetchone()[0]
+    if t0 is None: return None
+    out = {"since": t0}
+    for kind in ("claude", "random"):
+        rows = DB.execute("SELECT stake, realized + COALESCE(tokens_left,0)*COALESCE(last_price,0), status, ladder_hit, close_reason "
+                          "FROM picks WHERE kind=? AND picked_at>=?", (kind, t0)).fetchall()
+        done = [r for r in rows if r[2] == "closed"]; n = len(done); pnl = sum(v - st for st, v, *_ in done)
+        out[kind] = {"picks": len(rows), "open": len(rows) - n, "closed": n, "pnl": round(pnl, 2),
+                     "avg_x": round(sum(v / st for st, v, *_ in done) / n, 3) if n else None,
+                     "win_pct": round(100 * sum(v > st for st, v, *_ in done) / n) if n else None,
+                     "reached_first_sale_pct": round(100 * sum((r[3] or 0) > 0 for r in done) / n) if n else None,
+                     "stop_loss_pct": round(100 * sum(r[4] == "stop loss" for r in done) / n) if n else None}
+    return out
+
 def cmd_stats():
     rows = DB.execute("SELECT symbol,chain,picked_at,stake,realized,tokens_left,last_price,status,close_reason,p1h,p6h,p24h,p72h,score,reason,entry_price "
-                      "FROM picks ORDER BY picked_at").fetchall()
+                      "FROM picks WHERE kind='claude' ORDER BY picked_at").fetchall()
     picks = []
     for r in rows:
         value = r[4] + (r[5] or 0) * (r[6] or 0)
@@ -582,8 +612,8 @@ def cmd_export():
     """Write dashboard JSON (dashboard.json) and prune old data so the data branch stays small."""
     cols = ["id", "chain", "token", "symbol", "name", "picked_at", "entry_price", "stake", "score", "reason", "status",
             "tokens_left", "realized", "took_stake", "p1h", "p6h", "p24h", "p72h", "last_price", "peak", "closed_at", "close_reason",
-            "tokens0", "ladder_hit", "parts", "snapshot", "info"]
-    picks = []
+            "tokens0", "ladder_hit", "parts", "snapshot", "info", "kind"]
+    picks, controls = [], []
     for r in DB.execute(f"SELECT {','.join(cols)} FROM picks ORDER BY picked_at DESC"):
         p = dict(zip(cols, r))
         for k in ("parts", "snapshot", "info"): p[k] = json.loads(p[k]) if p[k] else None
@@ -591,7 +621,7 @@ def cmd_export():
         p["pnl"] = round(p["value_now"] - p["stake"], 2)
         p["mult_now"] = round((p["last_price"] or p["entry_price"]) / p["entry_price"], 3)
         p["dexscreener"] = f"https://dexscreener.com/{p['chain']}/{p['token']}"
-        picks.append(p)
+        (controls if p["kind"] == "random" else picks).append(p)
     seen = [dict(zip(["chain", "token", "first_seen", "result", "score"], r)) for r in
             DB.execute("SELECT chain,token,first_seen,last_result,score FROM seen ORDER BY first_seen DESC LIMIT 300")]
     counts = dict(DB.execute("SELECT substr(last_result,1,instr(last_result||':',':')-1), COUNT(*) FROM seen GROUP BY 1").fetchall())
@@ -606,7 +636,7 @@ def cmd_export():
     closed = [p for p in picks if p["status"] == "closed"]
     sym = {p["id"]: (p["symbol"], p["chain"], p["dexscreener"]) for p in picks}
     sales = [dict(zip(["id", "pick_id", "t", "kind", "detail", "fraction", "price", "mult", "tokens", "proceeds", "cost_basis", "pnl"], r))
-             for r in DB.execute("SELECT * FROM sales ORDER BY t DESC")]
+             for r in DB.execute("SELECT * FROM sales ORDER BY t DESC") if r[1] in sym]   # control picks' sales stay out of the main P&L
     for s_ in sales: s_["symbol"], s_["chain"], s_["dexscreener"] = sym.get(s_["pick_id"], ("?", "", ""))
     realized_pnl = round(sum(s_["pnl"] for s_ in sales), 2)
     for p in picks:   # per-pick realized profit and unrealized profit on what's still held
@@ -634,7 +664,7 @@ def cmd_export():
                        "scanned": sum(counts.values()), "outcomes": counts,
                        "incubating": DB.execute("SELECT COUNT(*) FROM incubator").fetchone()[0]},
            "reject_reasons": sorted(reasons.items(), key=lambda x: -x[1])[:15],
-           "picks": picks, "recent": seen, "sales": sales[:500],
+           "picks": picks, "controls": controls, "recent": seen, "sales": sales[:500],
            "analysis": json.load(open(os.path.join(HERE, "analysis.json"))) if os.path.exists(os.path.join(HERE, "analysis.json")) else None,
            "tuning": {**TUNING, "effective": {k: _get(k) for k in TUNABLE}},
            "learnings": open(os.path.join(HERE, "learnings.md")).read() if os.path.exists(os.path.join(HERE, "learnings.md")) else "",
