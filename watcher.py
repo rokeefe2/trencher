@@ -94,21 +94,22 @@ def main():
                 px = prices[p["token"]]
                 pk = max(peaks.get(p["id"], 0), p.get("peak") or 0, px); peaks[p["id"]] = pk
                 hit = max([p.get("ladder_hit") or 0] + [lvl + 1 for (pid, lvl) in applied if pid == p["id"] and lvl != "close"])
+                cfg = S.exit_cfg(p.get("kind"))   # 'alt' test copies use their own exit rules
                 sells, close, _ = S.decide_exit({"entry_price": p["entry_price"], "ladder_hit": hit, "peak_x": pk / p["entry_price"],
-                                                 "picked_at": p["picked_at"]}, px, now, S.CFG)
+                                                 "picked_at": p["picked_at"]}, px, now, cfg)
                 for lvl in sells:
                     if (p["id"], lvl) in applied: continue
                     applied.add((p["id"], lvl))
                     new_events.append({"id": uuid.uuid4().hex, "t": now, "pick_id": p["id"], "kind": "ladder", "level": lvl,
                                        "price": px, "peak_price": pk})
-                    lx, frac = S.CFG["ladder"][lvl]
-                    if p.get("kind") != "random": S.ntfy(f"{p['symbol']} hit {lx}x - sold {int(frac*100)}% (paper)",
+                    lx, frac = cfg["ladder"][lvl]
+                    if p.get("kind") not in S.TEST_KINDS: S.ntfy(f"{p['symbol']} hit {lx}x - sold {int(frac*100)}% (paper)",
                            f"Now {px/p['entry_price']:.2f}x. Locked in profit; the rest keeps riding.", p.get("dexscreener"), "high")
                 if close:
                     applied.add((p["id"], "close"))
                     new_events.append({"id": uuid.uuid4().hex, "t": now, "pick_id": p["id"], "kind": "close", "reason": close,
                                        "price": px, "peak_price": pk})
-                    if p.get("kind") != "random": S.ntfy(f"{p['symbol']} closed (paper): {close}", f"Exited at {px/p['entry_price']:.2f}x "
+                    if p.get("kind") not in S.TEST_KINDS: S.ntfy(f"{p['symbol']} closed (paper): {close}", f"Exited at {px/p['entry_price']:.2f}x "
                            f"(peak {pk/p['entry_price']:.2f}x).", p.get("dexscreener"), "high")
         if new_events:
             with open(os.path.join(EXITS, "events.jsonl"), "a") as f:
