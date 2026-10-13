@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT
   p1h REAL, p6h REAL, p24h REAL, p72h REAL, last_price REAL, peak REAL, closed_at REAL, close_reason TEXT);
 """)
 for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0"), ("parts", "TEXT"), ("snapshot", "TEXT"), ("info", "TEXT"),
-                   ("kind", "TEXT DEFAULT 'claude'"), ("no_price_since", "REAL")):   # kind: 'claude' (real paper pick) or 'random' (control, see cmd_record)
+                   ("kind", "TEXT DEFAULT 'claude'"), ("no_price_since", "REAL")):   # kind: 'claude' (real paper pick); 'random' or 'alt' (test portfolios, see cmd_record)
     try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
     except sqlite3.OperationalError: pass
 DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
@@ -326,6 +326,11 @@ def cmd_record():
              f"{v.get('reason','')[:300]}\nMcap ${c['mcap_usd']:,} | Liq ${c['liquidity_usd']:,} | Age {c['age_h']}h\n"
              f"Paper entry ${price:.8g} x ${stake}", c.get("dexscreener"), "high")
         log(f"PICK {c['symbol']} {c['token']} @ {price}"); picked += 1
+        if CFG.get("alt_exits"):   # same coin, same moment, same stake: only the exit rules differ (CFG['alt_exits'])
+            DB.execute("INSERT INTO picks (chain,token,symbol,name,picked_at,entry_price,stake,score,reason,tokens_left,last_price,peak,tokens0,ladder_hit,parts,kind) "
+                       "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,'alt')", (c["chain"], c["token"], c["symbol"], c["name"], NOW, price, stake,
+                       c["score"], f"Exit test: copy of Claude's pick, sold with: {CFG['alt_exits'].get('name', 'alt exits')}.",
+                       tokens, price, price, tokens, json.dumps(c["score_parts"])))
     # Control portfolio: for every coin Claude buys, buy one at random from the same shortlist (same stake, same exits,
     # no alerts, not counted in the main P&L or the daily limit). If chance does as well, the review isn't adding value.
     import random
@@ -339,6 +344,16 @@ def cmd_record():
     DB.commit()
 
 # ---------------------------------------------------------------- exits: profit-taking ladder (shared with watcher.py)
+TEST_KINDS = ("random", "alt")   # paper test portfolios: no alerts, no slots, kept out of the main P&L
+
+def exit_cfg(kind):
+    """Exit settings for a pick: 'alt' copies use CFG['alt_exits'] on top of the normal ones."""
+    return {**CFG, **CFG.get("alt_exits", {})} if kind == "alt" else CFG
+
+def kind_of(pid):
+    r = DB.execute("SELECT kind FROM picks WHERE id=?", (pid,)).fetchone()
+    return r[0] if r else "claude"
+
 def decide_exit(p, px, now, cfg):
     """Pure decision. p needs entry_price, ladder_hit, peak_x, picked_at. Returns (ladder_levels_to_sell, close_reason, peak_x)."""
     mult = px / p["entry_price"]; peak_x = max(p.get("peak_x") or 1.0, mult)
@@ -371,12 +386,14 @@ def apply_ladder(pid, level, px, sale_id=None, t_sale=None):
     row = DB.execute("SELECT stake, tokens0, tokens_left, realized, ladder_hit, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
     if not row or row[5] != "open" or (row[4] or 0) > level: return False   # already applied / closed
     stake, tokens0, left, realized, _, _, sym = row
-    frac = CFG.get("ladder", [[1.5, .3], [2.0, .3], [3.0, .2]])[level][1]
+    lx, frac = exit_cfg(kind_of(pid)).get("ladder", [[1.5, .3], [2.0, .3], [3.0, .2]])[level]
     sell = min(left, frac * (tokens0 or left)); realized += sell * px * (1 - COST); left -= sell
-    record_sale(sale_id, pid, "partial", f"took profit at {CFG['ladder'][level][0]}x", sell, px, t_sale)
+    record_sale(sale_id, pid, "partial", f"took profit at {lx}x", sell, px, t_sale)
     DB.execute("UPDATE picks SET tokens_left=?, realized=?, ladder_hit=?, took_stake=? WHERE id=?",
                (left, realized, level + 1, int(realized >= stake), pid))
-    log(f"LADDER {sym}: sold {int(frac*100)}% at level {level+1}"); return True
+    log(f"LADDER {sym}: sold {int(frac*100)}% at level {level+1}")
+    if left <= 1e-9 * (tokens0 or 1): apply_close(pid, px, f"sold out at {lx}x", t_sale=t_sale)   # ladder sold everything
+    return True
 
 def apply_close(pid, px, reason, sale_id=None, t_sale=None):
     row = DB.execute("SELECT tokens_left, realized, status, symbol FROM picks WHERE id=?", (pid,)).fetchone()
@@ -403,8 +420,8 @@ def apply_watcher_events():
             if e["kind"] == "ladder" and not DB.execute("SELECT 1 FROM sales WHERE id=?", (e["id"],)).fetchone():   # backfill
                 tk0 = DB.execute("SELECT tokens0 FROM picks WHERE id=?", (e["pick_id"],)).fetchone()
                 if tk0 and tk0[0]:
-                    record_sale(e["id"], e["pick_id"], "partial", f"took profit at {CFG['ladder'][e['level']][0]}x",
-                                CFG["ladder"][e["level"]][1] * tk0[0], e["price"], e["t"])
+                    lx, frac = exit_cfg(kind_of(e["pick_id"]))["ladder"][e["level"]]
+                    record_sale(e["id"], e["pick_id"], "partial", f"took profit at {lx}x", frac * tk0[0], e["price"], e["t"])
             continue
         if e["kind"] == "ladder": apply_ladder(e["pick_id"], e["level"], e["price"], e["id"], e["t"])
         elif e["kind"] == "close": apply_close(e["pick_id"], e["price"], e["reason"], e["id"], e["t"])
@@ -428,7 +445,7 @@ def cmd_track():
         for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]; infos[(chain, t)] = d
         if not dex_info.failed: answered.add(chain)
     for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status, kind) in rows:
-        say = ntfy if kind != "random" else (lambda *a, **k: None)   # control picks trade silently
+        say = ntfy if kind not in TEST_KINDS else (lambda *a, **k: None)   # test portfolios trade silently
         px = prices.get((chain, tok))
         if not px:   # DexScreener answered but has no price: the pool is gone (rugged or delisted)
             if status == "open" and chain in answered:
@@ -450,9 +467,10 @@ def cmd_track():
         prow = DB.execute("SELECT status, ladder_hit, peak FROM picks WHERE id=?", (pid,)).fetchone()
         if prow[0] == "open" and not watcher_on:   # the watcher normally handles exits; this is the fallback
             sells, close, _ = decide_exit({"entry_price": entry, "ladder_hit": prow[1], "peak_x": (prow[2] or px) / entry,
-                                           "picked_at": t0}, px, NOW, CFG)
+                                           "picked_at": t0}, px, NOW, exit_cfg(kind))
             for lvl in sells:
-                if apply_ladder(pid, lvl, px): say(f"{sym} hit {CFG['ladder'][lvl][0]}x (paper)", f"Sold {int(CFG['ladder'][lvl][1]*100)}% of the position.")
+                lx, frac = exit_cfg(kind)["ladder"][lvl]
+                if apply_ladder(pid, lvl, px): say(f"{sym} hit {lx}x (paper)", f"Sold {int(frac*100)}% of the position.")
             if close and apply_close(pid, px, close): say(f"{sym} closed (paper): {close}", f"Exited at {mult:.2f}x.")
     # pools that vanished for >6h after 72h window: count as total loss
     DB.execute("UPDATE picks SET status='closed', close_reason='no price (pool gone)', closed_at=?, tokens_left=0 "
@@ -578,16 +596,18 @@ def cmd_analyze():
         {"check": "Claude's picks beat its passes (median 24h)", "ok": (out["by_stage"]["pick"].get("median_24h") or 0) >
          (out["by_stage"]["pass"].get("median_24h") or 0) and out["by_stage"]["pick"].get("n", 0) >= 10,
          "value": f'{out["by_stage"]["pick"].get("median_24h", "-")} vs {out["by_stage"]["pass"].get("median_24h", "-")}'}]
-    out["control"] = control_stats()
+    out["control"] = control_stats("random")
+    out["alt_exits"] = control_stats("alt")
+    if out["alt_exits"]: out["alt_exits"]["name"] = CFG.get("alt_exits", {}).get("name")
     json.dump(out, open(os.path.join(HERE, "analysis.json"), "w"), indent=1, default=str)
     print(json.dumps(out, indent=1, default=str))
 
-def control_stats():
-    """Claude's picks vs. random picks from the same shortlists, both counted from the first random pick on."""
-    t0 = DB.execute("SELECT MIN(picked_at) FROM picks WHERE kind='random'").fetchone()[0]
+def control_stats(test):
+    """Claude's picks vs. a test portfolio ('random' coins, or 'alt' exit rules), both counted from the test's first pick."""
+    t0 = DB.execute("SELECT MIN(picked_at) FROM picks WHERE kind=?", (test,)).fetchone()[0]
     if t0 is None: return None
     out = {"since": t0}
-    for kind in ("claude", "random"):
+    for kind in ("claude", test):
         rows = DB.execute("SELECT stake, realized + COALESCE(tokens_left,0)*COALESCE(last_price,0), status, ladder_hit, close_reason "
                           "FROM picks WHERE kind=? AND picked_at>=?", (kind, t0)).fetchall()
         done = [r for r in rows if r[2] == "closed"]; n = len(done); pnl = sum(v - st for st, v, *_ in done)
@@ -630,7 +650,7 @@ def cmd_export():
         p["pnl"] = round(p["value_now"] - p["stake"], 2)
         p["mult_now"] = round((p["last_price"] if p["last_price"] is not None else p["entry_price"]) / p["entry_price"], 3)   # 0 = pool gone
         p["dexscreener"] = f"https://dexscreener.com/{p['chain']}/{p['token']}"
-        (controls if p["kind"] == "random" else picks).append(p)
+        (controls if p["kind"] in TEST_KINDS else picks).append(p)
     seen = [dict(zip(["chain", "token", "first_seen", "result", "score"], r)) for r in
             DB.execute("SELECT chain,token,first_seen,last_result,score FROM seen ORDER BY first_seen DESC LIMIT 300")]
     counts = dict(DB.execute("SELECT substr(last_result,1,instr(last_result||':',':')-1), COUNT(*) FROM seen GROUP BY 1").fetchall())

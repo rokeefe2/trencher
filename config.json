@@ -51,5 +51,11 @@
  "trail_pct": 30,
  "breakeven_x": 1.0,
  "watch_tick_s": 5,
- "scan_stale_min": 22
+ "scan_stale_min": 22,
+ "alt_exits": {
+  "name": "sell 80% at 1.5x, ride 20% with a 50% trailing stop (never below break-even), cash out at 10x",
+  "ladder": [[1.5, 0.8], [10.0, 0.2]],
+  "trail_pct": 50,
+  "breakeven_x": 1.0
+ }
 }

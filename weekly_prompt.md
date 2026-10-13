@@ -37,6 +37,10 @@ coin through any stop between checks, so some exits land far below their stop.
    same shortlist (same stake and exits, kept out of the main P&L). Compare total P&L, avg return, win %, share that
    reached the first ladder sale, and stop-loss %. Call the review's value only with ≥ 20 closed trades on each side;
    if random keeps matching or beating Claude, say so plainly and suggest changes to the review prompt in the notebook.
+   **Exit rules test** (ANALYSIS.alt_exits): since `since`, every Claude pick is copied into a paper portfolio
+   that sells by CONFIG.alt_exits instead of the normal ladder (same coins, entry and stake). Compare the two the
+   same way, with ≥ 20 closed on each side before calling it. You can't switch exits yourself; recommend it in the
+   notebook if the test exits clearly win.
    **Entry signals** (ANALYSIS.entry_signals) are tracked but not used by the code yet. For each, compare
    yes vs no (down 40% / up 50% at the 1h check, median 24h). You can't turn one on yourself: if one
    clearly separates crashes from winners with ≥ 40 coins on each side, recommend it in the notebook.
