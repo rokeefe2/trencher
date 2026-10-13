@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS picks (id INTEGER PRIMARY KEY, chain TEXT, token TEXT
   p1h REAL, p6h REAL, p24h REAL, p72h REAL, last_price REAL, peak REAL, closed_at REAL, close_reason TEXT);
 """)
 for _col, _typ in (("tokens0", "REAL"), ("ladder_hit", "INTEGER DEFAULT 0"), ("parts", "TEXT"), ("snapshot", "TEXT"), ("info", "TEXT"),
-                   ("kind", "TEXT DEFAULT 'claude'")):   # kind: 'claude' (real paper pick) or 'random' (control, see cmd_record)
+                   ("kind", "TEXT DEFAULT 'claude'"), ("no_price_since", "REAL")):   # kind: 'claude' (real paper pick) or 'random' (control, see cmd_record)
     try: DB.execute(f"ALTER TABLE picks ADD COLUMN {_col} {_typ}")
     except sqlite3.OperationalError: pass
 DB.execute("UPDATE picks SET tokens0=tokens_left WHERE tokens0 IS NULL AND ladder_hit=0 AND took_stake=0")
@@ -131,9 +131,10 @@ def discover(chain):
     return list(pools.values())
 
 def dex_info(chain, tokens):
-    out = {}
+    out = {}; dex_info.failed = False   # True if DexScreener didn't answer, so "no price" means "unknown", not "pool gone"
     for i in range(0, len(tokens), 30):
-        d = get(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(tokens[i:i+30])}") or []
+        d = get(f"https://api.dexscreener.com/tokens/v1/{chain}/{','.join(tokens[i:i+30])}")
+        if d is None: dex_info.failed = True; d = []
         for p in d:
             t = p.get("baseToken", {}).get("address")
             if not t: continue
@@ -422,13 +423,21 @@ def cmd_track():
                       "FROM picks WHERE status='open' OR p72h IS NULL").fetchall()
     by_chain = {}
     for r in rows: by_chain.setdefault(r[1], []).append(r[2])
-    prices, infos = {}, {}
+    prices, infos, answered = {}, {}, set()
     for chain, toks in by_chain.items():
         for t, d in dex_info(chain, toks).items(): prices[(chain, t)] = d["price"]; infos[(chain, t)] = d
+        if not dex_info.failed: answered.add(chain)
     for (pid, chain, tok, sym, t0, entry, stake, left, realized, took, peak, p1, p6, p24, p72, status, kind) in rows:
         say = ntfy if kind != "random" else (lambda *a, **k: None)   # control picks trade silently
         px = prices.get((chain, tok))
-        if not px: continue  # no price = pool gone; handled at 72h
+        if not px:   # DexScreener answered but has no price: the pool is gone (rugged or delisted)
+            if status == "open" and chain in answered:
+                since = DB.execute("SELECT no_price_since FROM picks WHERE id=?", (pid,)).fetchone()[0] or NOW
+                DB.execute("UPDATE picks SET no_price_since=? WHERE id=?", (since, pid))
+                if NOW - since >= CFG.get("dead_pool_hours", 2) * 3600 and apply_close(pid, 0.0, "no price (pool gone)"):
+                    say(f"{sym} closed (paper): pool gone", "No price for 2h+; booked as a total loss.")
+            continue
+        if status == "open": DB.execute("UPDATE picks SET no_price_since=NULL WHERE id=?", (pid,))
         age_h = (NOW - t0) / 3600; mult = px / entry
         d = infos[(chain, tok)]
         upd = {"last_price": px, "info": json.dumps({"t": NOW, "mcap": d["mcap"], "liq": d["liq"], "vol24": d["vol24"], "chg24": d["chg24"],
@@ -619,7 +628,7 @@ def cmd_export():
         for k in ("parts", "snapshot", "info"): p[k] = json.loads(p[k]) if p[k] else None
         p["value_now"] = round(p["realized"] + (p["tokens_left"] or 0) * (p["last_price"] or 0), 2)
         p["pnl"] = round(p["value_now"] - p["stake"], 2)
-        p["mult_now"] = round((p["last_price"] or p["entry_price"]) / p["entry_price"], 3)
+        p["mult_now"] = round((p["last_price"] if p["last_price"] is not None else p["entry_price"]) / p["entry_price"], 3)   # 0 = pool gone
         p["dexscreener"] = f"https://dexscreener.com/{p['chain']}/{p['token']}"
         (controls if p["kind"] == "random" else picks).append(p)
     seen = [dict(zip(["chain", "token", "first_seen", "result", "score"], r)) for r in
