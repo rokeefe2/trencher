@@ -11,6 +11,7 @@
  "max_insider_pct": 15,
  "min_lp_locked_pct": 80,
  "max_sell_tax_pct": 10,
+ "max_paid_boosts": 0,
  "min_score": 60,
  "max_reviews_per_run": 4,
  "max_picks_per_day": 5,
