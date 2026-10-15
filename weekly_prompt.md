@@ -55,7 +55,7 @@ coin through any stop between checks, so some exits land far below their stop.
   only with strong evidence (many blocked winners, very few rugs among blocked coins).
 - Tunable keys: min_score, max_picks_per_day, max_reviews_per_run, stop_loss_pct, trail_pct, no_move_hours,
   no_move_min_gain_pct, min_age_h, max_age_h, max_top10_pct, max_creator_pct, max_linked_wallets,
-  max_insider_pct, max_sell_tax_pct, min_lp_locked_pct, min_liquidity, min_holders,
+  max_insider_pct, max_sell_tax_pct, max_paid_boosts, min_lp_locked_pct, min_liquidity, min_holders,
   weights.momentum / weights.holders / weights.liquidity / weights.buyer_breadth / weights.social / weights.survival (0.5–1.5).
 - Early weeks with thin data: "no changes — need more data" is the right answer.
 

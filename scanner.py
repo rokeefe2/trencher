@@ -261,6 +261,15 @@ def cmd_scan():
         log(f"{chain}: {len(pools)} pools in window, {len(new)} not seen in 24h")
         for c in new:
             fails, s = holder_check(*(safety_solana if chain == "solana" else safety_base)(c))
+            d = dx.get(c["token"], {})
+            # Paid DexScreener boosts: every stop loss that crashed straight through to ~0.03x came from a boosted coin
+            # (5 of 29 boosted trades, 0 of 40 unboosted; boosted trades -$6.56 each vs +$1.00).
+            if (d.get("boosts") or 0) > CFG.get("max_paid_boosts", 0):
+                fails.append("has paid DexScreener boosts")
+                if len(fails) == 1:   # rejected for boosts alone: always score and track it, to keep judging the rule
+                    total, parts, metrics = score(c, s, d)
+                    shadow(chain, c["token"], "reject", fails[0], d.get("price") or c["price"], c["liq"], total, parts,
+                           {**metrics, "safety": s, "age_h": round(c["age_h"], 1), "mcap": round(c["mcap"]), "boosts": d.get("boosts")})
             if fails:
                 DB.execute("INSERT OR REPLACE INTO seen VALUES (?,?,?,?,?)", (chain, c["token"], NOW, "REJECT: " + "; ".join(fails), None))
                 if rejects_tracked < CFG.get("shadow_rejects_per_run", 8):   # sample rejects to learn if the rule was right
@@ -268,7 +277,6 @@ def cmd_scan():
                            metrics={"age_h": round(c["age_h"], 1), "mcap": round(c["mcap"]), "pc": c["pc"]})
                     rejects_tracked += 1
                 continue
-            d = dx.get(c["token"], {})
             total, parts, metrics = score(c, s, d)
             DB.execute("INSERT OR REPLACE INTO seen VALUES (?,?,?,?,?)", (chain, c["token"], NOW, "SCORED", total))
             shadow(chain, c["token"], "scored" if total >= CFG["min_score"] else "low_score", "", d.get("price") or c["price"],
@@ -716,7 +724,7 @@ TUNABLE = {
     "stop_loss_pct": (25, 60, 10, None), "trail_pct": (15, 50, 5, None), "no_move_hours": (6, 24, 6, None), "no_move_min_gain_pct": (10, 40, 10, None),
     "min_age_h": (0.5, 6, 1, None), "max_age_h": (12, 72, 12, None),
     "max_top10_pct": (15, 30, 5, "down"), "max_creator_pct": (1, 5, 1, "down"), "max_linked_wallets": (10, 40, 10, "down"),
-    "max_insider_pct": (5, 15, 5, "down"), "max_sell_tax_pct": (0, 10, 5, "down"),
+    "max_insider_pct": (5, 15, 5, "down"), "max_sell_tax_pct": (0, 10, 5, "down"), "max_paid_boosts": (0, 100, 10, "down"),
     "min_lp_locked_pct": (80, 100, 10, "up"), "min_liquidity": (20000, 100000, 20000, "up"), "min_holders": (100, 1000, 200, "up"),
     **{f"weights.{k}": (0.5, 1.5, 0.25, None) for k in ("momentum", "holders", "liquidity", "buyer_breadth", "social", "survival")},
 }
