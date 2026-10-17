@@ -1,0 +1,53 @@
+{
+ "slots_left_today": 1,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "7iYM9cjpKKNyLvJfq4pYyjubk83dnqxtPDrRdf77pump",
+   "symbol": "iMolest ",
+   "name": "iMolest ",
+   "score": 79.4,
+   "score_parts": {
+    "momentum": 22,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 6
+   },
+   "age_h": 1.1,
+   "liquidity_usd": 31996,
+   "mcap_usd": 137634,
+   "price_usd": 0.0001313,
+   "safety": {
+    "top10_pct": 18.9,
+    "creator_pct": 1.81,
+    "insider_pct": 0,
+    "linked_wallets": 8,
+    "lp_locked_pct": 100.0,
+    "holders": 5958,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 35.58,
+    "buy_ratio_1h": 0.54,
+    "price_change": {
+     "m5": -12.213,
+     "m15": -35.011,
+     "m30": -67.676,
+     "h1": 18.563,
+     "h6": 203.816,
+     "h24": 203.816
+    },
+    "buyers_6h": 5422,
+    "liq_to_mcap": 0.232
+   },
+   "socials": {
+    "twitter": "https://x.com/imolest_sol"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/do8mgcnen6ydyeauytntt9q7xdxmsjksvbzx2ehhgrzk",
+   "paid_boosts": 0
+  }
+ ]
+}

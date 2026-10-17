@@ -1,0 +1,13 @@
+**iMolest** (`7iYM…pump`): PASS.
+
+- **Momentum is fading.** The 5m, 15m and 30m changes are -12%, -35% and -68%. The 1h change is still +18.6% only because of the earlier spike, and the 6h and 24h gains are identical at +204%, which points to a single pump. Entering now means buying into a dump.
+- **Buy ratio is weak.** It's 0.54 against the 0.55 threshold, and 1h turnover is 35x, which looks like churn rather than broad accumulation.
+- **Linked wallets are a flag.** There are 8 linked wallets even though the hard filters passed.
+- **The name is a poor narrative.** It's shock-bait with no website and only one Twitter link.
+- **The track record argues for caution.** The paper-trading record is -$88.59 with a 47% win rate. Many picks around this score, 79 or lower, hit stop losses, and coins that spike and then retrace fast have mostly lost.
+
+The one slot is better saved for a steadier climb.
+
+```json
+{"verdicts": [{"token": "7iYM9cjpKKNyLvJfq4pYyjubk83dnqxtPDrRdf77pump", "verdict": "PASS", "reason": "Price is collapsing (m15 -35%, m30 -68%) after a one-spike 6h/24h run, so entry would be buying a dump. The buy ratio is only 0.54, there are 8 linked wallets, and the narrative is weak."}]}
+```

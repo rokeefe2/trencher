@@ -1,0 +1,53 @@
+{
+ "overrides": {
+  "weights": {
+   "momentum": 0.75,
+   "holders": 0.5
+  }
+ },
+ "changelog": [
+  {
+   "date": "2026-09-28",
+   "key": "weights.momentum",
+   "from": 1.0,
+   "to": 1,
+   "reason": "High-momentum-scored candidates underperformed low-momentum ones (doubled 11% vs 18%, up50 14% vs 26%); likely chasing already-pumped coins near local tops. Lowering weight should favor less-extended entries.",
+   "evidence_n": 274
+  },
+  {
+   "date": "2026-09-28",
+   "key": "weights.holders",
+   "from": 1.0,
+   "to": 1,
+   "reason": "High-holders-scored candidates rugged far more than low-holders ones (90% vs 49% rug rate); component likely rewards inflated/bot-driven holder counts. Lowering weight should reduce exposure to this trap.",
+   "evidence_n": 274
+  },
+  {
+   "date": "2026-09-30",
+   "key": "weights.momentum",
+   "from": 1.0,
+   "to": 0.75,
+   "reason": "Set by Ray",
+   "evidence_n": 0,
+   "approved_by": "Ray"
+  },
+  {
+   "date": "2026-09-30",
+   "key": "weights.holders",
+   "from": 1.0,
+   "to": 0.75,
+   "reason": "Set by Ray",
+   "evidence_n": 0,
+   "approved_by": "Ray"
+  },
+  {
+   "date": "2026-10-12",
+   "key": "weights.holders",
+   "from": 0.75,
+   "to": 0.5,
+   "reason": "High holders-score coins rug 88% vs 56% for low (n=1129); the component rewards inflated holder counts. 38 post-9-30 picks at 0.75 showed no improvement (-$2.34/pick). Hypothesis: lowering to 0.5 shifts picks toward less rug-prone coins. Confirm if the next ~20 picks have fewer stop-losses (<45%) and better P&L per pick; undo if not.",
+   "evidence_n": 1129
+  }
+ ],
+ "pending": []
+}

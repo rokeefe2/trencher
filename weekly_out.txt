@@ -1,0 +1,94 @@
+# Trencher weekly review, 2026-10-12
+
+## 1. Headline
+Paper P&L is **-$121.35** on $3,050 staked (-4.0%). There are 61 closed picks, 0 open, and the win rate is 46%. Since last week's notebook there were 21 new picks, which netted **-$4.77**, so the bleeding has nearly stopped. We aren't closer to real money yet: total P&L is negative, only 1 of the last 3 weeks was profitable (-32 / -34 / -55), and Claude's picks still trail its passes.
+
+## 2. Pick table (21 picks since last review)
+| Symbol | Score | 1h | 6h | 24h | 72h | P&L | Exit |
+|---|---|---|---|---|---|---|---|
+| SLAZH | 85.1 | 1.00 | 1.00 | 2.66 | 0.05 | -1.49 | no move 12h |
+| SOLgiving | 75.5 | 0.85 | 0.03 | 0.03 | 0.03 | -48.72 | stop |
+| TANG | 69.9 | 1.08 | 1.06 | 0.39 | 1.12 | -21.87 | stop |
+| IRL | 87.6 | 1.42 | 0.05 | 0.02 | 0.02 | +37.97 | trail |
+| A1 | 85.4 | 1.21 | 2.25 | 3.19 | 0.01 | +4.89 | trail |
+| GOMOCAT | 82 | 0.90 | 1.06 | 0.01 | 0.01 | +9.01 | trail |
+| OMARCHY | 79.2 | 0.41 | 0.14 | 0.10 | 0.06 | +14.15 | trail |
+| PLAY | 93 | 0.61 | 0.01 | 0.01 | 0.01 | -20.89 | stop |
+| swordowl | 91 | 1.15 | 0.02 | 0.01 | 0.01 | +41.87 | trail |
+| puter | 95.5 | 0.41 | 0.01 | 0.01 | 0.01 | +11.04 | trail |
+| SC | 91 | 0.83 | 0.99 | 0.01 | 0.01 | -22.19 | stop |
+| QW | 84.2 | 0.01 | 0.01 | 0.01 | – | +12.61 | trail |
+| HI | 88.7 | 1.06 | 0.74 | 0.07 | – | -21.37 | stop |
+| SW | 82 | 1.48 | 0.85 | 0.01 | – | -49.68 | stop (gapped) |
+| BUNKER | 86.2 | 0.71 | 0.70 | 0.76 | – | -22.35 | stop |
+| QT | 87.6 | 3.08 | 4.07 | 5.71 | – | +64.57 | trail |
+| SIB | 94.9 | 1.18 | 0.01 | 0.01 | – | -25.74 | stop |
+| Chada | 79.4 | 0.27 | 0.35 | – | – | -23.43 | stop |
+| GOMODOGE | 91 | 1.65 | 0.69 | – | – | +20.99 | trail |
+| SDR | 73.2 | 1.04 | 1.64 | – | – | +36.03 | trail |
+| DOGEFATHER | 95.5 | 0.01 | 0.01 | – | – | -0.17 | trail |
+
+All picks are on Solana. The 1h checkpoint is the coin's price, not our position. Several "trail" wins (puter, QW, DOGEFATHER) show ~0.01× at 1h, meaning we sold on an early spike before the coin collapsed. Two stops (SW, SOLgiving) gapped to about -$49, roughly 2× the normal stop loss.
+
+## 3. Rule report card
+Rejects overall: n=6,457, 73% rugged, 5% doubled. The safety layer is protective in aggregate.
+
+| Rule | n | Rug % | Doubled % | Verdict |
+|---|---|---|---|---|
+| too few holders | 5257 | 72 | 1 | Good |
+| owner can mint | 1320 | 87 | 0 | Good |
+| creator/owner holds X% | 1228 | 90 | 0 | Good |
+| LP locked/burned | 1081 | 84 | 23 | Protective, but 23% doubled; watch |
+| Large LP Unlocked | 808 | 92 | 28 | Very protective despite 28% doubled; keep |
+| top 10 hold X% | 683 | 82 | 22 | Keep |
+| linked wallets | 374 | 72 | 10 | Keep |
+| contract not verified | 146 | 44 | 23 | Weakest rug rate; no strong case yet |
+| Mint / Freeze authority | 17–35 | 12–22 | 0–4 | Low rug and low doubled; loosening gains nothing |
+| honeypot | 25 | 28 | 56 | Looks like false positives, but a honeypot means we can't sell; **do not loosen** |
+| Creator rug history, sell tax, others | <20 | – | – | n too small to judge |
+
+No rule is clearly too tight. The safety rules aren't the weak point. Entry quality is.
+
+## 4. Scoring
+- **Buckets are not monotonic.** 70–79 has the lowest rug rate (61%) and best median (0.12). 80+ rugs 76% with a 0.04 median, and <60 is no better. Higher score does not mean better coin. Our picks mostly sit in 80+.
+- **Components:**
+  - **Holders is inverted.** High scores rug 88% vs 56% for low (n=1129). The weight was cut to 0.75 on 9-30.
+  - **Liquidity** is the only sensible one: low scores rug 80% vs 63% for high.
+  - **Buyer_breadth** is maxed by 90% of coins, so it can't discriminate. That is a threshold problem.
+  - **Social high** is worse (doubled 4% vs 13%, n=77).
+  - **Momentum** is slightly worse when high. It is already at 0.75.
+  - **Survival** has a slight edge (rug 54% vs 71%), but the high group is small.
+- **Weight change check (9-30):** 38 post-change picks netted -$88.95 (-$2.34/pick, 45% win). Pre-change, 23 picks netted -$32.40 (-$1.41/pick). There is no improvement, but 38 picks of mostly stop-loss noise can't prove the weights are the cause either.
+- **Claude vs. passes:** picks have a 0.04 median 24h vs 0.10 for passes. They rug 79% vs 62% and double 6% vs 14%. The Stage 3 review is **not adding value** and is slightly negative.
+- **Claude vs. chance:** `control` is null, so there is no data yet. No call is possible.
+- **Entry signal (5-min spike >20%):** yes has 50% down-40% at 1h vs 43% for no, and up-50% at 9% vs 12%. This is a slight negative signal, not a clear separation (n=139 vs 829). It is not worth enabling.
+
+## 5. Exits
+Actual average exit is 0.96× vs 0.43× for hold-24h and 0.18× for hold-72h (n=61). Exits are the strongest part of the system, because they turn coins that later rug into small wins. The remaining cost is the stop-loss tail. About 29 stops at roughly -$22 each, plus two gaps near -$49, offset the trailing wins. I'm not touching the exit settings.
+
+## 6. Go-live checklist
+- ≥30 closed picks: **PASS** (61)
+- Total P&L positive: **FAIL** (-$121)
+- Win rate ≥35%: **PASS** (46%)
+- Profitable in 2 of the last 3 weeks: **FAIL** (-32 / -34 / -55)
+- Claude's picks beat its passes: **FAIL** (0.04 vs 0.10)
+
+Also missing is Claude-vs-random control data (`control` is null).
+
+## 7. Changes this week
+**One change: `weights.holders` 0.75 → 0.5.**
+- **Evidence:** high holders-score coins rug 88% vs 56% for low (n=1129). The component is the most clearly inverted one, and last week's notebook set this as the trigger.
+- **Hypothesis:** a lower weight lets the less rug-prone, lower-holder-score coins rank higher.
+- **Confirm or undo:** if the next ~20 picks show a stop-loss share below ~45% and P&L per pick above -$1, keep it. If they are no better, or the 70–79 bucket stops outperforming, revert it.
+
+I'm holding steady on everything else:
+- The social and momentum effects are too weak or too small in n to act on.
+- The exits are working.
+- Loosening the safety rules isn't justified.
+
+Paper trading only — not financial advice.
+
+```json
+{"changes": [{"key": "weights.holders", "value": 0.5, "reason": "High holders-score coins rug 88% vs 56% for low (n=1129); the component rewards inflated holder counts. 38 post-9-30 picks at 0.75 showed no improvement (-$2.34/pick). Hypothesis: lowering to 0.5 shifts picks toward less rug-prone coins. Confirm if the next ~20 picks have fewer stop-losses (<45%) and better P&L per pick; undo if not.", "evidence_n": 1129}],
+ "notebook": "**Notebook (as of 2026-10-12; 61 closed, P&L -$121.35, win 46%)**\n\n**State:** Exits are the strongest part (actual avg 0.96x vs hold-24h 0.43x vs hold-72h 0.18x). Do NOT touch stop/trail/no-move. Safety rules are protective overall (rejects 73% rug, 5% doubled). The problem is entry quality: picks rug about 79% in 24h, worse than passes (62%). About 29 stop-losses at about -$22 (plus two gaps at -$49: SW, SOLgiving) eat the trailing wins. Last 3 weeks: -32 / -34 / -55. This past week, 21 picks netted -$4.77, a near-flat improvement.\n\n**Weights:** momentum and holders set to 0.75 on 9-30 (by Ray). 38 post-change picks: -$88.95 (-$2.34/pick, 45% win) vs pre-change 23 picks -$32.40 (-$1.41/pick), no improvement. On 10-12 I cut holders to 0.5. Holders component inverted: high rugs 88% vs 56% low (n=1129). CHECK next week: stop-loss share of new picks (<45% = good), P&L/pick better than -$1; revert if no better. Momentum at 0.75; leave.\n\n**Scoring:** buckets non-monotonic (70-79 best: rug 61%, median 0.12; 80+ rug 76%, median 0.04). Buyer_breadth maxed by 90% of coins (useless without a tighter threshold; owner). Liquidity is the only sensible component. Social high is worse (doubled 4% vs 13%, n=77); consider cutting social weight to 0.75 if still true next week. Survival has a slight edge, small n.\n\n**Claude Stage 3:** picks median 24h 0.04 vs passes 0.10, rug 79% vs 62%, doubled 6% vs 14%. The review is not adding value (negative two weeks running). The control (random-pick) data is still null; need >=20 closed on each side. Suggest the owner revisit the review prompt: demand evidence of organic buying and no early sell pressure, and penalise 80+ score hype.\n\n**Entry signals:** 5-min spike >20% shows no useful separation (n=134 yes; slightly worse: down40 50% vs 43%). Do not enable.\n\n**Safety watchlist (no action):** contract not verified (rug 44%, doubled 23%, n=146); mint/freeze rules (rug 12-22%, doubled <5%, n~20-35, loosening gains nothing); honeypot (n=25, doubled 56%, but can't-sell is a real risk, do not loosen).\n\n**Ideas for owner to build:**\n1. Early-rug filter: many picks hit ~0.01x within 1h; add a first-hour sell-pressure or liquidity-drop check before entry.\n2. Tighter buyer_breadth threshold so it discriminates.\n3. Smaller stake or a size cut on 80+ scores (they do worse).\n4. Gap-protection: cap stake on thin-liquidity coins, since two stops gapped to -$49.\n5. Partial take-profit on fast spikes.\n\n**Next week:** the holders=0.5 verdict, whether Claude control data accumulates, 80+ bucket recovery, stop-loss share, and the go-live P&L and weekly-profit checks."}
+```
