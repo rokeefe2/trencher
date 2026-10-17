@@ -71,3 +71,5 @@
 {"id": "d020974912a9418e93d4975776277cdc", "t": 1792273810.2890842, "pick_id": 97, "kind": "ladder", "level": 0, "price": 0.0004115, "peak_price": 0.0004115}
 {"id": "c8a25faf54b74271b115b39e648f8762", "t": 1792273810.2890842, "pick_id": 98, "kind": "ladder", "level": 0, "price": 0.0004115, "peak_price": 0.0004115}
 {"id": "665822c1669046c5b235d0e8f18f1c59", "t": 1792273810.2890842, "pick_id": 99, "kind": "ladder", "level": 0, "price": 0.0004115, "peak_price": 0.0004115}
+{"id": "c1fbf19346ba42018d49f7ad269477c1", "t": 1792275300.9537928, "pick_id": 97, "kind": "ladder", "level": 1, "price": 0.0005912, "peak_price": 0.0005912}
+{"id": "42d0efd9b3a0499298fe89978c11b2ac", "t": 1792275300.9537928, "pick_id": 99, "kind": "ladder", "level": 1, "price": 0.0005912, "peak_price": 0.0005912}
