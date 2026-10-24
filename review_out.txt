@@ -1,0 +1,15 @@
+None of the three is a calculated bet, so I'm passing on all of them.
+
+- **HCAT:** It is down 76% in the last hour and 57% in the last 5 minutes. That looks like the top of a vertical candle dumping, even with 100% locked liquidity and a low top-10 share. Buying now means catching a falling knife.
+- **Bunnett:** It is up about 13x in 24h and 3.5x in 6h, so I'd be chasing a move that has already happened. It also has 9 linked wallets, a 24.9% top-10 share, a thin narrative (a Polymarket tweet link and a search-page "website"), and a negative 5-minute change. The room to run is mostly gone.
+- **SolFauc:** It is down 44% in the last hour and the buy ratio is only 0.52. It has no socials, no website, 9 linked wallets, and turnover of 11x, which looks like churn. It's a generic name with nothing behind it.
+
+The track record also argues for holding back. The win rate is 46% and total PnL is negative, with most losses coming from stop-outs on high-score coins that were already fading. Skipping all three today is consistent with that.
+
+```json
+{"verdicts": [
+{"token": "3AQmLmBUKGGenieXnkNh1QGoFC1sSTkbdoiEU2Cxpump", "verdict": "PASS", "reason": "Price is down 76% in 1h and 57% in 5m, so the pump is already unwinding and entry would be a falling knife despite clean holder data."},
+{"token": "41thoMqVENHtGhuSp5Jhy9yPWghqrPfeETrMe97JK4tg", "verdict": "PASS", "reason": "Already up about 13x in 24h and 3.5x in 6h, so the entry is late. It also has 9 linked wallets, 24.9% top-10 concentration, a weak narrative and a negative 5m change."},
+{"token": "FAuc5ZDyHcsmLq6kGKHgNnsiQbGMCFAQvDdPvC9DeT16", "verdict": "PASS", "reason": "Down 44% in 1h with a 0.52 buy ratio, no socials or website, 9 linked wallets and 11x turnover churn. There is no story and no sign of organic momentum."}
+]}
+```
