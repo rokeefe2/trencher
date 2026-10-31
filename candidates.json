@@ -1,0 +1,97 @@
+{
+ "slots_left_today": 5,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "2MXhpKgHBREgYYj3bSdorqbuJjkPAve1LTNHtk8Lpump",
+   "symbol": "Pikmin",
+   "name": "Pikmin",
+   "score": 69.7,
+   "score_parts": {
+    "momentum": 10,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 6
+   },
+   "age_h": 1.8,
+   "liquidity_usd": 23332,
+   "mcap_usd": 82598,
+   "price_usd": 8.51e-05,
+   "safety": {
+    "top10_pct": 19.1,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 0,
+    "lp_locked_pct": 100.0,
+    "holders": 3815,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 8.98,
+    "buy_ratio_1h": 0.48,
+    "price_change": {
+     "m5": 14.795,
+     "m15": -19.535,
+     "m30": 16.084,
+     "h1": -43.569,
+     "h6": 137.539,
+     "h24": 137.539
+    },
+    "buyers_6h": 3791,
+    "liq_to_mcap": 0.282
+   },
+   "socials": {
+    "twitter": "https://x.com/TheApophenoth/status/2116533897915711943"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/eyi8qwe7tflhwrgajd88kuzpxuxetf9b5hn9zbyvkxi6",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "base",
+   "token": "0xf7b9cf4dab32ce42f1e08c05f561ccc0e7b44cea",
+   "symbol": null,
+   "name": "Anthropic / USDC",
+   "score": 62.1,
+   "score_parts": {
+    "momentum": 5,
+    "holders": 20,
+    "liquidity": 15,
+    "buyer_breadth": 10,
+    "social": 0,
+    "survival": 10
+   },
+   "age_h": 3.3,
+   "liquidity_usd": 10308490,
+   "mcap_usd": 10191888,
+   "price_usd": 0.000101918875062801,
+   "safety": {
+    "top10_pct": 1.0,
+    "creator_pct": 0.0,
+    "sell_tax_pct": 0.0,
+    "lp_locked_pct": 0,
+    "holders": 5214.0
+   },
+   "metrics": {
+    "turnover_1h": 0.0,
+    "buy_ratio_1h": 0.55,
+    "price_change": {
+     "m5": 0.074,
+     "m15": 0.043,
+     "m30": 0.102,
+     "h1": -0.358,
+     "h6": 227.706,
+     "h24": 227.706
+    },
+    "buyers_6h": 214,
+    "liq_to_mcap": 1.011
+   },
+   "socials": null,
+   "websites": null,
+   "dexscreener": null,
+   "paid_boosts": null
+  }
+ ]
+}

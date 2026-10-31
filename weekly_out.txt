@@ -1,0 +1,95 @@
+# Trencher weekly review, 2026-10-26
+
+## 1. Headline
+Paper P&L is **-$95.53** on $4,600 staked: 91 closed picks plus 1 open, a 46% win rate, and 2,313 coins scanned (2,096 rejected by safety). Last week's 15 closed picks netted **-$5.45**, with 7 wins (47%) and 6 stop-losses (40%). Excluding one +$103 outlier (KIMCHIBULL), the week was about -$109. We are **not yet closer to real money**: P&L is still negative, and only 2 of 5 go-live checks pass.
+
+## 2. Picks
+This week's picks are below. The earlier 76 are summarised in sections 4 and 5.
+
+| Symbol | Score | 1h | 6h | 24h | 72h | P&L | Exit |
+|---|---|---|---|---|---|---|---|
+| Monaka | 85.4 | .42 | .14 | .08 | .04 | -21.10 | stop loss |
+| ORYN | 85.0 | 1.44 | .02 | .02 | .02 | +14.22 | trailing |
+| STICKFU | 96.2 | 1.0 | 1.0 | .06 | .06 | -1.49 | no move 12h |
+| Pikachu | 91.2 | .02 | .02 | .02 | – | -49.13 | stop loss (gap) |
+| DACITY | 91.2 | .01 | .01 | .01 | .01 | -21.06 | stop loss |
+| KIMCHINU | 88.8 | .60 | .00 | .00 | .00 | +4.64 | trailing |
+| KIMCHIBULL | 85.0 | 5.46 | 2.27 | .35 | .00 | **+103.24** | trailing |
+| KIMCHI | 91.2 | .64 | .01 | .01 | .01 | -23.95 | stop loss |
+| BROZO | 88.4 | 1.77 | .02 | .02 | .02 | +5.20 | trailing |
+| ヤギ | 80.3 | .21 | .00 | .00 | .00 | -25.04 | stop loss |
+| NOWHEEL | 70.9 | 1.20 | 1.28 | 1.05 | 3.49 | -3.92 | no move 12h |
+| Peekhole | 86.6 | 1.49 | 2.51 | 1.86 | – | +10.90 | trailing |
+| REMUS | 88.8 | 1.35 | 1.47 | 3.36 | – | +12.04 | trailing |
+| PRIVACY | 90.9 | 99.9 | .16 | .24 | – | -21.47 | stop loss |
+| SLOPCOIN | 80.6 | .31 | .14 | .09 | – | +11.47 | trailing |
+| FOMOPAD | 85.9 | open | | | | -0.75 | open |
+
+Some checkpoints look odd. Several "trailing stop" wins show 0.01× at 1h (QW, Send and others earlier), and PRIVACY shows 99.9× at 1h before a stop-loss. These are probably price-feed quirks or very fast pump-and-rug moves. I'm treating checkpoints cautiously.
+
+## 3. Rule report card
+- **Protecting well (large n):**
+  - too few holders: n=7791, 69% rug, 1% doubled.
+  - creator/owner holds X%: n=2320, 87% rug, 1% doubled.
+  - owner can mint: n=2073, 85% rug, 0% doubled.
+  - pause/blacklist sellers: n=579, 77% rug, 2% doubled.
+  - Low Liquidity: n=336, 86% rug, 5% doubled.
+- **Block some winners but mostly rugs, so don't loosen:**
+  - Large LP Unlocked: n=1079, 92% rug, 27% doubled.
+  - only X% LP locked: n=1687, 84% rug, 20% doubled.
+  - top-10 holds X%: n=988, 81% rug, 20% doubled.
+- **Contract not verified:** n=238, 51% rug, 24% doubled. This is the only rule with a rug rate near half. It is a loosening candidate, but it isn't a tunable key and the evidence isn't strong enough.
+- **Honeypot:** n=48, 44% rug, 48% doubled. The can't-sell risk is too severe to loosen.
+- **Mint, Freeze and Permanent Control authority rules:** n=17–47, rug 12–32%, doubled 0–6%. They cost little but gain little, since these coins mostly don't rug. n is small, so no action.
+- **Too small to judge (n<20):** sell tax, Permanent Control, hidden ownership, Missing metadata, Symbol Mismatch.
+- **No rule is clearly too loose or too tight.**
+- **Stage rug rates:** rejects 71%, low_score 75%, scored 72%, pass 63%, pick 76%. Picks rug about as much as rejects.
+
+## 4. Scoring
+- **Buckets are non-monotonic.** Rug rate is 61–62% for 60–79 and 75% for 80+, while median 24h is 0.11 for 60–79 and 0.03 for 80+. Higher scores do **not** beat lower ones. Many of our worst losses scored 91+ (Pikachu, DACITY, KIMCHI, PLAY, DOPEUS, SIB, VCAT).
+- **Components:**
+  - holders: high rugs 86% vs 56% low, so it is inverted. Weight is already 0.5, and 41% of coins are at max.
+  - survival: high rugs 52% vs 71% low (n=256), with doubled 15% vs 12%. It is the best component and the pattern held two weeks running.
+  - social: high doubles 5% vs 14% and rugs 78% vs 68%. It is a negative signal and its weight is already cut.
+  - momentum: high doubles 15% vs 12% (last week's inverse pattern flipped), with rug 72% vs 67%. Mixed, no action.
+  - liquidity: full marks rug 63% vs 80%. This is sensible.
+  - buyer_breadth: 89% of coins are at max, so it can't separate coins. That is a threshold problem for the owner.
+- **Claude PICK vs PASS:** median 24h is 0.04 vs 0.09, and rug is 76% vs 63%. The go-live check fails on this metric.
+- **Claude vs random** (n=30 closed each, past the 20 threshold):
+
+| | P&L | Avg × | Win | Reached first sale | Stop-loss |
+|---|---|---|---|---|---|
+| Claude | +26.57 | 1.018 | 47% | 47% | 43% |
+| Random | -83.36 | 0.944 | 33% | 33% | 53% |
+
+  The direction favours Claude on every metric. The edge is fragile, though: KIMCHIBULL alone is +$103, and without it Claude is roughly -$77, similar to random. I'd call it "promising, not proven". It conflicts with the PICK-vs-PASS check, which says picks do not beat passes.
+- **Alt exits** (n=26 closed each): normal ladder +21.37 vs alt -13.19, with identical win and stop-loss rates. The alt exits don't win, so keep the normal ladder.
+- **Entry signal, 5-min spike >20%:** down40 at 1h is 54% (n=191) vs 44% (n=1264), a 10-point gap. Up50 at 1h is 8% vs 12%. Doubled at 24h is 13% vs 14% and median 24h is 0.08 vs 0.07. This is a weak separation, so I'm not recommending it yet.
+
+## 5. Exits
+Actual average is **0.979×** vs hold-24h 0.795× and hold-72h 0.615× (n=91). The exits clearly beat simple holding. The costs come from stop-losses at about -$22 each and four gap-down exits near -$48 (Pikachu this week; earlier SW, SOLgiving, ALIVE, DOPEUS).
+
+## 6. Go-live checklist
+- ≥30 closed picks: **pass** (91).
+- Total P&L positive: **fail** (-$94.81).
+- Win rate ≥35%: **pass** (46%).
+- Profitable in 2 of the last 3 weeks: **fail** (-55 / +32 / -5).
+- Claude's picks beat its passes (median 24h): **fail** (0.04 vs 0.09).
+
+## 7. Changes this week
+Weights for holders (0.5) and social (0.75) are still under test, so I'm leaving them alone.
+- **Holders test:** since the 10-12 change there are 30 closed picks, with +$26.57 (+$0.89/pick, helped by one outlier) and a 43% stop-loss share, under the 45% target. That is a mild confirmation, so keep it.
+- **Social test:** this was changed a week ago and has only about 15 picks, so I'm not judging it yet.
+
+**One change:** raise `weights.survival` from 1.0 to 1.25.
+- **Hypothesis:** survival is the one component that separates rugs from non-rugs, and weighting it more tilts picks toward longer-lived coins.
+- **Evidence:** the high bucket (n=256) rugs 52% vs 71% for low. This is the same pattern two weeks running.
+- **Confirm** if the next ~20 picks show a stop-loss share below 40% and P&L/pick above 0. **Undo** if the stop-loss share is 45% or more.
+- It is a small step, and this is a third weight change in two weeks, so attribution is muddied.
+
+Paper trading only — not financial advice.
+
+```json
+{"changes": [{"key": "weights.survival", "value": 1.25, "reason": "High survival-score coins rug 52% vs 71% for low (n=256 high, 1736 total), doubled 15% vs 12%; same pattern two weeks running and the only component that separates rugs. Hypothesis: weighting it more shifts picks toward longer-lived coins. Confirm if next ~20 picks have stop-loss share <40% and P&L/pick >0; undo if stop-loss share >=45%.", "evidence_n": 1736}],
+ "notebook": "**Notebook (as of 2026-10-26; 91 closed, P&L -$95.5, win 46%)**\n\n**State:** Exits are the strongest part: actual avg 0.979x vs hold-24h 0.795x vs hold-72h 0.615x. Do NOT touch stop/trail/no-move. Safety rules protect overall (rejects 71% rug, 5% doubled). Problem is entry quality: picks rug 76% at 24h vs passes 63%; score 80+ is worse than 60-79 (rug 75% vs 62%). Stop-losses of about -$22 each and gap-downs of about -$48 (SW, SOLgiving, ALIVE, DOPEUS, Pikachu) eat the trailing wins. Weekly P&L: -55 / +32 / -5 / this week -5.5 (15 closed, 7 wins, 6 stops = 40%). This week only profitable because of KIMCHIBULL +$103; without it about -$109. Results are outlier-driven.\n\n**Weights:** momentum 0.75, holders 0.5 (cut 10-12), social 0.75 (cut 10-19), survival 1.25 (raised 10-26). Holders test: 30 closed picks since 10-12, +$26.6 total (+$0.89/pick), stop-loss share 43% (<45% target): mild confirm, keep. Social test: only about 15 picks since the change, still pending; undo if doubled rate flips or stops rise. Survival test: confirm if next ~20 picks have stop share <40% and P&L/pick >0; undo if stop share >=45%. Momentum signal flipped (high now doubles 15% vs 12%): watch, no action. Three weight changes in two weeks, so attribution is muddy; do not change more weights next week.\n\n**Scoring:** buckets non-monotonic. Buyer_breadth maxed by 89% (useless; owner should tighten threshold). Survival best component. Holders inverted (high rug 86% vs 56%). Social negative.\n\n**Claude Stage 3:** picks median 0.04 vs passes 0.09, rug 76% vs 63% (go-live check fails). Control (n=30 each): Claude +$26.6 vs random -$83.4, win 47% vs 33%, stop 43% vs 53%. Direction favors Claude but driven by one outlier; without KIMCHIBULL, about equal to random. Alt exits (n=26 each): +21.4 vs -13.2; keep normal ladder. If random catches up, revise review prompt: demand organic buying, no early sell pressure, penalize 80+ hype.\n\n**Entry signals:** 5-min spike >20%: down40 at 1h 54% vs 44% (n=191/1264), up50 8% vs 12%, doubled 13% vs 14%. Weak; do not enable yet. Re-check with more data.\n\n**Safety watchlist (no action):** contract not verified (rug 51%, doubled 24%, n=238) is the only loosening candidate, need more evidence; LP unlocked / lp locked / top10 block 20-27% winners but 81-92% rug, don't loosen; honeypot doubled 48% but can't-sell risk; mint/freeze rules cost little.\n\n**Data quirk:** many trailing-stop wins show ~0.01x at 1h checkpoint (QW, Send, CATBOT, PRIVACY 99.9x at 1h). Possible price-feed issue or fast pump-and-rug; owner could check checkpoint source.\n\n**Ideas for owner to build:**\n1. Early-rug filter: first-hour sell-pressure/liquidity-drop check.\n2. Tighter buyer_breadth threshold.\n3. Smaller stake on 80+ scores and on thin-liquidity coins (gap protection).\n4. Partial take-profit on fast spikes.\n5. Cap per-coin loss (limit-sell/liquidity-depth check) for gaps.\n\n**Next week:** survival verdict, social verdict, whether Claude-vs-random holds ex-outlier, whether a 2nd-in-3 profitable week arrives, 80+ bucket."}
+```

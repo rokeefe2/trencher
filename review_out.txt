@@ -1,0 +1,8 @@
+Both candidates are PASS.
+
+- **Pikmin:** It's 1.8h old and down 43% over the last hour. The buy ratio is 0.48, so sellers are slightly ahead, and the +137% over 6h looks like a spike that's already fading. Its only social link is a single tweet, and it has no website. The paper-trading record doesn't favor this setup either.
+- **Anthropic / USDC (Base):** Liquidity ($10.3M) is about equal to market cap ($10.2M), which isn't normal for a meme coin. Turnover is 0, the price is flat over 5m to 1h, the LP is 0% locked, and there are no socials. Only 214 buyers (transactions) in 6h is also thin for 5,214 holders. It looks like a synthetic or pegged-style pool, not a coin with room to run, and there's no way to verify it's legitimate.
+
+```json
+{"verdicts": [{"token": "2MXhpKgHBREgYYj3bSdorqbuJjkPAve1LTNHtk8Lpump", "verdict": "PASS", "reason": "Price is down 43% over 1h with a 0.48 buy ratio, so the 6h pump is already fading and it is only 1.8h old. Socials are a single tweet with no website."}, {"token": "0xf7b9cf4dab32ce42f1e08c05f561ccc0e7b44cea", "verdict": "PASS", "reason": "Liquidity roughly equals market cap, turnover is 0, price is flat and the LP is unlocked. It has no socials or organic momentum and looks like an odd or synthetic pool, not a meme-coin bet with room to run."}]}
+```
