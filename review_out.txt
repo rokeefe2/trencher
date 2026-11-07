@@ -1,0 +1,15 @@
+I'm picking one of the four candidates, FUSE, and passing on the rest. The track record is a 45% win rate and net negative, so I'm keeping the bar high.
+
+- **FUSE** has the steadiest profile. Its climb is gradual: +35% over 6h, +126% over 24h, and +8.8% over the last hour. Buy ratio is 0.59, turnover is a calm 0.5, and liquidity is a strong 35% of mcap with about 6.3k holders. The 5 linked wallets and no paid boosts are the caveats.
+- **DCAT** already ran +640% and has gone flat, with 5m and 30m both negative. Buy ratio is only 0.54, and it's one of many cat coins.
+- **HATCH** has a small mcap and a decent climb. But it has 8 linked wallets, a weak 0.52 buy ratio, a negative 5m move, and only a single social link.
+- **José** has 22 linked wallets, a 0.5 buy ratio, and negative 15m and 30m moves after a +413% run. Its "website" is a third-party otcdesks.cash page, not a project site.
+
+```json
+{"verdicts": [
+{"token": "5pdu9jrUf9ryLzCsv3S92ikoBiK3n2zA9tMN9Rr7pump", "verdict": "PASS", "reason": "Already ran +640% and is now flat with 5m/30m negative and a weak 0.54 buy ratio; it's also a crowded cat-coin theme, so there is little room left."},
+{"token": "46r5vJSK4vZWvU4roBXoQYoBZE8d4nmN3b6wRa6Gpump", "verdict": "PASS", "reason": "Small and climbing, but 8 linked wallets, a 0.52 buy ratio, a negative 5m move and a single social link make it too easy to manipulate."},
+{"token": "CzwzQw6eGr9RjF3ZLmEPxcxspSk6csRg9Gpvsnycz5eD", "verdict": "PICK", "reason": "FUSE is climbing steadily (+35% 6h, +126% 24h) on a healthy 0.59 buy ratio, with deep liquidity at 35% of mcap, about 6.3k holders and no paid boosts. Main risk: 5 linked wallets and only a Twitter presence, so a coordinated dump or the stop loss could hit quickly."},
+{"token": "87CQtouHSb6YCXaPZ1pp8jD56VudRMXBVqU3oDMD1UJT", "verdict": "PASS", "reason": "22 linked wallets, a 0.5 buy ratio, and falling 15m/30m after a +413% spike; the website is a third-party OTC page rather than a project site."}
+]}
+```
