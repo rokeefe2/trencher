@@ -1,0 +1,83 @@
+# Trencher weekly review: 2026-11-09
+
+## 1. Headline
+Paper P&L is **−$79.89** on 118 closed picks (win rate 48%, none open). Last week was **+$93**, the first positive week in three. We're closer to real money but not there: cumulative P&L is still negative and the profit comes from a few outliers (KIMCHIBULL +$103, BTC +$61, QT +$65).
+
+## 2. Pick table
+This week's 8 picks are listed in full. The full 118 are in STATS. Checkpoints are coin prices, not our position.
+
+| Symbol | Chain | Score | 1h | 6h | 24h | 72h | P&L | Exit |
+|---|---|---|---|---|---|---|---|---|
+| HODL | sol | 90.3 | 0.01 | 0.01 | 0.01 | – | +14.23 | trailing |
+| PI | sol | 85.2 | 0.84 | 1.11 | 1.40 | – | −24.60 | stop loss |
+| FUSE | sol | 85.8 | 0.72 | 0.72 | 0.36 | – | +13.67 | trailing |
+| ANTS | sol | 84.2 | 1.08 | 1.05 | 1.52 | – | +0.75 | no move |
+| BTC | sol | 81.2 | 0.98 | 1.03 | 3.46 | – | +60.74 | trailing |
+| TAOLF | sol | 85.2 | 0.45 | 0.14 | 0.09 | – | +15.75 | trailing |
+| ORBIT | sol | 81.5 | 1.04 | 1.04 | 0.003 | – | +28.89 | trailing |
+| HEREWEGO / NVIDIH | sol | 84.2 / 87.9 | 1.35 / 0.77 | 1.35 / 0.77 | 0.002 / – | – | +13.35 / +14.29 | trailing |
+
+(Rocco, a "no move" exit at −1.17, was also this week. Of the 11 picks since 11-05, 9 were winners or flat, and PI was the only stop loss.)
+
+## 3. Rule report card
+Tracked coins: 6,674. Rejected by safety: 5,544, of which 68% rugged and 5% doubled. The rules protect us overall.
+
+| Rule | n | Rug % | Doubled % | Verdict |
+|---|---|---|---|---|
+| too few holders | 4323 | 66 | 2 | Fine |
+| creator/owner holds X% | 1622 | 87 | 1 | Fine |
+| owner can mint | 1373 | 85 | 1 | Fine |
+| LP locked < X% | 1019 | 83 | 16 | Fine, some winners lost but rugs dominate |
+| pause/blacklist | 626 | 78 | 1 | Fine |
+| top 10 hold X% | 561 | 78 | 15 | Keep |
+| Large LP Unlocked | 533 | 90 | 25 | Keep; 25% doubled but 90% rug |
+| linked wallets | 353 | 67 | 11 | Keep |
+| paid boosts | 206 | 65 | 7 | Keep |
+| contract not verified | 142 | 59 | 25 | Loosening candidate, but 59% still rug; evidence not strong enough |
+| honeypot | 31 | 55 | 45 | n small. Can't-sell risk, never loosen |
+| Mint/Freeze authority | 10–25 | 16–60 | 0–8 | n < 20 for most; low cost |
+
+No rule looks too loose. Rules with n < 20 (Permanent Control, Missing metadata, Symbol Mismatch, sell tax, etc.) can't be judged.
+
+## 4. Scoring
+- **Buckets are non-monotonic.** The 60–69 bucket is best (rug 47%, median 0.21). The 80+ bucket is no better than the lower ones (rug 70%, median 0.03). The score doesn't predict outcomes above ~60.
+- **Components.**
+  - Survival separates best (rug 53% high vs 69% low).
+  - Holders is inverted (rug 83% high vs 51% low).
+  - Social is mildly negative.
+  - Momentum is mildly positive (doubled 13% vs 9%).
+  - Buyer_breadth is maxed by 87% of coins and liquidity by 66%, so neither can tell coins apart. That is a threshold problem.
+- **Claude's picks vs its passes.** Picks have median 24h 0.02 vs 0.11 for passes. Picks rug 71% vs 59% for passes, so the go-live check fails. Checkpoints include post-exit movement and the feed has a quirk (see notebook), so this metric is noisy.
+- **Claude vs chance (n=57 each).** Claude made **+$41.47** (avg 1.015×, win 51%, first sale 47%, stop 39%). Random made **−$188.54** (avg 0.934×, win 40%, first sale 40%, stop 46%). With n ≥ 20 each side, Claude's review is adding value. The gap is partly outlier-driven, so keep watching it.
+- **Exit rules test (n=53 each).** The normal ladder made +$36.27 and the alt exits made −$16.25. The win rates are identical, so the difference is in size of wins. Keep the normal exits.
+- **Entry signal: 5-min spike > 20%.**
+  - 1h: down 40% in 56% of spike coins vs 41% without (n=114 vs 874). Up 50% at 1h: 5% vs 11%.
+  - Median 24h is similar (0.07 vs 0.08), and the 24h rug rate is 72% vs 62%.
+  - It is a mild crash-separator only. There are fewer than 40 coins... no, n is large enough, but the effect on 24h outcome is small. I'm not recommending it yet.
+
+## 5. Exits
+Actual average multiple is **0.986×**, vs 0.716× for hold-24h and 0.577× for hold-72h. The exit logic clearly beats holding and should not be touched. Remaining leakage is gap-downs (−$48 each) and stop-losses at about −$22.
+
+## 6. Go-live checklist
+| Check | Status |
+|---|---|
+| ≥ 30 closed picks | ✅ 118 |
+| Total P&L positive | ❌ −$79.92 (about −$80 from break-even) |
+| Win rate ≥ 35% | ✅ 48% |
+| Profitable 2 of last 3 weeks | ❌ −5 / −78 / +93 |
+| Claude's picks beat its passes (median 24h) | ❌ 0.02 vs 0.11 |
+
+Missing: one or two more profitable weeks, and a fix for gap-down losses.
+
+## 7. Changes this week
+**None. Holding steady.**
+
+- **Survival weight 1.25 (set 10-26) is confirmed so far.** Across the 27 picks since the change, stop-loss share is 33% (target < 40%) and P&L is about +$14.9, or +$0.55/pick (target > 0). Keep it.
+- **Social weight 0.75 and holders weight 0.5.** They were changed recently, so attribution would be muddy. I'm making no more weight changes while survival is still being tested.
+- No safety rule has the strong evidence needed to loosen it.
+
+*Paper trading only — not financial advice.*
+
+```json
+{"changes": [], "notebook": "**Notebook (as of 2026-11-09; 118 closed, P&L -$79.9, win 48%)**\n\n**State:** Exits are the strongest part: actual avg 0.986x vs hold-24h 0.716x vs hold-72h 0.577x. Do NOT touch stop/trail/no-move. Safety rules protect overall (rejects 68% rug, 5% doubled). Weekly P&L: -5 / -78 / +93 (first green week in 3). Results are outlier-driven (KIMCHIBULL +103, QT +65, BTC +61). Gap-downs (~-$48: SW, SOLgiving, ALIVE, DOPEUS, Pikachu, LumiBot) and stop-losses (~-$22) are the main leakage.\n\n**Weights:** momentum 0.75, holders 0.5 (since 10-12), social 0.75 (since 10-19), survival 1.25 (since 10-26). Survival test PASSED so far: 27 picks since change, stop share 33% (<40% target), P&L +$14.9 (+$0.55/pick). Keep at 1.25; reconsider only if stop share goes >=45% over next ~20 picks. Social test: ~50 picks since change, inconclusive, hold. Make at most one weight change per week for clean attribution.\n\n**Scoring:** buckets non-monotonic; 60-69 is best (rug 47%), 80+ no better than 70-79 (rug 70%). Buyer_breadth maxed by 87%, liquidity by 66% (useless; owner should tighten thresholds). Survival best component; holders inverted (high rug 83% vs 51%); social mildly negative; momentum mildly positive.\n\n**Claude Stage 3:** picks median 24h 0.02 vs passes 0.11 (go-live check fails, but metric is noisy: post-exit moves + feed quirk). Control (n=57 each): Claude +$41.5 vs random -$188.5, win 51% vs 40%, stop 39% vs 46%. Review appears to add value (n>=20 each) but verify ex-outlier. Alt exits (n=53): normal +$36.3 vs alt -$16.3; keep normal ladder.\n\n**Entry signals:** 5-min spike >20%: down40 at 1h 56% vs 41% (n=114/874), up50 at 1h 5% vs 11%, median 24h same (0.07 vs 0.08). Mild; not enabling. Would only recommend as a size-reducer, not a block.\n\n**Safety watchlist (no action):** contract not verified (rug 59%, doubled 25%, n=142) only loosening candidate, evidence insufficient; LP unlocked/top10 block 15-25% winners but 78-90% rug, don't loosen; honeypot doubled 45% but can't-sell risk (n=31).\n\n**Data quirk:** many trailing-stop wins show ~0.01x at all checkpoints (TON, GAMBIT, HYPEDOG, TRACER, QW, Send, CATBOT, HODL; PRIVACY 99.9x at 1h). Likely price-feed/decimal issue in checkpoint source; owner should check. Checkpoint stats for those are unreliable.\n\n**Ideas for owner to build:**\n1. Early-rug filter: first-hour sell-pressure/liquidity-drop check.\n2. Tighter buyer_breadth and liquidity thresholds so they discriminate.\n3. Smaller stake on thin-liquidity coins (gap protection).\n4. Per-coin loss cap via liquidity-depth check.\n5. Fix checkpoint price source.\n\n**Next week:** survival verdict continues (~20 more picks), social verdict, Claude vs random ex-outlier, whether a second profitable week arrives, 80+ bucket, spike-signal as a stake reducer."}
+```

@@ -1,0 +1,105 @@
+{
+ "slots_left_today": 3,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "46sup1Mc1AdQPpikrdNLUjmzSgZcEYdV3pk8XPPXpump",
+   "symbol": "DOGCOIN",
+   "name": "DOGCOIN",
+   "score": 85.2,
+   "score_parts": {
+    "momentum": 22,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 6
+   },
+   "age_h": 1.7,
+   "liquidity_usd": 21387,
+   "mcap_usd": 84471,
+   "price_usd": 7.132e-05,
+   "safety": {
+    "top10_pct": 21.3,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 4,
+    "lp_locked_pct": 100.0,
+    "holders": 1697,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 12.61,
+    "buy_ratio_1h": 0.55,
+    "price_change": {
+     "m5": 11.962,
+     "m15": -38.024,
+     "m30": -51.294,
+     "h1": 37.198,
+     "h6": 209.579,
+     "h24": 209.579
+    },
+    "buyers_6h": 2241,
+    "liq_to_mcap": 0.253
+   },
+   "socials": {
+    "twitter": "https://x.com/kentotorhiki/status/2121583947352273087?a=Vhg3pjuwrW9AE82HEIo&s=19"
+   },
+   "websites": [
+    "https://solana.com/news/breakpoint-guide-part2"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/9t43nzubclrnuraqwry9mnyqxgte9pa4bdq6b7ebemar",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "85RhcSEMy15SNhFLmSArNm7udPKXVagVgsq4YmSopump",
+   "symbol": "bill",
+   "name": "bill",
+   "score": 81.5,
+   "score_parts": {
+    "momentum": 18,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 6
+   },
+   "age_h": 1.1,
+   "liquidity_usd": 48494,
+   "mcap_usd": 235237,
+   "price_usd": 0.0002616,
+   "safety": {
+    "top10_pct": 18.1,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 12,
+    "lp_locked_pct": 100.0,
+    "holders": 4130,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 17.49,
+    "buy_ratio_1h": 0.55,
+    "price_change": {
+     "m5": -13.461,
+     "m15": 14.185,
+     "m30": -21.015,
+     "h1": 213.755,
+     "h6": 305.013,
+     "h24": 305.013
+    },
+    "buyers_6h": 4365,
+    "liq_to_mcap": 0.206
+   },
+   "socials": {
+    "twitter": "https://x.com/billtobillion"
+   },
+   "websites": [
+    "https://billtobillion.fun/"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/95ytgfrcbgt1d8ioaqkptxea6qrgj5omgimhnyherxdp",
+   "paid_boosts": 0
+  }
+ ]
+}

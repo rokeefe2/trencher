@@ -1,0 +1,10 @@
+I'm passing on both candidates, so there are no PICKs today.
+
+- **DOGCOIN:** The price fell 51% over 30 minutes and then bounced, which is a volatile pump-and-dump shape and not a steady climb. It is a generic dog-coin name. Its only socials are a random tweet and a website that points at a Solana Breakpoint news page, with no project presence of its own. Buy ratio is only 0.55 and turnover is 12.6x, which is churn. At $84k mcap and 1.7h old, it is too easy to manipulate.
+- **bill:** The 1h change is +214%, which my rules treat as late, and the 6h change is +305%. Momentum is already fading, with 5m at -13% and 30m at -21%. It has 12 linked wallets, which is a lot even though the hard filter passed it. Turnover is 17.5x on an age of about an hour, so the entry would be buying after the vertical candle.
+
+The track record backs this up. The 48% win rate has still lost money overall, with many stop-loss exits after early spikes. Late entries into 1h spikes are the pattern that keeps failing.
+
+```json
+{"verdicts": [{"token": "46sup1Mc1AdQPpikrdNLUjmzSgZcEYdV3pk8XPPXpump", "verdict": "PASS", "reason": "Generic copycat name with a weak, unrelated website and tweet. Price fell 51% in 30 minutes before a bounce, which is erratic and easy to manipulate at 1.7h old."}, {"token": "85RhcSEMy15SNhFLmSArNm7udPKXVagVgsq4YmSopump", "verdict": "PASS", "reason": "The 1h change is +214% and the 6h change is +305%, so this is a late entry after a vertical candle. Momentum is already rolling over, and it has 12 linked wallets and a buy ratio of only 0.55."}]}
+```
