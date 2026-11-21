@@ -1,0 +1,43 @@
+{"id": "33d075fd26c94d90912a3fae68cafb78", "t": 1794703166.591292, "pick_id": 241, "kind": "close", "reason": "stop loss", "price": 8.261e-05, "peak_price": 0.0001459}
+{"id": "e4640b7fbe9a46eea5ee5894c428b2a5", "t": 1794703166.591292, "pick_id": 242, "kind": "close", "reason": "stop loss", "price": 8.261e-05, "peak_price": 0.0001459}
+{"id": "c1fe485d19fd44f3977dfe1e02f281b9", "t": 1794714021.6766489, "pick_id": 243, "kind": "ladder", "level": 0, "price": 0.0001557, "peak_price": 0.0001557}
+{"id": "5b2f4d3f7769433088dd1f22a93d9623", "t": 1794726382.0675688, "pick_id": 243, "kind": "close", "reason": "trailing stop", "price": 0.0001241, "peak_price": 0.0001801}
+{"id": "32257380789545209def6fe4d402dbe2", "t": 1794773526.8933067, "pick_id": 244, "kind": "close", "reason": "stop loss", "price": 1.604e-06, "peak_price": 0.000371}
+{"id": "35d00bbe985f4b79a95fdc939e96c334", "t": 1794773526.8933067, "pick_id": 245, "kind": "close", "reason": "stop loss", "price": 1.604e-06, "peak_price": 0.000371}
+{"id": "ffe75c798d204058b593c663d0cea37c", "t": 1794788202.2452886, "pick_id": 246, "kind": "ladder", "level": 0, "price": 0.001083, "peak_price": 0.001083}
+{"id": "f3d41e25aafd4b55ac965ede60b2ab7e", "t": 1794804926.703797, "pick_id": 247, "kind": "close", "reason": "stop loss", "price": 0.0001033, "peak_price": 0.0002181}
+{"id": "b89677e7e8d1440d852649ff85f216a8", "t": 1794804926.703797, "pick_id": 248, "kind": "close", "reason": "stop loss", "price": 0.0001033, "peak_price": 0.0002181}
+{"id": "b0e3cf7d8bb741b7a3c8b3fd0fbd3f0d", "t": 1794809791.8193567, "pick_id": 249, "kind": "ladder", "level": 0, "price": 0.0005402, "peak_price": 0.0005402}
+{"id": "9ce23ea66939434f9a20a8b3c6426b45", "t": 1794821166.9841342, "pick_id": 246, "kind": "close", "reason": "trailing stop", "price": 0.0008783, "peak_price": 0.001282}
+{"id": "483e8ae5cc294f05b76e6495270d401b", "t": 1794822352.0124228, "pick_id": 249, "kind": "ladder", "level": 1, "price": 0.0007296, "peak_price": 0.0007296}
+{"id": "1d9f549bb3d0409dba7032df16f6bbfc", "t": 1794823157.0318046, "pick_id": 249, "kind": "close", "reason": "trailing stop", "price": 1.406e-06, "peak_price": 0.0007997}
+{"id": "d678c915237e48dfbb2b946a180c98cb", "t": 1794863097.8670013, "pick_id": 250, "kind": "close", "reason": "stop loss", "price": 1.32e-06, "peak_price": 0.0002135}
+{"id": "7764ce5a58624201a219f7b965d11c7a", "t": 1794863097.8670013, "pick_id": 251, "kind": "close", "reason": "stop loss", "price": 1.32e-06, "peak_price": 0.0002135}
+{"id": "ab1a283daab24e77a5d533911591268f", "t": 1794863097.8670013, "pick_id": 252, "kind": "close", "reason": "stop loss", "price": 1.32e-06, "peak_price": 0.0002135}
+{"id": "f4108af51a93445bbcf3f4a2941c0270", "t": 1794924468.29918, "pick_id": 255, "kind": "close", "reason": "stop loss", "price": 8.897e-05, "peak_price": 0.000189}
+{"id": "b065593767aa4b779bcf1dddf9415769", "t": 1794945365.6603522, "pick_id": 253, "kind": "close", "reason": "stop loss", "price": 7.818e-05, "peak_price": 0.0002626}
+{"id": "a014cf5c36184b23aafc963e6c7ae2e3", "t": 1794945365.6603522, "pick_id": 254, "kind": "close", "reason": "stop loss", "price": 7.818e-05, "peak_price": 0.0002626}
+{"id": "42facc9fc47045c196703fe8684a9c9f", "t": 1794974726.1553638, "pick_id": 261, "kind": "close", "reason": "stop loss", "price": 5.127e-05, "peak_price": 0.0001127}
+{"id": "f547e1de10b6453bbb0806ca6f5569f5", "t": 1794978896.2473779, "pick_id": 256, "kind": "ladder", "level": 0, "price": 0.001163, "peak_price": 0.001163}
+{"id": "c19310daf4234786be4021363fbe522f", "t": 1794978896.2473779, "pick_id": 257, "kind": "ladder", "level": 0, "price": 0.001163, "peak_price": 0.001163}
+{"id": "e5f4d983df444f86a955acbe295e8546", "t": 1794995828.6491144, "pick_id": 256, "kind": "ladder", "level": 1, "price": 0.001494, "peak_price": 0.001494}
+{"id": "be0e11a02e3442a0acacad3438efa556", "t": 1794998843.7067323, "pick_id": 258, "kind": "ladder", "level": 0, "price": 0.001019, "peak_price": 0.001019}
+{"id": "21f5aef6ee264d8bb9ef85a10737a7b8", "t": 1794998843.7067323, "pick_id": 259, "kind": "ladder", "level": 0, "price": 0.001019, "peak_price": 0.001019}
+{"id": "7451db904d9746e8beb7be132a67bfb1", "t": 1794998843.7067323, "pick_id": 260, "kind": "ladder", "level": 0, "price": 0.001019, "peak_price": 0.001019}
+{"id": "9edffdf282a9459b9f6d8d1a7218266d", "t": 1795002353.773292, "pick_id": 256, "kind": "close", "reason": "trailing stop", "price": 0.001167, "peak_price": 0.001668}
+{"id": "71dbb0a85fc644319385c7778e0084b8", "t": 1795003988.8043654, "pick_id": 258, "kind": "ladder", "level": 1, "price": 0.001363, "peak_price": 0.001363}
+{"id": "0b747e2d2ccc4739a02b85f987474228", "t": 1795003988.8043654, "pick_id": 260, "kind": "ladder", "level": 1, "price": 0.001363, "peak_price": 0.001363}
+{"id": "803050eef979483bb9a12824851692b0", "t": 1795052569.3856921, "pick_id": 258, "kind": "ladder", "level": 2, "price": 0.00205, "peak_price": 0.00205}
+{"id": "7e1d8713deb14c51a2482dfe44592a2c", "t": 1795052569.3856921, "pick_id": 260, "kind": "ladder", "level": 2, "price": 0.00205, "peak_price": 0.00205}
+{"id": "2552799dbc6d4b39974d51e710ae326d", "t": 1795068104.7274415, "pick_id": 258, "kind": "close", "reason": "trailing stop", "price": 0.00148, "peak_price": 0.00229}
+{"id": "c58cba77ff734efaa2aebf238a22ae41", "t": 1795068104.7274415, "pick_id": 260, "kind": "close", "reason": "trailing stop", "price": 0.00148, "peak_price": 0.00229}
+{"id": "8af02d11f72d434da7f4340a8041ba72", "t": 1795079459.0969977, "pick_id": 259, "kind": "close", "reason": "trailing stop", "price": 0.000929, "peak_price": 0.001881}
+{"id": "30a15812e6f64de497414078ea306226", "t": 1795083025.6968114, "pick_id": 257, "kind": "close", "reason": "trailing stop", "price": 0.00157, "peak_price": 0.003303}
+{"id": "f739e6fcb1c44aedba5ef5aa08e2e369", "t": 1795092315.9380915, "pick_id": 264, "kind": "close", "reason": "stop loss", "price": 0.001297, "peak_price": 0.002229}
+{"id": "d488e539a14141d6b668d7963b02d549", "t": 1795095576.0215433, "pick_id": 262, "kind": "close", "reason": "stop loss", "price": 5.335e-05, "peak_price": 0.0002363}
+{"id": "5e5693137bc04f7c9723c5b33b7feb2c", "t": 1795095576.0215433, "pick_id": 263, "kind": "close", "reason": "stop loss", "price": 5.335e-05, "peak_price": 0.0002363}
+{"id": "6174838159844254a63353cfa27e3316", "t": 1795190811.0785549, "pick_id": 265, "kind": "close", "reason": "stop loss", "price": 7.428e-05, "peak_price": 0.0001788}
+{"id": "269909ea39fe4050a26fbb4ed690ecf2", "t": 1795190811.0785549, "pick_id": 266, "kind": "close", "reason": "stop loss", "price": 7.428e-05, "peak_price": 0.0001788}
+{"id": "f9c007bba0de47dc9454ffb24b2d5f31", "t": 1795262888.5122757, "pick_id": 268, "kind": "close", "reason": "stop loss", "price": 0.0001304, "peak_price": 0.0003225}
+{"id": "8cc134a207584c8fb5e59eea5c4a9981", "t": 1795262888.5122757, "pick_id": 269, "kind": "close", "reason": "stop loss", "price": 0.0001304, "peak_price": 0.0003225}
+{"id": "292c80efba5045e490aa883be88df985", "t": 1795262888.5122757, "pick_id": 270, "kind": "close", "reason": "stop loss", "price": 0.0001304, "peak_price": 0.0003225}
