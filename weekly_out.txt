@@ -1,0 +1,100 @@
+# Trencher weekly review, week ending 2026-11-16
+
+## 1. Headline
+Paper P&L is **−$169.57** on $6,300 staked (126 picks, 125 closed, 1 open). Win rate is 47%. Last week was **−$89**, so the green week of +$93 did not repeat. The weekly sequence is now −78 / +93 / −89. We are **not closer to real money**: P&L is negative, only 1 of the last 3 weeks was profitable, and the losses come from gap-down rugs that stops can't catch.
+
+## 2. Picks
+Picks from the past week (Nov 10–16) are in the table below. Earlier picks are summarized in the later sections. Checkpoints are the coin's price, not our position. Many trailing-stop wins show about 0.01× at every checkpoint, which is the price-feed quirk from the notebook, so treat those columns as unreliable.
+
+| Symbol | Chain | Score | 1h | 6h | 24h | 72h | P&L | Exit |
+|---|---|---|---|---|---|---|---|---|
+| NOBUSHIBA | sol | 83.9 | 1.19 | 1.19 | 10.5 | 0.01 | +36.26 | trailing stop |
+| AI | sol | 90.3 | 1.30 | 0.01 | 0.01 | 0.01 | +16.90 | trailing stop |
+| PEACEFROG | sol | 83.0 | 0.52 | 0.25 | 0.01 | n/a | −21.44 | stop loss |
+| SPEED | sol | 79.4 | 0.003 | 0.003 | 0.003 | n/a | −25.60 | stop loss |
+| SWIF | sol | 90.3 | 0.009 | 0.009 | 0.009 | n/a | −22.53 | stop loss |
+| ANT | sol | 80.6 | 0.004 | 0.005 | 0.005 | n/a | −49.75 | stop loss (gap-down) |
+| Neil | sol | 80.6 | 0.58 | 0.58 | n/a | n/a | −22.77 | stop loss |
+| VICEDORD | sol | 90.3 | n/a | n/a | n/a | n/a | −0.75 | open |
+
+Week total: about −$89 (2 wins, 5 stop-losses, 1 open). Four of the five stop-losses came in at 0.5× or lower at 1h, and SPEED, SWIF and ANT were already near 0.005×. Those coins were effectively dead on entry.
+
+## 3. Rule report card
+All rules below have n ≥ 20 except where noted.
+
+- **Too few holders** (n=2556): 62% rugged, 2% doubled. Working.
+- **Creator/owner holds X%** (n=1031): 84% rugged, 1% doubled. Strong.
+- **Owner can mint** (n=716): 83% rugged, 1% doubled. Strong.
+- **Owner can pause/blacklist** (n=660): 79% rugged, 1% doubled. Strong.
+- **LP locked below minimum** (n=650): 83% rugged, 14% doubled. Fine.
+- **Top 10 wallets hold X%** (n=382): 76% rugged, 14% doubled.
+- **Large LP unlocked** (n=308): 88% rugged, 22% doubled.
+- **Many linked wallets** (n=264): 64% rugged, 11% doubled.
+- **Paid boosts** (n=247): 61% rugged, 9% doubled. This is the loosest of the large rules, but still 6 rugs per winner.
+- **Contract not verified** (n=103): 65% rugged, 22% doubled. It is the only loosening candidate, but the evidence is thin and stays below the bar.
+- **Honeypot** (n=22): 36% doubled, but can't-sell risk. Don't loosen.
+- **Mint authority still enabled** (n=18) and **creator can mint** (n=15): only about 6–7% rugged, but n is under 20. Watch these.
+- **Sell tax** (n=9, 100% rug) and all rules with n<20: too small to judge.
+
+No rule has strong enough evidence to loosen. Rejects overall rugged 65% and doubled 5%, so the safety layer is protecting us. The leak is in what passes the filters.
+
+## 4. Scoring
+- **Buckets are non-monotonic.** 60–69 is the best bucket (rug 48%, doubled 19%). 80+ is the worst of the high buckets (rug 70%, doubled 12%). Higher score does not mean better outcomes.
+- **Stages:** picks rug at 70% and double at 21%. Passes rug at 59% and double at 15%. Picks have a *lower* median 24h than passes (0.02 vs 0.11), so that go-live check fails. This metric is distorted by post-exit moves and the feed quirk.
+- **Components:**
+  - **Holders** is strongly inverted (high rug 82% vs 48%, n≈910). Its weight is already at the 0.5 floor.
+  - **Survival** is the best separator (high rug 53% vs 68%).
+  - **Liquidity** (65% at max) and **buyer_breadth** (87% at max) can't tell coins apart. This is a threshold problem, not a code bug.
+  - **Social** is mildly negative (doubled 8% vs 13%).
+  - **Momentum** is mixed. High momentum doubles more (15% vs 10%) but rugs more (71% vs 57%).
+- **Claude vs chance** (since the control start, 64 closed each, so ≥20):
+
+| | Claude | Random |
+|---|---|---|
+| P&L | −$47.5 | −$190.1 |
+| Avg return | 0.985× | 0.941× |
+| Win % | 48 | 44 |
+| Reached first sale | 45% | 44% |
+| Stop-loss % | 42 | 44 |
+
+  Claude beats random by about $143. Most of that comes from a few outliers on the Claude side, and win rate and ladder rate are nearly identical. The edge has also shrunk: last week's note had Claude at +$41.5 and random at −$188.5, and Claude lost about $89 this week. **Claude is better than random but still unprofitable.** The value of the review is plausible, not proven.
+- **Exit rules test** (60 closed each): normal ladder −$52.7 vs alt exits −$122.2. The normal ladder clearly wins, so keep it.
+- **Entry signal, 5-min spike over 20%:**
+  - **1h down 40%:** 68% (n=68) vs 43% (n=686).
+  - **1h up 50%:** 4% vs 13%.
+  - **Median 24h:** 0.06 vs 0.08, essentially no difference.
+  - **Verdict:** it separates early crashes but not final outcomes. It is below the 40-per-side bar on the "yes" side, so I'm not recommending it as a block. A smaller stake on spike coins is a possible use.
+
+## 5. Exits
+Across 125 closed picks, actual exits averaged **0.973×**, against 0.76× for hold-24h and 0.572× for hold-72h. The exit rules are doing their job and I'm not touching them. The leakage is in two places:
+- Stop-losses at about −$22 each, which are 42% of picks.
+- Gap-downs at about −$48 each (ANT, LumiBot, ALIVE, DOPEUS, Pikachu, SW, SOLgiving). A watcher can't stop these.
+
+## 6. Go-live checklist
+| Check | Result |
+|---|---|
+| At least 30 closed picks | **Pass** (125) |
+| Total P&L positive | **Fail** (−$168.85) |
+| Win rate ≥ 35% | **Pass** (47%) |
+| Profitable in 2 of last 3 weeks | **Fail** (−78 / +93 / −89) |
+| Claude's picks beat its passes (median 24h) | **Fail** (0.02 vs 0.11) |
+
+Still missing:
+- A way to avoid gap-down rugs.
+- Evidence that the edge survives without 3 or 4 outlier winners.
+- A reliable checkpoint price source.
+
+## 7. Changes this week
+**No changes.**
+- **Survival weight (1.25):** 32 closed picks since the 10-26 change have a stop-loss share of about 41% and P&L of about −$54 (−$1.7/pick). Last week it looked like a pass; this week the picture is neutral to slightly negative. It is not over the 45% undo threshold and not under the 40% confirm target, so it stays inconclusive. Changing it now would break attribution.
+- **Holders weight:** it is already at the 0.5 floor.
+- **Social weight (0.75):** inconclusive.
+- **Stop, trail and no-move settings:** exits are the strongest part of the system.
+- **min_score:** buckets are non-monotonic, so a threshold move has no clear direction.
+- **Safety rules:** no evidence strong enough to loosen any of them.
+
+Paper trading only — not financial advice.
+
+```json
+{"changes": [], "notebook": "**Notebook (as of 2026-11-16; 125 closed, P&L -$169.6, win 47%)**\n\n**State:** Weekly P&L -78 / +93 / -89. The green week did not repeat; results are outlier-driven (KIMCHIBULL +103, QT +65, BTC +61). Exits remain the strongest part: actual avg 0.973x vs hold-24h 0.76x vs hold-72h 0.572x. Do NOT touch stop/trail/no-move. Main leakage: stop-losses (~-$22, ~42% of picks) and gap-down rugs (~-$48: ANT, LumiBot, ALIVE, DOPEUS, Pikachu, SW, SOLgiving). Last week 4 of 5 stop-losses were already <=0.5x at 1h (SPEED, SWIF, ANT near 0.005x), so early-dead coins are being entered.\n\n**Weights:** momentum 0.75, holders 0.5 (floor), social 0.75 (since 10-19), survival 1.25 (since 10-26). Survival test now INCONCLUSIVE: 32 closed picks since change, stop share ~41%, P&L ~-$54 (-$1.7/pick); last week looked like a pass, this week it slipped. Undo only if stop share >=45% over next ~20 picks; confirm if <40% and P&L/pick >0. Social: inconclusive, hold. One weight change per week max.\n\n**Scoring:** buckets non-monotonic; 60-69 best (rug 48%), 80+ worse (rug 70%). Holders strongly inverted (high rug 82% vs 48%), survival best separator. Buyer_breadth (87% at max) and liquidity (65%) are useless as scored; thresholds need tightening (owner). Social mildly negative.\n\n**Claude Stage 3:** control (n=64 each): Claude -$47.5 vs random -$190.1, win 48% vs 44%, stop 42% vs 44%. Better than random but edge shrank vs last week (+$41.5 vs -$188.5) and win/ladder rates are near identical; value plausible, not proven. Picks median 24h 0.02 vs passes 0.11 (go-live fails, metric noisy). Alt exits (n=60): normal -$52.7 vs alt -$122.2; keep normal ladder.\n\n**Entry signal (5-min spike >20%):** 1h down40 68% vs 43% (yes n=68), up50 4% vs 13%, median 24h same. Crashes early but no final-outcome difference; at most a stake-reducer, not a block.\n\n**Safety watchlist (no action):** contract not verified (rug 65%, doubled 22%, n=103) only loosening candidate; LP unlocked/top10 block 14-22% winners but 76-88% rug, don't loosen. Mint-authority/creator-can-mint rules show ~6% rug but n<20; watch.\n\n**Data quirk:** many trailing-stop wins show ~0.01x at all checkpoints; checkpoint feed unreliable for those.\n\n**Ideas for owner to build:**\n1. Early-rug filter: first-hour sell-pressure/liquidity-drop check before entry.\n2. Tighter buyer_breadth and liquidity thresholds.\n3. Smaller stake on thin-liquidity coins / spike coins (gap protection).\n4. Liquidity-depth per-coin loss cap.\n5. Fix checkpoint price source.\n6. Prompt tweak for Claude review: penalize coins already down >40% from peak at entry.\n\n**Next week:** survival verdict (~20 more picks), social verdict, Claude vs random ex-outlier, whether any week turns green, 80+ bucket underperformance."}
+```

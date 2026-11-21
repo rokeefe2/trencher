@@ -1,0 +1,195 @@
+{
+ "slots_left_today": 4,
+ "candidates": [
+  {
+   "chain": "solana",
+   "token": "3b7WvfRxRaoMuq4j6JWJzrL5mym3Km3QzfX5dqCopump",
+   "symbol": "Bigfoot",
+   "name": "Bigfoot",
+   "score": 88.8,
+   "score_parts": {
+    "momentum": 22,
+    "holders": 12,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 11,
+    "survival": 10
+   },
+   "age_h": 3.9,
+   "liquidity_usd": 36318,
+   "mcap_usd": 236510,
+   "price_usd": 0.0002353,
+   "safety": {
+    "top10_pct": 23.9,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 39,
+    "lp_locked_pct": 100.0,
+    "holders": 3647,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 5.68,
+    "buy_ratio_1h": 0.54,
+    "price_change": {
+     "m5": 10.423,
+     "m15": 28.481,
+     "m30": 15.962,
+     "h1": 72.948,
+     "h6": 722.76,
+     "h24": 722.76
+    },
+    "buyers_6h": 4546,
+    "liq_to_mcap": 0.154
+   },
+   "socials": {
+    "twitter": "https://x.com/TMZ/status/2124136628360716776"
+   },
+   "websites": [
+    "https://x.com/search?q=bigfoot&src=typed_query&f=top"
+   ],
+   "dexscreener": "https://dexscreener.com/solana/75gt1hbmhtljv4anizrjz2ojmsm6xesilok6255euxnu",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "BjnxH6a3D6HQz1LRPsGX5TZmW3GwstpexSNrK2utpump",
+   "symbol": "XV",
+   "name": "Tesla Super Inu",
+   "score": 82.1,
+   "score_parts": {
+    "momentum": 17,
+    "holders": 16,
+    "liquidity": 15,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 10
+   },
+   "age_h": 8.0,
+   "liquidity_usd": 31577,
+   "mcap_usd": 135051,
+   "price_usd": 0.000128,
+   "safety": {
+    "top10_pct": 16.9,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 4,
+    "lp_locked_pct": 100.0,
+    "holders": 3265,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 1.61,
+    "buy_ratio_1h": 0.52,
+    "price_change": {
+     "m5": 5.22,
+     "m15": 5.139,
+     "m30": 20.955,
+     "h1": 65.948,
+     "h6": -48.948,
+     "h24": 199.87
+    },
+    "buyers_6h": 1551,
+    "liq_to_mcap": 0.234
+   },
+   "socials": {
+    "twitter": "https://x.com/elonmusk/status/2124071338394399028?a=wcUsJ87ibQaGlWi0J7g&s=20"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/5bs5kjjztthfbmildem8sx2lt6zkntchxdcy6ccgjd9n",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "dkpuQdjegjU8zcwYrBzYrLW11wvtjwonBsQhjLApump",
+   "symbol": "RIEMANN",
+   "name": "Riemann Hypothesis",
+   "score": 72.4,
+   "score_parts": {
+    "momentum": 17,
+    "holders": 20,
+    "liquidity": 5,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 10
+   },
+   "age_h": 13.7,
+   "liquidity_usd": 78725,
+   "mcap_usd": 1182704,
+   "price_usd": 0.001196,
+   "safety": {
+    "top10_pct": 4.0,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 0,
+    "lp_locked_pct": 100.0,
+    "holders": 3480,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 2.72,
+    "buy_ratio_1h": 0.51,
+    "price_change": {
+     "m5": -1.83,
+     "h1": 37.31,
+     "h6": 227.0,
+     "h24": 1325.0
+    },
+    "buyers_6h": 2006,
+    "liq_to_mcap": 0.067
+   },
+   "socials": {
+    "twitter": "https://x.com/sciam/status/2123782587235655707"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/aj5lteuxkptmc6shqg8acvddepgraipupe44s8tamws",
+   "paid_boosts": 0
+  },
+  {
+   "chain": "solana",
+   "token": "Jd3NCawdFiDNWpLiTtsMqoeoBMjC1ZQMrMScRVzpump",
+   "symbol": "NOHR",
+   "name": "NO HUMAN",
+   "score": 68.2,
+   "score_parts": {
+    "momentum": 19,
+    "holders": 20,
+    "liquidity": 5,
+    "buyer_breadth": 15,
+    "social": 6,
+    "survival": 6
+   },
+   "age_h": 2.3,
+   "liquidity_usd": 95051,
+   "mcap_usd": 1719006,
+   "price_usd": 0.001734,
+   "safety": {
+    "top10_pct": 6.8,
+    "creator_pct": 0.0,
+    "insider_pct": 0,
+    "linked_wallets": 0,
+    "lp_locked_pct": 100.0,
+    "holders": 2391,
+    "rugcheck_score": 1
+   },
+   "metrics": {
+    "turnover_1h": 0.86,
+    "buy_ratio_1h": 0.59,
+    "price_change": {
+     "m5": 5.1,
+     "h1": 6.4,
+     "h6": 1571.0,
+     "h24": 1571.0
+    },
+    "buyers_6h": 4483,
+    "liq_to_mcap": 0.055
+   },
+   "socials": {
+    "twitter": "https://x.com/nohrfun"
+   },
+   "websites": [],
+   "dexscreener": "https://dexscreener.com/solana/fbqxu5ezpbbv4vktfd83qperygcotcvqzrtabsxhqs2m",
+   "paid_boosts": 0
+  }
+ ]
+}

@@ -1,0 +1,510 @@
+{
+ "generated_at": 1795283210.8235333,
+ "tracked": 3020,
+ "with_24h_outcome": 2981,
+ "safety_rules": [
+  {
+   "rule": "too few holders",
+   "n": 1623,
+   "median_24h": 0.0,
+   "rug_pct": 57,
+   "doubled_pct": 2,
+   "up50_pct": 3
+  },
+  {
+   "rule": "creator/owner holds X%",
+   "n": 615,
+   "median_24h": 0.0,
+   "rug_pct": 80,
+   "doubled_pct": 1,
+   "up50_pct": 1
+  },
+  {
+   "rule": "owner can pause or blacklist sellers",
+   "n": 559,
+   "median_24h": 0.0,
+   "rug_pct": 80,
+   "doubled_pct": 1,
+   "up50_pct": 1
+  },
+  {
+   "rule": "only X% of liquidity locked/burned",
+   "n": 429,
+   "median_24h": 0.0,
+   "rug_pct": 80,
+   "doubled_pct": 14,
+   "up50_pct": 18
+  },
+  {
+   "rule": "owner can mint new coins",
+   "n": 310,
+   "median_24h": 0.0,
+   "rug_pct": 82,
+   "doubled_pct": 1,
+   "up50_pct": 2
+  },
+  {
+   "rule": "top 10 wallets hold X%",
+   "n": 254,
+   "median_24h": 0.31,
+   "rug_pct": 72,
+   "doubled_pct": 16,
+   "up50_pct": 20
+  },
+  {
+   "rule": "has paid DexScreener boosts",
+   "n": 246,
+   "median_24h": 0.04,
+   "rug_pct": 59,
+   "doubled_pct": 9,
+   "up50_pct": 19
+  },
+  {
+   "rule": "many linked wallets",
+   "n": 231,
+   "median_24h": 0.19,
+   "rug_pct": 60,
+   "doubled_pct": 11,
+   "up50_pct": 18
+  },
+  {
+   "rule": "Large Amount of LP Unlocked",
+   "n": 202,
+   "median_24h": 0.32,
+   "rug_pct": 85,
+   "doubled_pct": 24,
+   "up50_pct": 29
+  },
+  {
+   "rule": "contract not verified",
+   "n": 82,
+   "median_24h": 0.0,
+   "rug_pct": 72,
+   "doubled_pct": 17,
+   "up50_pct": 18
+  },
+  {
+   "rule": "Single holder ownership",
+   "n": 71,
+   "median_24h": 0.01,
+   "rug_pct": 70,
+   "doubled_pct": 13,
+   "up50_pct": 13
+  },
+  {
+   "rule": "Low Liquidity",
+   "n": 71,
+   "median_24h": 0.01,
+   "rug_pct": 68,
+   "doubled_pct": 7,
+   "up50_pct": 7
+  },
+  {
+   "rule": "Top 10 holders high ownership",
+   "n": 53,
+   "median_24h": 0.16,
+   "rug_pct": 60,
+   "doubled_pct": 9,
+   "up50_pct": 11
+  },
+  {
+   "rule": "rugcheck unavailable",
+   "n": 48,
+   "median_24h": 0.03,
+   "rug_pct": 83,
+   "doubled_pct": 17,
+   "up50_pct": 19
+  },
+  {
+   "rule": "High ownership",
+   "n": 41,
+   "median_24h": 0.0,
+   "rug_pct": 68,
+   "doubled_pct": 10,
+   "up50_pct": 10
+  },
+  {
+   "rule": "creator holds X%",
+   "n": 38,
+   "median_24h": 0.02,
+   "rug_pct": 79,
+   "doubled_pct": 21,
+   "up50_pct": 24
+  },
+  {
+   "rule": "Mint Authority still enabled",
+   "n": 17,
+   "median_24h": 0.97,
+   "rug_pct": 6,
+   "doubled_pct": 12,
+   "up50_pct": 12
+  },
+  {
+   "rule": "Creator history of rugged tokens",
+   "n": 16,
+   "median_24h": 0.05,
+   "rug_pct": 69,
+   "doubled_pct": 6,
+   "up50_pct": 6
+  },
+  {
+   "rule": "honeypot (can't sell)",
+   "n": 16,
+   "median_24h": 0.0,
+   "rug_pct": 62,
+   "doubled_pct": 38,
+   "up50_pct": 38
+  },
+  {
+   "rule": "creator can still mint new coins",
+   "n": 14,
+   "median_24h": 0.97,
+   "rug_pct": 7,
+   "doubled_pct": 14,
+   "up50_pct": 14
+  },
+  {
+   "rule": "sell tax X%",
+   "n": 9,
+   "median_24h": 0.0,
+   "rug_pct": 100,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  },
+  {
+   "rule": "Freeze Authority still enabled",
+   "n": 6,
+   "median_24h": 1.0,
+   "rug_pct": 17,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  },
+  {
+   "rule": "creator can freeze wallets",
+   "n": 5,
+   "median_24h": 0.97,
+   "rug_pct": 20,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  },
+  {
+   "rule": "Permanent Control Enabled",
+   "n": 4,
+   "median_24h": 0.97,
+   "rug_pct": 0,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  },
+  {
+   "rule": "Missing metadata",
+   "n": 2,
+   "median_24h": 0.03,
+   "rug_pct": 100,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  },
+  {
+   "rule": "owner can change taxes",
+   "n": 1,
+   "median_24h": 0.0,
+   "rug_pct": 100,
+   "doubled_pct": 0,
+   "up50_pct": 0
+  }
+ ],
+ "by_stage": {
+  "reject": {
+   "n": 2389,
+   "median_24h": 0.02,
+   "rug_pct": 60,
+   "doubled_pct": 5,
+   "up50_pct": 8
+  },
+  "low_score": {
+   "n": 125,
+   "median_24h": 0.0,
+   "rug_pct": 65,
+   "doubled_pct": 6,
+   "up50_pct": 15
+  },
+  "scored": {
+   "n": 38,
+   "median_24h": 0.08,
+   "rug_pct": 63,
+   "doubled_pct": 11,
+   "up50_pct": 13
+  },
+  "pass": {
+   "n": 376,
+   "median_24h": 0.12,
+   "rug_pct": 57,
+   "doubled_pct": 16,
+   "up50_pct": 21
+  },
+  "pick": {
+   "n": 53,
+   "median_24h": 0.02,
+   "rug_pct": 66,
+   "doubled_pct": 21,
+   "up50_pct": 25
+  }
+ },
+ "score_buckets": {
+  "<50": {
+   "n": 70,
+   "median_24h": 0.0,
+   "rug_pct": 66,
+   "doubled_pct": 6,
+   "up50_pct": 19
+  },
+  "50-59": {
+   "n": 62,
+   "median_24h": 0.0,
+   "rug_pct": 56,
+   "doubled_pct": 5,
+   "up50_pct": 11
+  },
+  "60-69": {
+   "n": 94,
+   "median_24h": 0.21,
+   "rug_pct": 49,
+   "doubled_pct": 18,
+   "up50_pct": 23
+  },
+  "70-79": {
+   "n": 227,
+   "median_24h": 0.12,
+   "rug_pct": 57,
+   "doubled_pct": 15,
+   "up50_pct": 22
+  },
+  "80+": {
+   "n": 298,
+   "median_24h": 0.03,
+   "rug_pct": 69,
+   "doubled_pct": 12,
+   "up50_pct": 19
+  }
+ },
+ "score_components": {
+  "momentum": {
+   "high": {
+    "n": 370,
+    "median_24h": 0.03,
+    "rug_pct": 69,
+    "doubled_pct": 15,
+    "up50_pct": 23
+   },
+   "low": {
+    "n": 381,
+    "median_24h": 0.12,
+    "rug_pct": 54,
+    "doubled_pct": 10,
+    "up50_pct": 17
+   },
+   "split_at": 15,
+   "split": "above 15 vs 15 or less",
+   "at_max_pct": 10
+  },
+  "holders": {
+   "high": {
+    "n": 364,
+    "median_24h": 0.01,
+    "rug_pct": 80,
+    "doubled_pct": 9,
+    "up50_pct": 18
+   },
+   "low": {
+    "n": 387,
+    "median_24h": 0.25,
+    "rug_pct": 44,
+    "doubled_pct": 16,
+    "up50_pct": 22
+   },
+   "split_at": 16,
+   "split": "above 16 vs 16 or less",
+   "at_max_pct": 46
+  },
+  "liquidity": {
+   "high": {
+    "n": 469,
+    "median_24h": 0.17,
+    "rug_pct": 53,
+    "doubled_pct": 13,
+    "up50_pct": 19
+   },
+   "low": {
+    "n": 282,
+    "median_24h": 0.0,
+    "rug_pct": 75,
+    "doubled_pct": 11,
+    "up50_pct": 21
+   },
+   "split_at": 15,
+   "split": "full marks (15) vs less",
+   "at_max_pct": 62
+  },
+  "buyer_breadth": {
+   "high": {
+    "n": 644,
+    "median_24h": 0.06,
+    "rug_pct": 63,
+    "doubled_pct": 13,
+    "up50_pct": 20
+   },
+   "low": {
+    "n": 107,
+    "median_24h": 0.03,
+    "rug_pct": 52,
+    "doubled_pct": 8,
+    "up50_pct": 16
+   },
+   "split_at": 15,
+   "split": "full marks (15) vs less",
+   "at_max_pct": 86
+  },
+  "social": {
+   "high": {
+    "n": 79,
+    "median_24h": 0.01,
+    "rug_pct": 63,
+    "doubled_pct": 9,
+    "up50_pct": 16
+   },
+   "low": {
+    "n": 672,
+    "median_24h": 0.07,
+    "rug_pct": 61,
+    "doubled_pct": 13,
+    "up50_pct": 20
+   },
+   "split_at": 11,
+   "split": "above 11 vs 11 or less",
+   "at_max_pct": 11
+  },
+  "survival": {
+   "high": {
+    "n": 294,
+    "median_24h": 0.12,
+    "rug_pct": 54,
+    "doubled_pct": 11,
+    "up50_pct": 19
+   },
+   "low": {
+    "n": 457,
+    "median_24h": 0.04,
+    "rug_pct": 66,
+    "doubled_pct": 14,
+    "up50_pct": 20
+   },
+   "split_at": 6,
+   "split": "above 6 vs 6 or less",
+   "at_max_pct": 40
+  }
+ },
+ "entry_signals": [
+  {
+   "signal": "5-min spike over 20%",
+   "yes": {
+    "n": 48,
+    "median_24h": 0.03,
+    "rug_pct": 83,
+    "doubled_pct": 8,
+    "up50_pct": 10,
+    "n_1h": 48,
+    "down40_1h_pct": 75,
+    "up50_1h_pct": 4
+   },
+   "no": {
+    "n": 568,
+    "median_24h": 0.09,
+    "rug_pct": 60,
+    "doubled_pct": 15,
+    "up50_pct": 22,
+    "n_1h": 576,
+    "down40_1h_pct": 44,
+    "up50_1h_pct": 12
+   }
+  }
+ ],
+ "exits": {
+  "n": 132,
+  "actual_avg_x": 0.961,
+  "hold_24h_avg_x": 0.763,
+  "hold_72h_avg_x": 0.561
+ },
+ "go_live": [
+  {
+   "check": "At least 30 closed paper picks",
+   "ok": true,
+   "value": 132
+  },
+  {
+   "check": "Total paper P&L positive (after fees and slippage)",
+   "ok": false,
+   "value": -258.21
+  },
+  {
+   "check": "Win rate at least 35%",
+   "ok": true,
+   "value": "46%"
+  },
+  {
+   "check": "Profitable in 2 of the last 3 weeks",
+   "ok": false,
+   "value": "+93 / -89 / -89"
+  },
+  {
+   "check": "Claude's picks beat its passes (median 24h)",
+   "ok": false,
+   "value": "0.02 vs 0.12"
+  }
+ ],
+ "control": {
+  "since": 1791827345.3425252,
+  "claude": {
+   "picks": 71,
+   "open": 0,
+   "closed": 71,
+   "pnl": -136.83,
+   "avg_x": 0.961,
+   "win_pct": 46,
+   "reached_first_sale_pct": 44,
+   "stop_loss_pct": 45
+  },
+  "random": {
+   "picks": 71,
+   "open": 0,
+   "closed": 71,
+   "pnl": -305.39,
+   "avg_x": 0.914,
+   "win_pct": 41,
+   "reached_first_sale_pct": 41,
+   "stop_loss_pct": 48
+  }
+ },
+ "alt_exits": {
+  "since": 1791904814.1554394,
+  "claude": {
+   "picks": 67,
+   "open": 0,
+   "closed": 67,
+   "pnl": -142.02,
+   "avg_x": 0.958,
+   "win_pct": 45,
+   "reached_first_sale_pct": 42,
+   "stop_loss_pct": 46
+  },
+  "alt": {
+   "picks": 67,
+   "open": 0,
+   "closed": 67,
+   "pnl": -242.91,
+   "avg_x": 0.927,
+   "win_pct": 45,
+   "reached_first_sale_pct": 42,
+   "stop_loss_pct": 46
+  },
+  "name": "sell 80% at 1.5x, ride 20% with a 50% trailing stop (never below break-even), cash out at 10x"
+ }
+}

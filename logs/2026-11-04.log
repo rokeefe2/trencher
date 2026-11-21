@@ -1,0 +1,85 @@
+09:29:47 CLOSE SA: no move in 12h
+09:29:47 CLOSE SA: no move in 12h
+09:29:47 CLOSE None: no price (pool gone)
+09:30:30 solana: 19 pools in window, 12 not seen in 24h
+09:32:21 base: 18 pools in window, 17 not seen in 24h
+09:32:34 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0bddfa9a0a1eb326593262c7af47ee091db9cb70&chainID=8453: HTTP Error 404: Not Found
+09:32:45 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x138EB5Ff3C79d608B48f38Cf2C7fB7Ceb451aC33&chainID=8453: HTTP Error 404: Not Found
+09:32:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2D30056F5CF821825bB3b9fB4Dc555DBef670d67&chainID=8453: HTTP Error 404: Not Found
+09:33:10 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2e9D8BdDE9D6503FA37f282cA07b4b9AB86fF161&chainID=8453: HTTP Error 404: Not Found
+09:33:23 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x769034610970c9dcFBCA63D23009CDf5E316b328&chainID=8453: HTTP Error 404: Not Found
+09:33:36 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7aAe17C7901a11076ea21474e18B446693a1F924&chainID=8453: HTTP Error 404: Not Found
+09:33:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7b662B18F168a5B98CD3Dc4907610fe719e56749&chainID=8453: HTTP Error 404: Not Found
+09:34:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x883c57e49906aAFEE4B9C0ce59E3696F70F6C3F7&chainID=8453: HTTP Error 404: Not Found
+09:34:12 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x9E2b949e6bFE502c6F9f262e482111F1590F2Be1&chainID=8453: HTTP Error 404: Not Found
+09:34:23 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xa186288D115448eb7A2C6891f68D5E11950F9e76&chainID=8453: HTTP Error 404: Not Found
+09:34:35 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xAfFF39EbA60Cfb0181fDf8C6a2Fc1dcF8bA1220c&chainID=8453: HTTP Error 404: Not Found
+09:34:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xB8A0cA241571BAB87bDF9EBe85F48F9a89D2B174&chainID=8453: HTTP Error 404: Not Found
+09:35:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xCa87d6B7c246987E5bA30545DEF37c77a55428ea&chainID=8453: HTTP Error 404: Not Found
+09:35:14 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd9e63dF3D8e13B0dABAe8a03a7Cf818355Db2728&chainID=8453: HTTP Error 404: Not Found
+09:35:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe56ABd659C54d1C2999bbFf80b5Bf05CFE736397&chainID=8453: HTTP Error 404: Not Found
+09:35:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xee66D074AC93051965C0BCB033F3353e15531adB&chainID=8453: HTTP Error 404: Not Found
+09:35:38 scan done: 6 scored >= 60, 4 pick slots left, sending 4 to review
+09:35:58 PICK AMD 5tdWkbqhTqVyPmksqX8WVKrHbjjqmvQfrMGwZoZPpump @ 0.000848
+09:35:58 CONTROL (random) AIB EwHV6XfuMmBirGSiDVSypVkHcw7jD7Mho1s5xGwjpump @ 7.809e-05
+14:46:22 CLOSE AIB: stop loss
+14:47:37 solana: 18 pools in window, 10 not seen in 24h
+14:49:27 base: 35 pools in window, 33 not seen in 24h
+14:49:38 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe125872d91a5a67704fa782aa74014adff7cae7e&chainID=8453: HTTP Error 404: Not Found
+14:49:49 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x10f4CBc84E468f885bdd4f849E6445038D8e3309&chainID=8453: HTTP Error 404: Not Found
+14:50:00 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x1261072E70D69f046a9cac76308d85f5931F343e&chainID=8453: HTTP Error 404: Not Found
+14:50:11 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x12827D853315727c5eCAF1c8CacE37C415f18b07&chainID=8453: HTTP Error 404: Not Found
+14:50:22 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x16a3EA0D22E3eb516787Ea276E6930Db373B1B55&chainID=8453: HTTP Error 404: Not Found
+14:50:32 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x18BcEC45d414e886d62c8712dB08d4aEfAFEac78&chainID=8453: HTTP Error 404: Not Found
+14:50:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x290a6f151594dc002599e5B0Fe66E33d3f643471&chainID=8453: HTTP Error 404: Not Found
+14:50:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2B2CC7CB7686Cb84901CB588F94Ba882f34e30B2&chainID=8453: HTTP Error 404: Not Found
+14:51:05 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x32245D459eCA8003B5DA80B3cf9f8cbB279eBBF5&chainID=8453: HTTP Error 404: Not Found
+14:51:18 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3D992e2B6894a4Cc0EE43637e2d7367A16Db1B07&chainID=8453: HTTP Error 404: Not Found
+14:51:29 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3fC7522175104371c07DeC2459f3FbD7CC760C35&chainID=8453: HTTP Error 404: Not Found
+14:51:40 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x465d2505C7cFC467A719cdB2A286581D73a6f9e9&chainID=8453: HTTP Error 404: Not Found
+14:51:51 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x47ac75c9CF5609D8dB8a2DAF0419035650cba79B&chainID=8453: HTTP Error 404: Not Found
+14:52:02 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6A5cb115A026C1e4F87a0Cf9f97DD09A7F45Eb07&chainID=8453: HTTP Error 404: Not Found
+14:52:13 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x6F18277E5566090Ad8Ab35e401ce9155739BFb07&chainID=8453: HTTP Error 404: Not Found
+14:52:24 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x70794Bf30c1Fec8173A687F0137710b56c201e1D&chainID=8453: HTTP Error 404: Not Found
+14:52:35 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7DaBA0e3800e87039C3245A39E6Ef02Dca82Bb07&chainID=8453: HTTP Error 404: Not Found
+14:52:46 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xaC768415cfDc57BfE1Bed859C61e840525ac8b07&chainID=8453: HTTP Error 404: Not Found
+14:52:57 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xaeb51b6165D8b6f1C2714867E817e3FEB1414B07&chainID=8453: HTTP Error 404: Not Found
+14:53:08 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xB8A366417FFe2d94AF37753f01870923F16B7B07&chainID=8453: HTTP Error 404: Not Found
+14:53:19 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xb8bFa92c1C92896b9Ea328EBF37Ee0F1de2d1D9b&chainID=8453: HTTP Error 404: Not Found
+14:53:30 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xbb3293a3EFad38367786f38391A058b8064D0f72&chainID=8453: HTTP Error 404: Not Found
+14:53:41 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xBE2871c93aF49B39956ca4Ee7C009E9319e656e6&chainID=8453: HTTP Error 404: Not Found
+14:53:52 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xC8209809131c35a5d15fE6c157089DE943783C58&chainID=8453: HTTP Error 404: Not Found
+14:54:03 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xcDb4F0511E6D4709ca18a6D2632242De7ac32078&chainID=8453: HTTP Error 404: Not Found
+14:54:14 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xdBD559BdBB16a2C0E57710b6729D28AA57f8bF2e&chainID=8453: HTTP Error 404: Not Found
+14:54:25 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xE4176F02127B8C929Ac0ccD66e24663a48aE78eA&chainID=8453: HTTP Error 404: Not Found
+14:54:36 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xe828D33A66e079053310120954cf1ceb6069f319&chainID=8453: HTTP Error 404: Not Found
+14:54:47 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xea96e4F175933E0c8398bB1fF3C84A94Dbb9C87C&chainID=8453: HTTP Error 404: Not Found
+14:54:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf30174e92Db558C2e6ac8932977d4528B69cE328&chainID=8453: HTTP Error 404: Not Found
+14:55:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xf378f20EDE5695067a3e2604d4b4b4742248C86a&chainID=8453: HTTP Error 404: Not Found
+14:55:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xFb2e9873A08438aF773eD3fd76a6f98DEF7172D9&chainID=8453: HTTP Error 404: Not Found
+14:55:21 scan done: 1 scored >= 60, 4 pick slots left, sending 1 to review
+18:56:49 CLOSE AMD: stop loss
+18:56:49 CLOSE AMD: stop loss
+18:57:32 solana: 20 pools in window, 9 not seen in 24h
+18:59:48 base: 24 pools in window, 21 not seen in 24h
+18:59:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x0A3c8aFA32831E8fF94491c099Bb56c12D617355&chainID=8453: HTTP Error 404: Not Found
+19:00:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x134BA967D5973baaFCD5aBBf459B91efF34e0B07&chainID=8453: HTTP Error 404: Not Found
+19:00:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x16357eCb7c526019ec78B8D18E542b5769Ff0Ea4&chainID=8453: HTTP Error 404: Not Found
+19:00:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x19219a491125333a23cA65792850fdD1d57CaFD6&chainID=8453: HTTP Error 404: Not Found
+19:00:43 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x28Bc94E7B3807C0342D28919CccAFF586E818A9f&chainID=8453: HTTP Error 404: Not Found
+19:00:54 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x28c4C895495af8D85B7fB80604876a31e2BC37b8&chainID=8453: HTTP Error 404: Not Found
+19:01:04 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2F9ABfC7C0a3Ff644BAF3dF18A17983082B0Fa8f&chainID=8453: HTTP Error 404: Not Found
+19:01:15 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x2fA5Aec3a3563a6017312B2d8DD7Ef1df431471b&chainID=8453: HTTP Error 404: Not Found
+19:01:26 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x334c7ACabA4Dd9895e09090434e5Cf27eBD0e0c8&chainID=8453: HTTP Error 404: Not Found
+19:01:37 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3463D31A0F43bdeD731e24EDD98c014eaa49d7f4&chainID=8453: HTTP Error 404: Not Found
+19:01:48 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x3DD6C1294Bf1DDfa4BbAAAD96676d3525e38ebA3&chainID=8453: HTTP Error 404: Not Found
+19:01:58 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x52678E896db9283d35B832e50d5E2C9F9af6e39D&chainID=8453: HTTP Error 404: Not Found
+19:02:09 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x75225a5BBD878fbFe3e0056Af387803181C707C6&chainID=8453: HTTP Error 404: Not Found
+19:02:20 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x7a55899D818C474808b322f333Ab7f3347B9D120&chainID=8453: HTTP Error 404: Not Found
+19:02:31 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0x9F0750c0db5253f3F536371d2E9fcf8a09ef9903&chainID=8453: HTTP Error 404: Not Found
+19:02:41 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd04E9Ab24BDDCECF1BfB27f7D1f705782BC7Dd02&chainID=8453: HTTP Error 404: Not Found
+19:02:52 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd1434C3fFEE621C47E0B883F0DEEbC0cA24b6f33&chainID=8453: HTTP Error 404: Not Found
+19:03:03 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xd5ff297EADD7c5838c815b89205597fCe9d6c8cC&chainID=8453: HTTP Error 404: Not Found
+19:03:14 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xF34095D45Bf5dd3c8D8F019b6f46039608741Fe7&chainID=8453: HTTP Error 404: Not Found
+19:03:24 GET failed https://api.honeypot.is/v2/IsHoneypot?address=0xF522e3630A4919575A2165D35cD6Ce9131C8B153&chainID=8453: HTTP Error 404: Not Found
+19:03:25 scan done: 3 scored >= 60, 4 pick slots left, sending 3 to review

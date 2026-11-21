@@ -1,0 +1,15 @@
+I'm passing on all four. The track record is 46% wins and net negative, and each candidate has a clear weakness.
+
+- **Bigfoot:** 39 linked wallets is a serious coordination flag. It is up 723% in 6h on turnover of 5.7x, which looks like churn rather than steady buying. The buy ratio is only 0.54.
+- **Tesla Super Inu:** Price is down 49% over 6h, and the +66% in the last hour looks like a dead-cat bounce. It also reads as a copycat theme.
+- **Riemann Hypothesis:** It is up 1325% in 24h, so the move is already late. Liquidity is only 6.7% of market cap, below the ~8% floor, and the buy ratio is 0.51 with the last 5 minutes negative.
+- **NO HUMAN:** It is up 1571% in 2.3h and has now stalled, with only +6% in the last hour. Liquidity is 5.5% of a $1.7M market cap, so the room to run is thin and exit liquidity is poor.
+
+```json
+{"verdicts": [
+{"token": "3b7WvfRxRaoMuq4j6JWJzrL5mym3Km3QzfX5dqCopump", "verdict": "PASS", "reason": "39 linked wallets plus a 723% 6h run on extreme turnover and a 0.54 buy ratio looks coordinated and late."},
+{"token": "BjnxH6a3D6HQz1LRPsGX5TZmW3GwstpexSNrK2utpump", "verdict": "PASS", "reason": "Down 49% over 6h with a 1h bounce that looks like a dead-cat; copycat theme and weak buy ratio."},
+{"token": "dkpuQdjegjU8zcwYrBzYrLW11wvtjwonBsQhjLApump", "verdict": "PASS", "reason": "Already up 1325% in 24h with liquidity at 6.7% of mcap and a 0.51 buy ratio; late entry with a thin exit."},
+{"token": "Jd3NCawdFiDNWpLiTtsMqoeoBMjC1ZQMrMScRVzpump", "verdict": "PASS", "reason": "Up 1571% in 2.3h and now stalling, with liquidity only 5.5% of a $1.7M mcap; little room to run and a hard exit."}
+]}
+```
