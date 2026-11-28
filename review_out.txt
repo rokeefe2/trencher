@@ -1,0 +1,9 @@
+I'm passing on both candidates, so there are no PICKs today.
+
+**WLFI (Solana):** The momentum has stalled. The 1h change is only +0.5% after a +1,035% 24h run, and the 1h buy ratio is 0.53, below the 0.55 bar. It also shows 22 linked wallets, which is a yellow flag even though it passed the hard filter. The only social is a single tweet, and there's no website. The theme is a shock-value joke name, not a narrative with real attention. The mcap and distribution look fine, but the entry would be after the pump and on weak buying. The paper-trading record is also poor (46% win rate, net negative), which argues for being stricter.
+
+**ANT / USDC 0.01% (Base):** This looks like a liquidity pool, not a meme token. The "name" is a pool label, there's no symbol or socials, and liquidity is about 100% of mcap, which isn't a normal meme-coin profile. The data is unreliable. LP isn't locked, the pool is only 1.3h old, the buy ratio is 0.50, and Base buyer counts are transaction counts, so the 205 buyers overstate real breadth. I can't defend it as a calculated bet.
+
+```json
+{"verdicts": [{"token": "HmGQsYJyeiWrV6jABUY2Cb3bEmVxwk6LzVxCchsCpump", "verdict": "PASS", "reason": "Momentum has stalled after a +1035% 24h run (1h +0.5%, buy ratio 0.53). It has 22 linked wallets, thin socials and a shock-joke theme, so the entry would be late."}, {"token": "0x220de2bcd25b5565bef8a51d56b1c80375a19489", "verdict": "PASS", "reason": "This looks like a USDC liquidity pool, not a meme token. LP is unlocked, it's only 1.3h old on Base, the buy ratio is 0.50, and there are no socials or story."}]}
+```
